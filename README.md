@@ -50,7 +50,7 @@ enjoyhint_instance.runScript();
 Script Configuration
 =========
 
-steps can be only linear for now. So script config is an array. Every element of this array is the config for some step.
+All the steps can be only linear for now. So script config is an array. Every element of this array is the config for some step.
 
 Example. 
 Highlight some btn and then after click on it highlight some panel :
