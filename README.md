@@ -71,7 +71,7 @@ var enjoyhint_script_steps = [
 ```
 
 
-Properties of the step config:
+Properties of the step config:  
 **selector** - jquery selector of DOM-element, that will be highlighted  
 **event** - jquery event name. It fires for element that set in "selector" property  
 **key_code** - Key code for any "key*" event. Event fires only if keyCode of pressed key is equal to this property.    
