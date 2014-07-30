@@ -13,14 +13,15 @@ EnjoyHint require next plugins and libs:
 Installation
 =========
 1. Download latest version of enjoyhint
-2. Extract archive with enjoyhint to the any path on your server.
-3. Include next files to your HEAD tag:
+2. Extract archive with enjoyhint.
+3. Move the enjoyhint directory to somewhere on your webserver
+4. Include next lines to your HEAD tag:
 ```
-  <link href="pathontheserver/enjoyhint/jquery.enjoyhint.css" rel="stylesheet">
+  <link href="<pathontheserver>/enjoyhint/jquery.enjoyhint.css" rel="stylesheet">
   
-  <script src="pathontheserver/enjoyhint/jquery.enjoyhint.js"></script>
-  <script src="pathontheserver/enjoyhint/kinetic.min.js"></script>
-  <script src="pathontheserver/enjoyhint/enjoyhint.js"></script>
+  <script src="<pathontheserver>/enjoyhint/jquery.enjoyhint.js"></script>
+  <script src="<pathontheserver>/enjoyhint/kinetic.min.js"></script>
+  <script src="<pathontheserver>/enjoyhint/enjoyhint.js"></script>
 ```
 
 Initialization and configuration:
