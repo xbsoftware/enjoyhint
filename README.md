@@ -15,7 +15,7 @@ Installation
 1. Download latest version of enjoyhint
 2. Extract archive with enjoyhint.
 3. Move the enjoyhint directory to somewhere on your webserver
-4. insert next lines into your page's head tag:
+4. Insert next lines into your page's head tag:
 ```
   <link href="<pathontheserver>/enjoyhint/jquery.enjoyhint.css" rel="stylesheet">
   
