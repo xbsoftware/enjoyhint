@@ -1,7 +1,7 @@
 About
 =========
 
-EnjoyHint is a simplest way to create interactive tutorials and hints for your site or web-application. Also It can be used for highlighting and signing application elements. 
+**EnjoyHint** is a simplest way to create interactive tutorials and hints for your site or web-application. Also it can be used for highlighting and signing application elements. 
 
 Dependencies
 =========
