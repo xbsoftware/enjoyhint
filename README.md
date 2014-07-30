@@ -6,8 +6,9 @@ About
 Dependencies
 =========
 EnjoyHint require next plugins and libs:
-1. Jquery >1.7
-2. kineticJS v5.1.0(included in the pack)
+
+  1. Jquery >1.7
+  2. kineticJS v5.1.0(included in the pack)
 
 Installation
 =========
