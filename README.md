@@ -8,7 +8,7 @@ Dependencies
 EnjoyHint require next plugins and libs:
 
   1. Jquery >1.7
-  2. kineticJS v5.1.0(included in the pack)
+  2. kineticJS v5.1.0(included into js file)
 
 Installation
 =========
@@ -17,11 +17,9 @@ Installation
 3. Move the enjoyhint directory to somewhere on your webserver
 4. Insert next lines into your page's head tag:
 ```
-  <link href="<pathontheserver>/enjoyhint/jquery.enjoyhint.css" rel="stylesheet">
+  <link href="<pathontheserver>/enjoyhint/enjoyhint.css" rel="stylesheet">
   
-  <script src="<pathontheserver>/enjoyhint/jquery.enjoyhint.js"></script>
-  <script src="<pathontheserver>/enjoyhint/kinetic.min.js"></script>
-  <script src="<pathontheserver>/enjoyhint/enjoyhint.js"></script>
+  <script src="<pathontheserver>/enjoyhint/enjoyhint.min.js"></script>
 ```
 
 Initialization and configuration:
