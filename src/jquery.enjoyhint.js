@@ -56,8 +56,8 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
         // ========================---- enjoyhint ----==============================
         // =======================================================================
         that.canvas_size = {
-          w:2000,
-          h:1200
+          w:2560,
+          h:1600
         };
         var canvas_id = "enj_canvas";
         
@@ -75,6 +75,7 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
           width: that.canvas_size.w,
           height: that.canvas_size.h
         });
+        
         
         
         that.layer = new Kinetic.Layer();
@@ -98,6 +99,18 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
           that.options.onNextClick();
         });
         
+        that.$canvas.mousedown(function(e){
+          console.log('cl')
+          $('canvas').css({left:'4000px'});
+          
+          var BottomElement = document.elementFromPoint(e.clientX, e.clientY);
+          console.log(BottomElement.tagName)
+          $('canvas').css({left:'0px'});
+          
+          $(BottomElement).click();
+//          that.$canvas.show();
+          return false;
+        });
         
         
         var circle_r = 0;
@@ -111,24 +124,16 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
           sceneFunc: function (context) {
               var ctx = this.getContext("2d")._context;
               var pos = this.pos;
-//              context.save();
               var def_comp =    ctx.globalCompositeOperation;
               ctx.globalCompositeOperation = 'destination-out';
-//              ctx.fillStyle = "rgba(0,0,0,0.1)";
-//  //            ctx.stroke();
-//              ctx.fill();
               ctx.beginPath();
               
-//              ctx.arc(this.attrs.circle_x, this.attrs.circle_y, this.attrs.radius, 0, Math.PI * 2, false);
               var x = this.attrs.center_x-Math.round(this.attrs.width/2);
               var y = this.attrs.center_y-Math.round(this.attrs.height/2);
               ctx.roundRect(x, y, this.attrs.width, this.attrs.height, this.attrs.radius);
               ctx.fillStyle = "red";
-  //            ctx.stroke();
               ctx.fill();
-              //ctx.closePath();
 
-//              context.restore();
               ctx.globalCompositeOperation = def_comp;
           }
         });
@@ -147,9 +152,6 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
         
         that.show = function(){
           that.enjoyhint.removeClass(that.cl.hide);
-//          $.each(enjoyhint_elements, function(ind,val){
-//            val.removeClass(that.cl.hide);
-//          });
         };
         
         that.hide = function(){
@@ -362,8 +364,6 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
             $('#enjoyhint_arrpw_line').remove();
             var d = 'M'+x_from+','+y_from+' Q'+ control_point_x+','+ control_point_y+' '+x_to+','+y_to;
             that.$svg.append(makeSVG('path',{style:"fill:none; stroke:rgb(255,255,255); stroke-width:3",'marker-end':"url(#arrowMarker)", d:d, id:'enjoyhint_arrpw_line'}));
-//            that.$svg.css('display','block')
-
             that.enjoyhint.removeClass(that.cl.svg_transparent);
             
           },that.options.animation_time/2);
