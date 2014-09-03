@@ -1,21 +1,23 @@
+
 About
 =========
 
-**EnjoyHint** is a simplest way to create interactive tutorials and hints for your site or web-application. Also it can be used for highlighting and signing application elements. 
+**EnjoyHint** is a web-tool that provides the simplest way to create interactive tutorials and hints for your site or web-application. It can also be used to highlight and sign application elements.  
+ 
 
 Dependencies
 =========
-EnjoyHint require next plugins and libs:
+EnjoyHint require the following plugins and libs:
 
   1. Jquery >1.7
   2. kineticJS v5.1.0(included into js file)
 
 Installation
 =========
-1. Download latest version of enjoyhint
-2. Extract archive with enjoyhint.
-3. Move the enjoyhint directory to somewhere on your webserver
-4. Insert next lines into your page's head tag:
+1. Download the latest version of EnjoyHint
+2. Extract the archive with EnjoyHint.
+3. Move the EnjoyHint directory to somewhere on your webserver
+4. Insert next lines into your page's <head> tag:
 ```
   <link href="<pathontheserver>/enjoyhint/enjoyhint.css" rel="stylesheet">
   
@@ -30,7 +32,7 @@ var enjoyhint_instance = new EnjoyHint({});
 
 //simple config. 
 //Only one step - highlighting(with description) "New" button 
-//and after click on it, hide EnjoyHint.
+//hide EnjoyHint after a click on the button.
 var enjoyhint_script_steps = [
   {
     selector:'.new_btn',//jquery selector
@@ -50,10 +52,10 @@ enjoyhint_instance.runScript();
 Script Configuration
 =========
 
-Sequence of steps can be only linear for now. So script config is an array. Every element of this array is the config for some step.
+The sequence of steps can be only linear for now. So, the script config is an array. Every element of this array is the config for some step.
 
 Example. 
-Highlight some btn and then after click on it highlight some panel :
+Highlight some button and then after you click on it, highlight some panel:
 ```
 var enjoyhint_script_steps = [
   {
@@ -70,42 +72,42 @@ var enjoyhint_script_steps = [
 ```
 
 
-Properties of the step config:  
-**selector** - jquery selector of DOM-element, that will be highlighted  
-**event** - jquery event name. It fires for element that set in "selector" property  
-**key_code** - Key code for any "key*" event. Event fires only if keyCode of pressed key is equal to this property.    
-**event_selector** - if you need to attach event (that was set in "event" property) to other selector, you can use this one  
-**description** - description for highlighted element  
-**timeout** - delay before moment, when element will be highlighted   
-**shape** - shape for highlighting(circle|rect)  
-**margin** - margin for highlight shape(for Ex.:10)  
-**top** - top margin for shape of "rect" type  
-**right** - right margin for shape of "rect" type  
-**bottom** - bottom margin for shape of "rect" type  
-**left** - left margin for shape of "rect" type  
+Properties of the step configuration:  
+**selector** - jquery selector of the DOM-element, that will be highlighted  
+**event** - a jquery event that is set for the element defined in the selector. When it fires, the next step is triggered.   
+**key_code** - key code for any "key*" event. Event fires only if key code of the pressed key is equal to this property.    
+**event_selector** - if you need to attach an event (that was set in "event" property) to other selector, you can use this one  
+**description** - description for the highlighted element  
+**timeout** - delay before the moment, when an element is highlighted   
+**shape** - shape for highlighting (circle|rect)  
+**margin** - margin for the highlight shape (for Ex.:10)  
+**top** - top margin for the shape of "rect" type  
+**right** - right margin for the shape of "rect" type  
+**bottom** - bottom margin for the shape of "rect" type  
+**left** - left margin for the shape of "rect" type  
 **event_type** - type of event that will get you to the next step(auto|custom|next)
 
 Event Types descriptions:  
-**auto** - For example you need click on the same btn on the second step imediatelly after first step and go to the next step after it. Then you can use "auto" in event_type property and "click" in "event" property.
+**auto** - for example, you need to click on the same button on the second step imediatelly after the first step and go to the next step after it. Then you can use "auto" in the "event_type" property and "click" in "event" property.
 
-**custom** - This value is very usefull if you need to change step by the event in your code. For example you want to go to the next step only after some data have been loaded in your application. Then you should use "custom" event_type and "trigger" method of enjoyhint instance.  
+**custom** - this value is very usefull if you need to go to the next step by event in your app code. For example, you want to go to the next step only after some data have been loaded in your application. Then you should use the "custom" event_type and the "trigger" method of the EnjoyHint instance.  
 ```
 //Example of using custom event_type
 $.get('/load/some_data', function(data){
-  //trigger method have only one argument: event_name.(equal to the value of event property in step config)
+  //trigger method has only one argument: event_name.(equal to the value of event property in step config)
   enjoyhint_instance.trigger('custom_event_name');
 });
 ```  
-**next** - When you set value of event_type to "next", you will see "Next" btn on this step.
+**next** - when you set value of event_type to "next", you will see the "Next" btn on this step.
 
 
 
 Methods
 =========
-**setScript** - Set current steps config. Arguments: config  
-**runScript** - run current script. Have no any arguments  
-**resumeScript** - resume script from step where it was stopped. Have no any arguments  
-**getCurrentStep** - returns current step index  
+**setScript** - set current steps configuration. Arguments: config  
+**runScript** - run the current script. Has no arguments  
+**resumeScript** - resume the script from the step where it was stopped. Has no arguments  
+**getCurrentStep** - returns the current step index  
 
 
 Events
@@ -114,8 +116,8 @@ Events
 **Script Events**:
   
 
-onStart - Fires on fisrst step  
-onEnd - Fires after last step in script
+onStart - fires on the first step  
+onEnd - fires after the last step in script
 ```
 var enjoyhint_instance = new EnjoyHint({
   onStart:function(){
@@ -126,7 +128,7 @@ var enjoyhint_instance = new EnjoyHint({
 
 **Step Events**:  
   
-onBeforeStart - Fires Before step started
+onBeforeStart - fires before the step is started
 
 ```
 var enjoyhint_script_steps = [
