@@ -17,7 +17,7 @@ Installation
 1. Download the latest version of EnjoyHint
 2. Extract the archive with EnjoyHint.
 3. Move the EnjoyHint directory to somewhere on your webserver
-4. Insert next lines into your page's <head> tag:
+4. Insert next lines into your page's \<head\> tag:
 ```
   <link href="<pathontheserver>/enjoyhint/enjoyhint.css" rel="stylesheet">
   
@@ -55,7 +55,7 @@ Script Configuration
 The sequence of steps can be only linear for now. So, the script config is an array. Every element of this array is the config for some step.
 
 Example. 
-Highlight some button and then after you click on it, highlight some panel:
+Highlight some button and after you click on it, highlight some panel:
 ```
 var enjoyhint_script_steps = [
   {
