@@ -106,7 +106,7 @@ Methods
 =========
 **setScript** - Set current steps config. Arguments: config  
 **runScript** - run current script. Have no any arguments  
-**resumeScript** - resume script from step where it was closed. Have no any arguments  
+**resumeScript** - resume script from step where it was stopped. Have no any arguments  
 
 
 
