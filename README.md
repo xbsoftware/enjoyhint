@@ -101,6 +101,15 @@ $.get('/load/some_data', function(data){
 **next** - When you set value of event_type to "next", you will see "Next" btn on this step.
 
 
+
+Methods
+=========
+**setScript** - Set current steps config. Arguments: config  
+**runScript** - run current script. Have no any arguments  
+**resumeScript** - resume script from step where it was closed. Have no any arguments  
+
+
+
 Events
 =========
 
