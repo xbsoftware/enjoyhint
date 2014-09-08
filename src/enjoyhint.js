@@ -23,6 +23,12 @@ var EnjoyHint = function(_options){
       onNextClick:function(){
         current_step++;
         stepAction();
+      },
+      onSkipClick:function(){
+        var step_data = data[current_step];
+        var $element = $(step_data.selector);
+        off(step_data.event);
+        $element.off(makeEventName(step_data.event));
       }
     });
   };

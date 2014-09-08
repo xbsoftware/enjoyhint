@@ -16,6 +16,177 @@ var Kinetic={};!function(a){var b=Math.PI/180;Kinetic={version:"5.1.0",stages:[]
 !function(){Kinetic.Util.addMethods(Kinetic.Group,{___init:function(a){this.nodeType="Group",Kinetic.Container.call(this,a)},_validateAdd:function(a){var b=a.getType();"Group"!==b&&"Shape"!==b&&Kinetic.Util.error("You may only add groups and shapes to groups.")}}),Kinetic.Util.extend(Kinetic.Group,Kinetic.Container),Kinetic.Collection.mapMethods(Kinetic.Group)}();/*! KineticJS v5.1.0 2014-03-27 http://www.kineticjs.com by Eric Rowell @ericdrowell - MIT License https://github.com/ericdrowell/KineticJS/wiki/License*/
 !function(){Kinetic.Rect=function(a){this.___init(a)},Kinetic.Rect.prototype={___init:function(a){Kinetic.Shape.call(this,a),this.className="Rect",this.sceneFunc(this._sceneFunc)},_sceneFunc:function(a){var b=this.getCornerRadius(),c=this.getWidth(),d=this.getHeight();a.beginPath(),b?(a.moveTo(b,0),a.lineTo(c-b,0),a.arc(c-b,b,b,3*Math.PI/2,0,!1),a.lineTo(c,d-b),a.arc(c-b,d-b,b,0,Math.PI/2,!1),a.lineTo(b,d),a.arc(b,d-b,b,Math.PI/2,Math.PI,!1),a.lineTo(0,b),a.arc(b,b,b,Math.PI,3*Math.PI/2,!1)):a.rect(0,0,c,d),a.closePath(),a.fillStrokeShape(this)}},Kinetic.Util.extend(Kinetic.Rect,Kinetic.Shape),Kinetic.Factory.addGetterSetter(Kinetic.Rect,"cornerRadius",0),Kinetic.Collection.mapMethods(Kinetic.Rect)}();/*! KineticJS v5.1.0 2014-03-27 http://www.kineticjs.com by Eric Rowell @ericdrowell - MIT License https://github.com/ericdrowell/KineticJS/wiki/License*/
 !function(){var a=2*Math.PI-1e-4,b="Circle";Kinetic.Circle=function(a){this.___init(a)},Kinetic.Circle.prototype={___init:function(a){Kinetic.Shape.call(this,a),this.className=b,this.sceneFunc(this._sceneFunc)},_sceneFunc:function(b){b.beginPath(),b.arc(0,0,this.getRadius(),0,a,!1),b.closePath(),b.fillStrokeShape(this)},getWidth:function(){return 2*this.getRadius()},getHeight:function(){return 2*this.getRadius()},setWidth:function(a){Kinetic.Node.prototype.setWidth.call(this,a),this.setRadius(a/2)},setHeight:function(a){Kinetic.Node.prototype.setHeight.call(this,a),this.setRadius(a/2)}},Kinetic.Util.extend(Kinetic.Circle,Kinetic.Shape),Kinetic.Factory.addGetterSetter(Kinetic.Circle,"radius",0),Kinetic.Collection.mapMethods(Kinetic.Circle)}();
+var EnjoyHint = function(_options){
+  var that = this;
+  // Some options
+  var defaults = {
+    onStart:function(){
+      
+    },
+    onEnd: function(){
+      
+    }
+  };
+  var options = $.extend(defaults,_options);
+  
+  
+  var data = [];
+  var current_step = 0;
+  
+  $body = $('body');
+  
+  /********************* PRIVAT METHODS ***************************************/
+  var init = function(){
+    $body.enjoyhint({
+      onNextClick:function(){
+        current_step++;
+        stepAction();
+      },
+      onSkipClick:function(){
+        var step_data = data[current_step];
+        var $element = $(step_data.selector);
+        off(step_data.event);
+        $element.off(makeEventName(step_data.event));
+      }
+    });
+  };
+  
+  var $body = $('body');
+  var stepAction = function(){
+    
+    if(data && data[current_step]){
+      var step_data = data[current_step];
+      if(step_data.onBeforeStart && typeof step_data.onBeforeStart === 'function'){
+        step_data.onBeforeStart();
+      }
+      var timeout = step_data.timeout||0;
+      setTimeout(function(){
+        var $element = $(step_data.selector);
+        var event = makeEventName(step_data.event);
+        
+        $body.enjoyhint('show');
+        $body.enjoyhint('hide_next');
+        var $event_element = $element;
+        if(step_data.event_selector){
+          $event_element = $(step_data.event_selector);
+        }
+        if(step_data.event_type){
+          switch(step_data.event_type){
+            case 'auto':
+              $element[step_data.event]();
+              switch(step_data.event){
+                case 'click':
+                  break;
+              }
+              current_step++;
+              stepAction();
+              return;
+              break;
+            case 'custom':
+              on(step_data.event, function(){
+                current_step++;
+                off(step_data.event);
+                stepAction();
+              });
+              break;
+            case 'next':
+              $body.enjoyhint('show_next');
+              break;
+          }
+          
+        } else {
+          $event_element.on(event, function(e){
+            if(step_data.key_code && e.keyCode != step_data.key_code){
+              return;
+            }
+            current_step++;
+            $(this).off(event);
+            
+            stepAction();
+          });
+          
+        }
+        var max_habarites = Math.max($element.outerWidth(), $element.outerHeight());
+        var radius = Math.round(max_habarites/2)+5;
+        var offset = $element.offset();
+        var w = $element.outerWidth();
+        var h = $element.outerHeight();
+        var shape_margin = (step_data.margin !== undefined)?step_data.margin:10;
+        var coords = {
+          x: offset.left + Math.round(w/2),
+          y: offset.top + Math.round(h/2)
+        };
+        var shape_data = {
+          center_x:coords.x,
+          center_y:coords.y,
+          text:step_data.description,
+          top:step_data.top,
+          bottom:step_data.bottom,
+          left:step_data.left,
+          right:step_data.right,
+          margin:step_data.margin
+        };
+        
+        if(step_data.shape && step_data.shape == 'circle'){
+          shape_data.shape = 'circle';
+          shape_data.radius = radius;
+        } else {
+          shape_data.radius = 0;
+          shape_data.width = w+shape_margin;
+          shape_data.height = h+shape_margin;
+        }
+        $body.enjoyhint('render_label_with_shape',shape_data);
+        
+      },timeout);
+      
+    } else {
+      $body.enjoyhint('hide');
+      options.onEnd();
+    }
+    
+  };
+  
+  var makeEventName = function(name,is_custom){
+    return name+(is_custom?'custom':'')+'.enjoy_hint';
+  };
+  
+  var on = function(event_name, callback){
+    $body.on(makeEventName(event_name,true),callback);
+  };
+  var off = function(event_name){
+    $body.off(makeEventName(event_name,true));
+  };
+  
+  /********************* PUBLIC METHODS ***************************************/
+  that.runScript = function(){
+    current_step = 0;
+    options.onStart();
+    stepAction();
+  };
+  
+  that.resumeScript = function(){
+    stepAction();
+  };
+  
+  that.getCurrentStep = function(){
+    return current_step;
+  };
+  
+
+  that.trigger = function(event_name){
+    $body.trigger(makeEventName(event_name,true));
+  };
+  
+  that.setScript = function(_data){
+    if(_data){
+      data = _data;
+    }
+  };
+  
+
+  init();
+};
+
 CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
   if (w < 2 * r) r = w / 2;
   if (h < 2 * r) r = h / 2;
@@ -35,6 +206,7 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
       return this.each(function() {
         var defaults = {
           onNextClick:function(){},
+          onSkipClick:function(){},
           animation_time:800
         };
         
@@ -112,6 +284,7 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
         
         that.$skip_btn = $('<div>', {'class':that.cl.skip_btn+' '+that.cl.btn}).appendTo(that.enjoyhint).html('Skip').click(function(e){
           that.hide();
+          that.options.onSkipClick();
         });
         that.$next_btn = $('<div>', {'class':that.cl.next_btn}).appendTo(that.enjoyhint).html('Next').click(function(e){
           that.options.onNextClick();
@@ -724,168 +897,3 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
   };
 })(window.jQuery);
 
-
-var EnjoyHint = function(_options){
-  var that = this;
-  // Some options
-  var defaults = {
-    onStart:function(){
-      
-    },
-    onEnd: function(){
-      
-    }
-  };
-  var options = $.extend(defaults,_options);
-  
-  
-  var data = [];
-  var current_step = 0;
-  
-  $body = $('body');
-  
-  /********************* PRIVAT METHODS ***************************************/
-  var init = function(){
-    $body.enjoyhint({
-      onNextClick:function(){
-        current_step++;
-        stepAction();
-      }
-    });
-  };
-  
-  var $body = $('body');
-  var stepAction = function(){
-    
-    if(data && data[current_step]){
-      var step_data = data[current_step];
-      if(step_data.onBeforeStart && typeof step_data.onBeforeStart === 'function'){
-        step_data.onBeforeStart();
-      }
-      var timeout = step_data.timeout||0;
-      setTimeout(function(){
-        var $element = $(step_data.selector);
-        var event = makeEventName(step_data.event);
-        
-        $body.enjoyhint('show');
-        $body.enjoyhint('hide_next');
-        var $event_element = $element;
-        if(step_data.event_selector){
-          $event_element = $(step_data.event_selector);
-        }
-        if(step_data.event_type){
-          switch(step_data.event_type){
-            case 'auto':
-              $element[step_data.event]();
-              switch(step_data.event){
-                case 'click':
-                  break;
-              }
-              current_step++;
-              stepAction();
-              return;
-              break;
-            case 'custom':
-              on(step_data.event, function(){
-                current_step++;
-                off(step_data.event);
-                stepAction();
-              });
-              break;
-            case 'next':
-              $body.enjoyhint('show_next');
-              break;
-          }
-          
-        } else {
-          $event_element.on(event, function(e){
-            if(step_data.key_code && e.keyCode != step_data.key_code){
-              return;
-            }
-            current_step++;
-            $(this).off(event);
-            
-            stepAction();
-          });
-          
-        }
-        var max_habarites = Math.max($element.outerWidth(), $element.outerHeight());
-        var radius = Math.round(max_habarites/2)+5;
-        var offset = $element.offset();
-        var w = $element.outerWidth();
-        var h = $element.outerHeight();
-        var shape_margin = (step_data.margin !== undefined)?step_data.margin:10;
-        var coords = {
-          x: offset.left + Math.round(w/2),
-          y: offset.top + Math.round(h/2)
-        };
-        var shape_data = {
-          center_x:coords.x,
-          center_y:coords.y,
-          text:step_data.description,
-          top:step_data.top,
-          bottom:step_data.bottom,
-          left:step_data.left,
-          right:step_data.right,
-          margin:step_data.margin
-        };
-        
-        if(step_data.shape && step_data.shape == 'circle'){
-          shape_data.shape = 'circle';
-          shape_data.radius = radius;
-        } else {
-          shape_data.radius = 0;
-          shape_data.width = w+shape_margin;
-          shape_data.height = h+shape_margin;
-        }
-        $body.enjoyhint('render_label_with_shape',shape_data);
-        
-      },timeout);
-      
-    } else {
-      $body.enjoyhint('hide');
-      options.onEnd();
-    }
-    
-  };
-  
-  var makeEventName = function(name,is_custom){
-    return name+(is_custom?'custom':'')+'.enjoy_hint';
-  };
-  
-  var on = function(event_name, callback){
-    $body.on(makeEventName(event_name,true),callback);
-  };
-  var off = function(event_name){
-    $body.off(makeEventName(event_name,true));
-  };
-  
-  /********************* PUBLIC METHODS ***************************************/
-  that.runScript = function(){
-    current_step = 0;
-    options.onStart();
-    stepAction();
-  };
-  
-  that.resumeScript = function(){
-    stepAction();
-  };
-  
-  that.getCurrentStep = function(){
-    return current_step;
-  };
-  
-
-  that.trigger = function(event_name){
-    $body.trigger(makeEventName(event_name,true));
-  };
-  
-  that.setScript = function(_data){
-    if(_data){
-      data = _data;
-    }
-  };
-  
-
-  init();
-};

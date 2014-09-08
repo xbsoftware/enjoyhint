@@ -17,6 +17,7 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
       return this.each(function() {
         var defaults = {
           onNextClick:function(){},
+          onSkipClick:function(){},
           animation_time:800
         };
         
@@ -94,6 +95,7 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
         
         that.$skip_btn = $('<div>', {'class':that.cl.skip_btn+' '+that.cl.btn}).appendTo(that.enjoyhint).html('Skip').click(function(e){
           that.hide();
+          that.options.onSkipClick();
         });
         that.$next_btn = $('<div>', {'class':that.cl.next_btn}).appendTo(that.enjoyhint).html('Next').click(function(e){
           that.options.onNextClick();
