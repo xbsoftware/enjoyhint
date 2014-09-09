@@ -3,7 +3,8 @@ About
 =========
 
 **EnjoyHint** is a web-tool that provides the simplest way to create interactive tutorials and hints for your site or web-application. It can also be used to highlight and sign application elements.  
- 
+  
+Check out this [issue tracker demo with EnjoyHint](http://xbsoftware.com/products/enjoyhint/) 
 
 Dependencies
 =========
