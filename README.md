@@ -6,7 +6,7 @@ About
 
 EnjoyHint is free software distributed under the terms of MIT license.
   
-Check out this [issue tracker demo with EnjoyHint](http://xbsoftware.com/products/enjoyhint/) 
+Check out this [issue tracker demo with EnjoyHint](http://xbsoftware.com/products/enjoyhint/) and a [TODO app demo](http://xbsoftware.github.io/enjoyhint/) ([downloadable package](http://xbsoftware.github.io/enjoyhint/enjoyhint_todo_demo.zip))
 
 Dependencies
 =========
