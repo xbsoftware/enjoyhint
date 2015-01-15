@@ -1,0 +1,24 @@
+{
+  "name": "enjoyhint",
+  "main": "enjoyhint.js",
+  "version": "1.0.0",
+  "homepage": "https://github.com/xbsoftware/enjoyhint",
+  "authors": [
+    "XB Software"
+  ],
+  "description": "Web-tool that provides the simplest way to create interactive tutorials and hints.",
+  "keywords": [
+    "enjoyhint",
+    "hint",
+    "xbs",
+    "tutorials"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
