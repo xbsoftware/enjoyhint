@@ -107,7 +107,7 @@ $.get('/load/some_data', function(data){
 **Script Events**:
 * `onStart` - fires on the first step.
 * `onEnd` - fires after the last step in script.
-```javascrpt
+```javascript
 var enjoyhint_instance = new EnjoyHint({
   onStart:function(){
     //do something
@@ -116,7 +116,7 @@ var enjoyhint_instance = new EnjoyHint({
 ```
 **Step Events**:  
 * `onBeforeStart` - fires before the step is started.
-```javascrpt
+```javascript
 var enjoyhint_script_steps = [
   {
     selector:'.some_btn',//jquery selector
