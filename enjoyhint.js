@@ -358,10 +358,10 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
         
         that.hide();
         
-        that.hideNextBtn = function(){
+        that.showNextBtn = function(){
           that.$next_btn.addClass(that.cl.hide);
         };
-        that.showNextBtn = function(){
+        that.hideNextBtn = function(){
           that.$next_btn.removeClass(that.cl.hide);
         };
         
