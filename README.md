@@ -18,10 +18,10 @@ You can install it through `bower` package manager:
 bower install enjoyhint
 ```
 Alternative way:
-1. Download the latest version of EnjoyHint
-2. Extract the archive with EnjoyHint.
-3. Move the EnjoyHint directory to somewhere on your webserver
-4. Insert next lines into your page's \<head\> tag:
+- Download the latest version of EnjoyHint
+- Extract the archive with EnjoyHint.
+- Move the EnjoyHint directory to somewhere on your webserver
+- Insert next lines into your page's \<head\> tag:
 ```html
   <link href="<pathontheserver>/enjoyhint/enjoyhint.css" rel="stylesheet">
   <script src="<pathontheserver>/enjoyhint/enjoyhint.min.js"></script>
@@ -53,7 +53,7 @@ enjoyhint_instance.runScript();
 #### Script Configuration
 The sequence of steps can be only linear for now. So, the script config is an array. Every element of this array is the config for some step.
 
-#### Example. 
+#### Example of script configuration 
 Highlight some button and after you click on it, highlight some panel:
 ```javascript
 var enjoyhint_script_steps = [
