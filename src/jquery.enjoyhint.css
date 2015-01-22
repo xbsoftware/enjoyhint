@@ -1,10 +1,10 @@
 @font-face {
     font-family: 'casino_handregular';
-    src: url('Casino_Hand/casino_hand-webfont.eot');
-    src: url('Casino_Hand/casino_hand-webfont.eot?#iefix') format('embedded-opentype'),
-         url('Casino_Hand/casino_hand-webfont.woff') format('woff'),
-         url('Casino_Hand/casino_hand-webfont.ttf') format('truetype'),
-         url('Casino_Hand/casino_hand-webfont.svg#casino_handregular') format('svg');
+    src: url('src/Casino_Hand/casino_hand-webfont.eot');
+    src: url('src/Casino_Hand/casino_hand-webfont.eot?#iefix') format('embedded-opentype'),
+         url('src/Casino_Hand/casino_hand-webfont.woff') format('woff'),
+         url('src/Casino_Hand/casino_hand-webfont.ttf') format('truetype'),
+         url('src/Casino_Hand/casino_hand-webfont.svg#casino_handregular') format('svg');
     font-weight: normal;
     font-style: normal;
 
@@ -35,12 +35,31 @@
 }
 
 .enjoyhint_skip_btn{
-  position:absolute;
-  bottom:40px;
-  right:40px;
-  z-index: 1012;
-  /*display: none;*/
-  pointer-events: all;
+    position:absolute;
+    z-index: 1012;
+    /*display: none;*/
+    pointer-events: all;
+    -webkit-box-sizing: content-box;
+    -moz-box-sizing: content-box;
+    box-sizing: content-box;
+    width: 100px;
+    height: 40px;
+    cursor: pointer;
+    margin: 0 auto;
+    border: 2px solid rgb(30,205,151);
+    -webkit-border-radius: 40px;
+    border-radius: 40px;
+    font: normal normal normal 17px/40px "Advent Pro", Helvetica, sans-serif;
+    color: rgb(30, 205, 151);
+    text-align: center;
+    -o-text-overflow: clip;
+    text-overflow: clip;
+    letter-spacing: 1px;
+    background: rgba(0,0,0,0);
+    -webkit-transition: background-color 0.3s cubic-bezier(0, 0, 0, 0), color 0.3s cubic-bezier(0, 0, 0, 0), width 0.3s cubic-bezier(0, 0, 0, 0), border-width 0.3s cubic-bezier(0, 0, 0, 0), border-color 0.3s cubic-bezier(0, 0, 0, 0);
+    -moz-transition: background-color 0.3s cubic-bezier(0, 0, 0, 0), color 0.3s cubic-bezier(0, 0, 0, 0), width 0.3s cubic-bezier(0, 0, 0, 0), border-width 0.3s cubic-bezier(0, 0, 0, 0), border-color 0.3s cubic-bezier(0, 0, 0, 0);
+    -o-transition: background-color 0.3s cubic-bezier(0, 0, 0, 0), color 0.3s cubic-bezier(0, 0, 0, 0), width 0.3s cubic-bezier(0, 0, 0, 0), border-width 0.3s cubic-bezier(0, 0, 0, 0), border-color 0.3s cubic-bezier(0, 0, 0, 0);
+    transition: background-color 0.3s cubic-bezier(0, 0, 0, 0), color 0.3s cubic-bezier(0, 0, 0, 0), width 0.3s cubic-bezier(0, 0, 0, 0), border-width 0.3s cubic-bezier(0, 0, 0, 0), border-color 0.3s cubic-bezier(0, 0, 0, 0);
 }
 .enjoyhint_next_btn{
   position:absolute;

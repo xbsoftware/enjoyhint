@@ -19,6 +19,8 @@ var EnjoyHint = function(_options){
   
   /********************* PRIVAT METHODS ***************************************/
   var init = function(){
+      if ($('.enjoyhint'))
+          $('.enjoyhint').remove();
     $body.enjoyhint({
       onNextClick:function(){
         current_step++;
@@ -29,9 +31,15 @@ var EnjoyHint = function(_options){
         var $element = $(step_data.selector);
         off(step_data.event);
         $element.off(makeEventName(step_data.event));
+        destroyEnjoy();
       }
     });
   };
+
+    var destroyEnjoy = function () {
+        $body = $('body');
+        $('.enjoyhint').remove();
+    };
   
   var $body = $('body');
   var stepAction = function(){
@@ -124,6 +132,7 @@ var EnjoyHint = function(_options){
     } else {
       $body.enjoyhint('hide');
       options.onEnd();
+      destroyEnjoy();
     }
     
   };
