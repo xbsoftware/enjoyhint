@@ -27,10 +27,6 @@ var enjoyhint_script_steps = [
             "Click the button and move on."
     },
     {
-        "dblclick #def_but" : "You can use all standard JS events<br>" +
-            "Double click on the button."
-    },
-    {
         "next #text_select" : "You can highlight blocks by selecting them in a circle. <br>" +
             "<text style='color: #00ebe7'>shape</text> - you can define shape of highligting (rectangular||circle)<br>" +
             "{<br>" +
