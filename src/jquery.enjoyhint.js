@@ -61,7 +61,7 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
                 // =======================================================================
                 that.canvas_size = {
                     w: 2560,
-                    h: 1600
+                    h: 3000
                 };
                 var canvas_id = "enj_canvas";
 
@@ -79,7 +79,7 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
                     width: that.canvas_size.w,
                     height: that.canvas_size.h
                 });
-
+                console.log(that.enjoyhint);
 
                 that.layer = new Kinetic.Layer();
                 that.rect = new Kinetic.Rect({
@@ -297,7 +297,7 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
                     var label_h = label.height();
                     var label_left = label.offset().left;
                     var label_right = label.offset().left + label_w;
-                    var label_top = label.offset().top;
+                    var label_top = label.offset().top - $("body").scrollTop();
                     var label_bottom = label.offset().top + label_h;
 
                     var margin = 10;
@@ -710,6 +710,7 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
     };
 
     $.fn.enjoyhint = function (method) {
+        console.log(method);
         if (methods[method]) {
             return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
         } else if (typeof method === 'object' || !method) {
