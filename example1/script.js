@@ -27,7 +27,7 @@ var enjoyhint_script_steps = [
             "Click the button and move on."
     },
     {
-        "next #text_select" : "You can highlight blocks by selecting them in a circle. <br>" +
+        "next #button6" : "You can highlight blocks by selecting them in a circle. <br>" +
             "<text style='color: #00ebe7'>shape</text> - you can define shape of highligting (rectangular||circle)<br>" +
             "{<br>" +
             "<text style='color: #00a6eb'>&nbsp &nbsp ' next #selector '</text> : <text style='color: #2bff3c'>' Some description ',</text> <br>" +
@@ -37,15 +37,15 @@ var enjoyhint_script_steps = [
         shape : 'circle'
     },
     {
-        "next #text_select2" : "At this step we fix radius<br>" +
+        "next #mini_button" : "At this step we fix radius<br>" +
             "<text style='color: #00ebe7'>radius</text> - sets the size of the circle radius<br>" +
             "{<br>" +
             "<text style='color: #00a6eb'>&nbsp &nbsp ' next #selector '</text> : <text style='color: #2bff3c'>' Some description ',</text> <br>" +
             "<text style='color: #00a6eb'>&nbsp &nbsp ' shape '</text> :  <text style='color: #2bff3c'>' circle '</text> <br>" +
-            "<text style='color: #00a6eb'>&nbsp &nbsp ' radius '</text> : 280<br>" +
+            "<text style='color: #00a6eb'>&nbsp &nbsp ' radius '</text> : 80<br>" +
             "}<br>",
         shape : 'circle',
-        radius: 280
+        radius: 80
     },
     {
         "next #animationSpeed" : "Sometimes you need to scroll the page either very slowly (as we've just done) or very fast.<br>" +
