@@ -74,9 +74,9 @@ var EnjoyHint = function (_options) {
                     if (step_data.event_selector) {
                         $event_element = $(step_data.event_selector);
                     }
-                    if (!step_data.event_type && step_data.event){
+                    if (!step_data.event_type && step_data.event == "key"){
                         $element.keydown(function( event ) {
-                            if ( event.which == step_data.key_code ) {
+                            if ( event.which == step_data.keyCode ) {
                                 current_step++;
                                 stepAction();
                             }
@@ -109,7 +109,7 @@ var EnjoyHint = function (_options) {
 
                     } else {
                         $event_element.on(event, function (e) {
-                            if (step_data.key_code && e.keyCode != step_data.key_code) {
+                            if (step_data.keyCode && e.keyCode != step_data.keyCode) {
                                 return;
                             }
                             current_step++;
