@@ -22,6 +22,7 @@ var EnjoyHint = function (_options) {
         if ($('.enjoyhint'))
             $('.enjoyhint').remove();
         $body.css({'overflow':'hidden'});
+        document.ontouchstart = function(e){ e.preventDefault(); }
 
         $body.enjoyhint({
             onNextClick: function () {
@@ -42,6 +43,7 @@ var EnjoyHint = function (_options) {
         $body = $('body');
         $('.enjoyhint').remove();
         $body.css({'overflow':'auto'});
+        document.ontouchstart = function(e){ return true; }
     };
 
     var $body = $('body');
