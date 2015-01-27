@@ -22,6 +22,7 @@ var EnjoyHint = function (_options) {
         if ($('.enjoyhint'))
             $('.enjoyhint').remove();
         $body.css({'overflow':'hidden'});
+
         $body.enjoyhint({
             onNextClick: function () {
                 current_step++;
@@ -83,6 +84,17 @@ var EnjoyHint = function (_options) {
                                 stepAction();
                             }
                         });
+                    }
+                    if (step_data.showNext == true){
+                        $body.enjoyhint('show_next');
+                    }
+                    if (step_data.showSkip == false){
+                        $body.enjoyhint('hide_skip');
+                    }else{
+                        $body.enjoyhint('show_skip');
+                    }
+                    if (step_data.showSkip == true){
+
                     }
                     if (step_data.event_type) {
                         switch (step_data.event_type) {
@@ -235,6 +247,7 @@ var EnjoyHint = function (_options) {
 (function ($) {
     var methods = {
         init: function (options) {
+            console.log(options,'-------------');
             return this.each(function () {
                 var defaults = {
                     onNextClick: function () {
@@ -263,12 +276,13 @@ var EnjoyHint = function (_options) {
                     disable_events_element: 'enjoyhint_disable_events',
                     btn: 'enjoyhint_btn',
                     skip_btn: 'enjoyhint_next_btn',
+                    close_btn: 'enjoyhint_close_btn',
                     next_btn: 'enjoyhint_next_btn',
                     main_canvas: 'enjoyhint_canvas',
                     main_svg: 'enjoyhint_svg',
                     svg_wrapper: 'enjoyhint_svg_wrapper',
                     svg_transparent: 'enjoyhint_svg_transparent',
-                    kinetic_container: 'kinetic_container',
+                    kinetic_container: 'kinetic_container'
                 };
                 function makeSVG(tag, attrs) {
                     var el = document.createElementNS('http://www.w3.org/2000/svg', tag);
@@ -322,6 +336,11 @@ var EnjoyHint = function (_options) {
                 });
                 that.$next_btn = $('<div>', {'class': that.cl.next_btn}).appendTo(that.enjoyhint).html('Next').click(function (e) {
                     that.options.onNextClick();
+                });
+
+                that.$close_btn = $('<div>', {'class': that.cl.close_btn}).appendTo(that.enjoyhint).html('x').click(function (e){
+                    that.hide();
+                    that.options.onSkipClick();
                 });
 
                 that.$canvas.mousedown(function (e) {
@@ -400,6 +419,16 @@ var EnjoyHint = function (_options) {
                     that.$next_btn.removeClass(that.cl.hide);
                     that.nextBtn = "show";
                 };
+
+                that.hideSkipBtn = function () {
+                    that.$skip_btn.addClass(that.cl.hide);
+                };
+                that.showSkipBtn = function () {
+                    that.$skip_btn.removeClass(that.cl.hide);
+                };
+
+
+
 
 
                 that.renderCircle = function (data) {
@@ -747,6 +776,7 @@ var EnjoyHint = function (_options) {
                         top: label_y + label_height + 20
                     });
                     var left_skip = label_x + that.$next_btn.width() + 10;
+                    console.log(that.nextBtn);
                     if (that.nextBtn == "hide"){
                         left_skip = label_x;
                     }
@@ -754,6 +784,10 @@ var EnjoyHint = function (_options) {
                     that.$skip_btn.css({
                         left: left_skip,
                         top: label_y + label_height + 20
+                    });
+                    that.$close_btn.css({
+                        right : 10,
+                        top: 10
                     });
 
 
@@ -890,6 +924,20 @@ var EnjoyHint = function (_options) {
         show_next: function () {
             this.each(function () {
                 this.enjoyhint_obj.showNextBtn();
+            });
+            return this;
+        },
+
+        hide_skip: function () {
+            this.each(function () {
+                this.enjoyhint_obj.hideSkipBtn();
+            });
+            return this;
+        },
+
+        show_skip: function () {
+            this.each(function () {
+                this.enjoyhint_obj.showSkipBtn();
             });
             return this;
         },

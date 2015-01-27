@@ -24,7 +24,8 @@ var enjoyhint_script_steps = [
             "{<br>" +
             "<text style='color: #00a6eb'>&nbsp &nbsp ' click .btn-success '</text> : <text style='color: #2bff3c'>' Some description '</text> <br>" +
             "}<br>" +
-            "Click the button and move on."
+            "Click the button and move on.",
+        showSkip: false
     },
     {
         "next #button6" : "You can highlight blocks by selecting them in a circle. <br>" +
@@ -58,10 +59,10 @@ var enjoyhint_script_steps = [
     },
     {
         "key #suc_input" : "You can attach handlers to keyboard events.<br>" +
-            "<text style='color: #00ebe7'>key_code</text> - key code for any 'key*' event.<br>" +
+            "<text style='color: #00ebe7'>keyCode</text> - key code for any 'key' event.<br>" +
             "{<br>" +
             "<text style='color: #00a6eb'>&nbsp &nbsp ' key #selector '</text> : <text style='color: #2bff3c'>' Some description ',</text> <br>" +
-            "<text style='color: #00a6eb'>&nbsp &nbsp ' key_code '</text> : 13<br>" +
+            "<text style='color: #00a6eb'>&nbsp &nbsp ' keyCode '</text> : 13<br>" +
             "}<br>" +
             "Enter some text and press 'Enter'",
         keyCode : 13
