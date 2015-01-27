@@ -41,7 +41,7 @@ var EnjoyHint = function (_options) {
     var destroyEnjoy = function () {
         $body = $('body');
         $('.enjoyhint').remove();
-        $("html").css({'overflow':'auto'});
+        $("body").css({'overflow':'auto'});
 
     };
 
@@ -296,8 +296,8 @@ var EnjoyHint = function (_options) {
                 // ========================---- enjoyhint ----==============================
                 // =======================================================================
                 that.canvas_size = {
-                    w: 2000,
-                    h: 1100
+                    w: $(window).width()*1.4,
+                    h: $(window).height()*1.4
                 };
                 var canvas_id = "enj_canvas";
 
