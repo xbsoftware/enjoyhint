@@ -45,6 +45,9 @@ var EnjoyHint = function (_options) {
         $body = $('body');
         $('.enjoyhint').remove();
         $body.css({'overflow':'auto'});
+        $(document).bind('touchmove', function(e) {
+            return true;
+        });
     };
 
     var $body = $('body');
