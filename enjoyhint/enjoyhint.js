@@ -338,7 +338,7 @@ var EnjoyHint = function (_options) {
                     that.options.onNextClick();
                 });
 
-                that.$close_btn = $('<div>', {'class': that.cl.close_btn}).appendTo(that.enjoyhint).html('x').click(function (e){
+                that.$close_btn = $('<div>', {'class': that.cl.close_btn}).appendTo(that.enjoyhint).html('').click(function (e){
                     that.hide();
                     that.options.onSkipClick();
                 });
