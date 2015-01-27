@@ -22,7 +22,7 @@ var EnjoyHint = function (_options) {
         if ($('.enjoyhint'))
             $('.enjoyhint').remove();
         $body.css({'overflow':'hidden'});
-        document.ontouchstart = function(e){ e.preventDefault(); }
+        $('html.touch body').css({'overflow':'hidden'});
 
         $body.enjoyhint({
             onNextClick: function () {
@@ -43,7 +43,7 @@ var EnjoyHint = function (_options) {
         $body = $('body');
         $('.enjoyhint').remove();
         $body.css({'overflow':'auto'});
-        document.ontouchstart = function(e){ return true; }
+        $('html.touch body').css({'overflow':'auto'});
     };
 
     var $body = $('body');
@@ -297,8 +297,8 @@ var EnjoyHint = function (_options) {
                 // ========================---- enjoyhint ----==============================
                 // =======================================================================
                 that.canvas_size = {
-                    w: $(document).width(),
-                    h: 1200
+                    w: screen.width,
+                    h: screen.height
                 };
                 var canvas_id = "enj_canvas";
 
