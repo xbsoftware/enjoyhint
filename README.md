@@ -39,7 +39,7 @@ var enjoyhint_instance = new EnjoyHint({});
 //hide EnjoyHint after a click on the button.
 var enjoyhint_script_steps = [
   {
-    "click .new_btn" : 'Click the "New" button to start creating your project'
+    'click .new_btn' : 'Click the "New" button to start creating your project'
   }  
 ];
 
@@ -58,10 +58,10 @@ Highlight some button and after you click on it, highlight some panel:
 ```javascript
 var enjoyhint_script_steps = [
   {
-    "click .some_btn" : 'Click on this btn'
+    'click .some_btn' : 'Click on this btn'
   },  
   {
-    "click .some_panel" : 'Click on this panel'
+    'click .some_panel' : 'Click on this panel'
   }  
 ];
 ```
