@@ -4,7 +4,7 @@ EnjoyHint
 
 EnjoyHint is free software distributed under the terms of MIT license.
   
-#### Demos
+#### Demo
 * [TODO app demo](http://xbsoftware.github.io/enjoyhint/) ([downloadable package](http://xbsoftware.github.io/enjoyhint/enjoyhint_todo_demo.zip))
 * [A small guide on EnjoyHint](http://xbsoftware.github.io/enjoyhint/example1.html)
 
