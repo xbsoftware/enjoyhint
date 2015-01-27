@@ -21,10 +21,7 @@ var EnjoyHint = function (_options) {
     var init = function () {
         if ($('.enjoyhint'))
             $('.enjoyhint').remove();
-        $body.css({'overflow':'hidden'});
-        $(document).bind('touchmove', function(e) {
-            e.preventDefault();
-        });
+        $('html').css({'overflow':'hidden'});
 
         $body.enjoyhint({
             onNextClick: function () {
@@ -44,10 +41,8 @@ var EnjoyHint = function (_options) {
     var destroyEnjoy = function () {
         $body = $('body');
         $('.enjoyhint').remove();
-        $body.css({'overflow':'auto'});
-        $(document).bind('touchmove', function(e) {
-            return true;
-        });
+        $("html").css({'overflow':'auto'});
+
     };
 
     var $body = $('body');
@@ -301,8 +296,8 @@ var EnjoyHint = function (_options) {
                 // ========================---- enjoyhint ----==============================
                 // =======================================================================
                 that.canvas_size = {
-                    w: 2600,
-                    h: 1600
+                    w: 2000,
+                    h: 1100
                 };
                 var canvas_id = "enj_canvas";
 
