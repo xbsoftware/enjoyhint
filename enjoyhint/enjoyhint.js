@@ -22,6 +22,7 @@ var EnjoyHint = function (_options) {
         if ($('.enjoyhint'))
             $('.enjoyhint').remove();
         $('html').css({'overflow':'hidden'});
+        $(document).on("touchmove",lockTouch);
 
         $body.enjoyhint({
             onNextClick: function () {
@@ -38,10 +39,15 @@ var EnjoyHint = function (_options) {
         });
     };
 
+    var lockTouch = function(e) {
+        e.preventDefault();
+    };
+
     var destroyEnjoy = function () {
         $body = $('body');
         $('.enjoyhint').remove();
         $("body").css({'overflow':'auto'});
+        $(document).off("touchmove", lockTouch);
 
     };
 
