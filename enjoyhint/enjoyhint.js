@@ -21,6 +21,7 @@ var EnjoyHint = function (_options) {
     var init = function () {
         if ($('.enjoyhint'))
             $('.enjoyhint').remove();
+        $body.css({'overflow':'hidden'});
         $body.enjoyhint({
             onNextClick: function () {
                 current_step++;
@@ -39,6 +40,7 @@ var EnjoyHint = function (_options) {
     var destroyEnjoy = function () {
         $body = $('body');
         $('.enjoyhint').remove();
+        $body.css({'overflow':'auto'});
     };
 
     var $body = $('body');
@@ -127,7 +129,7 @@ var EnjoyHint = function (_options) {
                     var shape_margin = (step_data.margin !== undefined) ? step_data.margin : 10;
                     var coords = {
                         x: offset.left + Math.round(w / 2) ,
-                        y: offset.top + Math.round(h / 2)  - $("body").scrollTop()
+                        y: offset.top + Math.round(h / 2)  - $(document).scrollTop()
                     };
                     var shape_data = {
                         center_x: coords.x,
@@ -516,7 +518,7 @@ var EnjoyHint = function (_options) {
                     var label_h = label.height();
                     var label_left = label.offset().left;
                     var label_right = label.offset().left + label_w;
-                    var label_top = label.offset().top - $("body").scrollTop();
+                    var label_top = label.offset().top - $(document).scrollTop();;
                     var label_bottom = label.offset().top + label_h;
 
                     var margin = 10;
