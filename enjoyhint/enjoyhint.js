@@ -296,7 +296,7 @@ var EnjoyHint = function (_options) {
                 // =======================================================================
                 that.canvas_size = {
                     w: 2560,
-                    h: 3000
+                    h: 1600
                 };
                 var canvas_id = "enj_canvas";
 
