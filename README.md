@@ -4,7 +4,9 @@ EnjoyHint
 
 EnjoyHint is free software distributed under the terms of MIT license.
   
-Check out this [issue tracker demo with EnjoyHint](http://xbsoftware.com/products/enjoyhint/) and a [TODO app demo](http://xbsoftware.github.io/enjoyhint/) ([downloadable package](http://xbsoftware.github.io/enjoyhint/enjoyhint_todo_demo.zip))
+#### Demos
+[TODO app demo](http://xbsoftware.github.io/enjoyhint/) ([downloadable package](http://xbsoftware.github.io/enjoyhint/enjoyhint_todo_demo.zip))
+[A small guide on EnjoyHint](http://xbsoftware.github.io/enjoyhint/example1.html)
 
 #### Dependencies
 EnjoyHint require the following plugins and libs:
@@ -37,17 +39,15 @@ var enjoyhint_instance = new EnjoyHint({});
 //hide EnjoyHint after a click on the button.
 var enjoyhint_script_steps = [
   {
-    selector:'.new_btn',//jquery selector
-    event:'click',
-    description:'Click the "New" button to start creating your project'
+    "click .new_btn" : 'Click the "New" button to start creating your project'
   }  
 ];
 
 //set script config
-enjoyhint_instance.setScript(enjoyhint_script_steps);
+enjoyhint_instance.set(enjoyhint_script_steps);
 
 //run Enjoyhint script
-enjoyhint_instance.runScript();
+enjoyhint_instance.run();
 ```
 
 #### Script Configuration
@@ -58,24 +58,17 @@ Highlight some button and after you click on it, highlight some panel:
 ```javascript
 var enjoyhint_script_steps = [
   {
-    selector:    '.some_btn',//jquery selector
-    event:       'click',
-    description: 'Click on this btn'
+    "click .some_btn" : 'Click on this btn'
   },  
   {
-    selector:    '.some_panel',//jquery selector
-    event:       'click',
-    description: 'Click on this panel'
+    "click .some_panel" : 'Click on this panel'
   }  
 ];
 ```
 
 #### Properties of the step configuration
-* `selector` - jquery selector of the DOM-element, that will be highlighted  
-* `event` - a jquery event that is set for the element defined in the selector. When it fires, the next step is triggered.   
 * `key_code` - key code for any "key*" event. Event fires only if key code of the pressed key is equal to this property.    
 * `event_selector` - if you need to attach an event (that was set in "event" property) to other selector, you can use this one  
-* `description` - description for the highlighted element  
 * `timeout` - delay before the moment, when an element is highlighted   
 * `shape` - shape for highlighting (circle|rect)  
 * `margin` - margin for the highlight shape (for Ex.:10)  
@@ -83,7 +76,6 @@ var enjoyhint_script_steps = [
 * `right` - right margin for the shape of "rect" type  
 * `bottom` - bottom margin for the shape of "rect" type  
 * `left` - left margin for the shape of "rect" type  
-* `event_type` - type of event that will get you to the next step(auto|custom|next)
 
 #### Event Types descriptions:
 **auto** - for example, you need to click on the same button on the second step imediatelly after the first step and go to the next step after it. Then you can use "auto" in the "event_type" property and "click" in "event" property.
@@ -98,9 +90,9 @@ $.get('/load/some_data', function(data){
 * `next` - when you set value of event_type to "next", you will see the "Next" btn on this step.
 
 #### Methods
-* `setScript` - set current steps configuration. Arguments: config  
-* `runScript` - run the current script. Has no arguments  
-* `resumeScript` - resume the script from the step where it was stopped. Has no arguments  
+* `set` - set current steps configuration. Arguments: config  
+* `run` - run the current script. Has no arguments  
+* `resume` - resume the script from the step where it was stopped. Has no arguments  
 * `getCurrentStep` - returns the current step index  
 
 #### Events
