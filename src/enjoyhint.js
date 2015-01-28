@@ -52,7 +52,7 @@ var EnjoyHint = function (_options) {
     };
 
     that.clear = function(){
-        //Remove userClass and set default text
+        //(Remove userClass and set default text)
         $(".enjoyhint_next_btn").removeClass(that.nextUserClass);
         $(".enjoyhint_next_btn").text("Next");
         $(".enjoyhint_skip_btn").removeClass(that.skipUserClass);
@@ -60,6 +60,7 @@ var EnjoyHint = function (_options) {
     }
 
     var $body = $('body');
+
     var stepAction = function () {
         if (data && data[current_step]) {
             $(".enjoyhint").removeClass("enjoyhint-step-"+current_step);

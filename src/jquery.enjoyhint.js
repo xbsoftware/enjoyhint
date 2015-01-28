@@ -500,7 +500,8 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
                         w: that.enjoyhint.width(),
                         h: that.enjoyhint.height()
                     };
-                    //temp label used for detect label width and height
+
+
                     var label = that.getLabelElement({
                         x: 0,
                         y: 0,

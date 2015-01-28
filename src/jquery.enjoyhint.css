@@ -78,6 +78,7 @@
 
 .enjoyhint_skip_btn{
     position:absolute;
+    position: absolute;
     z-index: 1012;
     /*display: none;*/
     pointer-events: all;
