@@ -27,13 +27,21 @@ module.exports = function(grunt){
                     module: true
                 }
             }
+        },
+        cssmin: {
+            combine: {
+                files: {
+                    'enjoyhint.css': ['src/jquery.enjoyhint.css']
+                }
+            }
         }
     });
 
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-concat');
+    grunt.loadNpmTasks('grunt-contrib-cssmin');
 
-    grunt.registerTask("default", ["concat", "uglify"])
+    grunt.registerTask("default", ["concat", "uglify", "cssmin"])
 
 };

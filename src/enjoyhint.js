@@ -21,6 +21,9 @@ var EnjoyHint = function (_options) {
     var init = function () {
         if ($('.enjoyhint'))
             $('.enjoyhint').remove();
+        $('body').css({'overflow':'hidden'});
+        $(document).on("touchmove",lockTouch);
+
         $body.enjoyhint({
             onNextClick: function () {
                 current_step++;
@@ -36,14 +39,31 @@ var EnjoyHint = function (_options) {
         });
     };
 
+    var lockTouch = function(e) {
+        e.preventDefault();
+    };
+
     var destroyEnjoy = function () {
         $body = $('body');
         $('.enjoyhint').remove();
+        $("body").css({'overflow':'auto'});
+        $(document).off("touchmove", lockTouch);
+
     };
+
+    that.clear = function(){
+        //Remove userClass and set default text
+        $(".enjoyhint_next_btn").removeClass(that.nextUserClass);
+        $(".enjoyhint_next_btn").text("Next");
+        $(".enjoyhint_skip_btn").removeClass(that.skipUserClass);
+        $(".enjoyhint_skip_btn").text("Skip");
+    }
 
     var $body = $('body');
     var stepAction = function () {
         if (data && data[current_step]) {
+            $(".enjoyhint").removeClass("enjoyhint-step-"+current_step);
+            $(".enjoyhint").addClass("enjoyhint-step-"+(current_step+1));
             var step_data = data[current_step];
             if (step_data.onBeforeStart && typeof step_data.onBeforeStart === 'function') {
                 step_data.onBeforeStart();
@@ -62,7 +82,9 @@ var EnjoyHint = function (_options) {
                         }
                     }
                 }
-
+                setTimeout(function(){
+                    that.clear();
+                }, 250);
                 $(document.body).scrollTo(step_data.selector, step_data.scrollAnimationSpeed || 250, {offset: -100});
                 setTimeout(function () {
                     var $element = $(step_data.selector);
@@ -82,6 +104,31 @@ var EnjoyHint = function (_options) {
                             }
                         });
                     }
+                    if (step_data.showNext == true){
+                        $body.enjoyhint('show_next');
+                    }
+                    if (step_data.showSkip == false){
+                        $body.enjoyhint('hide_skip');
+                    }else{
+                        $body.enjoyhint('show_skip');
+                    }
+                    if (step_data.showSkip == true){
+
+                    }
+
+
+                    if (step_data.nextButton){
+                        $(".enjoyhint_next_btn").addClass(step_data.nextButton.className || "");
+                        $(".enjoyhint_next_btn").text(step_data.nextButton.text || "Next");
+                        that.nextUserClass = step_data.nextButton.className
+                    }
+
+                    if (step_data.skipButton){
+                        $(".enjoyhint_skip_btn").addClass(step_data.skipButton.className || "");
+                        $(".enjoyhint_skip_btn").text(step_data.skipButton.text || "Skip");
+                        that.skipUserClass = step_data.skipButton.className
+                    }
+
                     if (step_data.event_type) {
                         switch (step_data.event_type) {
                             case 'auto':
@@ -127,7 +174,7 @@ var EnjoyHint = function (_options) {
                     var shape_margin = (step_data.margin !== undefined) ? step_data.margin : 10;
                     var coords = {
                         x: offset.left + Math.round(w / 2) ,
-                        y: offset.top + Math.round(h / 2)  - $("body").scrollTop()
+                        y: offset.top + Math.round(h / 2)  - $(document).scrollTop()
                     };
                     var shape_data = {
                         center_x: coords.x,

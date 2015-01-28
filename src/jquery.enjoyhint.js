@@ -14,6 +14,7 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
 (function ($) {
     var methods = {
         init: function (options) {
+            console.log(options,'-------------');
             return this.each(function () {
                 var defaults = {
                     onNextClick: function () {
@@ -41,13 +42,14 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
                     hide: 'enjoyhint_hide',
                     disable_events_element: 'enjoyhint_disable_events',
                     btn: 'enjoyhint_btn',
-                    skip_btn: 'enjoyhint_next_btn',
+                    skip_btn: 'enjoyhint_skip_btn',
+                    close_btn: 'enjoyhint_close_btn',
                     next_btn: 'enjoyhint_next_btn',
                     main_canvas: 'enjoyhint_canvas',
                     main_svg: 'enjoyhint_svg',
                     svg_wrapper: 'enjoyhint_svg_wrapper',
                     svg_transparent: 'enjoyhint_svg_transparent',
-                    kinetic_container: 'kinetic_container',
+                    kinetic_container: 'kinetic_container'
                 };
                 function makeSVG(tag, attrs) {
                     var el = document.createElementNS('http://www.w3.org/2000/svg', tag);
@@ -60,8 +62,8 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
                 // ========================---- enjoyhint ----==============================
                 // =======================================================================
                 that.canvas_size = {
-                    w: 2560,
-                    h: 3000
+                    w: $(window).width()*1.4,
+                    h: $(window).height()*1.4
                 };
                 var canvas_id = "enj_canvas";
 
@@ -101,6 +103,11 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
                 });
                 that.$next_btn = $('<div>', {'class': that.cl.next_btn}).appendTo(that.enjoyhint).html('Next').click(function (e) {
                     that.options.onNextClick();
+                });
+
+                that.$close_btn = $('<div>', {'class': that.cl.close_btn}).appendTo(that.enjoyhint).html('').click(function (e){
+                    that.hide();
+                    that.options.onSkipClick();
                 });
 
                 that.$canvas.mousedown(function (e) {
@@ -179,6 +186,16 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
                     that.$next_btn.removeClass(that.cl.hide);
                     that.nextBtn = "show";
                 };
+
+                that.hideSkipBtn = function () {
+                    that.$skip_btn.addClass(that.cl.hide);
+                };
+                that.showSkipBtn = function () {
+                    that.$skip_btn.removeClass(that.cl.hide);
+                };
+
+
+
 
 
                 that.renderCircle = function (data) {
@@ -297,7 +314,7 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
                     var label_h = label.height();
                     var label_left = label.offset().left;
                     var label_right = label.offset().left + label_w;
-                    var label_top = label.offset().top - $("body").scrollTop();
+                    var label_top = label.offset().top - $(document).scrollTop();;
                     var label_bottom = label.offset().top + label_h;
 
                     var margin = 10;
@@ -526,6 +543,7 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
                         top: label_y + label_height + 20
                     });
                     var left_skip = label_x + that.$next_btn.width() + 10;
+                    console.log(that.nextBtn);
                     if (that.nextBtn == "hide"){
                         left_skip = label_x;
                     }
@@ -533,6 +551,10 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
                     that.$skip_btn.css({
                         left: left_skip,
                         top: label_y + label_height + 20
+                    });
+                    that.$close_btn.css({
+                        right : 10,
+                        top: 10
                     });
 
 
@@ -669,6 +691,20 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
         show_next: function () {
             this.each(function () {
                 this.enjoyhint_obj.showNextBtn();
+            });
+            return this;
+        },
+
+        hide_skip: function () {
+            this.each(function () {
+                this.enjoyhint_obj.hideSkipBtn();
+            });
+            return this;
+        },
+
+        show_skip: function () {
+            this.each(function () {
+                this.enjoyhint_obj.showSkipBtn();
             });
             return this;
         },
