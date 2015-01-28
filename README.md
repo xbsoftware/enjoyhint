@@ -67,17 +67,24 @@ var enjoyhint_script_steps = [
 ```
 
 #### Properties of the step configuration
-* `key_code` - key code for any "key*" event. Event fires only if key code of the pressed key is equal to this property.    
+* `"event selector" : "description"` - to describe a step you should set an event type, selecte element and add description for this element (hint)
+* `keyCode` - the code of a button, which triggers the next EnjoyHint step upon a click. Defined by the “key” event. (“key #block” : “hello”).
 * `event_selector` - if you need to attach an event (that was set in "event" property) to other selector, you can use this one  
 * `timeout` - delay before the moment, when an element is highlighted   
-* `shape` - shape for highlighting (circle|rect)  
+* `shape` - shape for highlighting (circle|rect)
+* `radius` -  if the shape of "circle" is specified, we can set the radius.
 * `margin` - margin for the highlight shape (for Ex.:10)  
 * `top` - top margin for the shape of "rect" type  
 * `right` - right margin for the shape of "rect" type  
 * `bottom` - bottom margin for the shape of "rect" type  
-* `left` - left margin for the shape of "rect" type  
+* `left` - left margin for the shape of "rect" type
+* `scrollAnimationSpeed` - sets the auto scroll speed (ms).
+* `showSkip` - shows or hides the Skip button (true|false)
+* `showNext` - shows or hides the Next button (true|false)
 
-#### Event Types descriptions:
+
+
+#### Non-standard events:
 **auto** - for example, you need to click on the same button on the second step imediatelly after the first step and go to the next step after it. Then you can use "auto" in the "event_type" property and "click" in "event" property.
 * `custom` - this value is very usefull if you need to go to the next step by event in your app code. For example, you want to go to the next step only after some data have been loaded in your application. Then you should use the "custom" event_type and the "trigger" method of the EnjoyHint instance.  
 ```javascript
@@ -88,6 +95,8 @@ $.get('/load/some_data', function(data){
 });
 ```  
 * `next` - when you set value of event_type to "next", you will see the "Next" btn on this step.
+* `key` - tells EnjoyHint to go to the next step when you click on the button defined by the keyCode
+
 
 #### Methods
 * `set` - set current steps configuration. Arguments: config  
@@ -120,3 +129,5 @@ var enjoyhint_script_steps = [
   }
 ];
 ```
+
+
