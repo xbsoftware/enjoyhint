@@ -21,7 +21,7 @@ var EnjoyHint = function (_options) {
     var init = function () {
         if ($('.enjoyhint'))
             $('.enjoyhint').remove();
-        $('html').css({'overflow':'hidden'});
+        $('body').css({'overflow':'hidden'});
         $(document).on("touchmove",lockTouch);
 
         $body.enjoyhint({
@@ -51,9 +51,19 @@ var EnjoyHint = function (_options) {
 
     };
 
+    that.clear = function(){
+        //Remove userClass and set default text
+        $(".enjoyhint_next_btn").removeClass(that.nextUserClass);
+        $(".enjoyhint_next_btn").text("Next");
+        $(".enjoyhint_skip_btn").removeClass(that.skipUserClass);
+        $(".enjoyhint_skip_btn").text("Skip");
+    }
+
     var $body = $('body');
     var stepAction = function () {
         if (data && data[current_step]) {
+            $(".enjoyhint").removeClass("enjoyhint-step-"+current_step);
+            $(".enjoyhint").addClass("enjoyhint-step-"+(current_step+1));
             var step_data = data[current_step];
             if (step_data.onBeforeStart && typeof step_data.onBeforeStart === 'function') {
                 step_data.onBeforeStart();
@@ -72,7 +82,9 @@ var EnjoyHint = function (_options) {
                         }
                     }
                 }
-
+                setTimeout(function(){
+                    that.clear();
+                }, 250);
                 $(document.body).scrollTo(step_data.selector, step_data.scrollAnimationSpeed || 250, {offset: -100});
                 setTimeout(function () {
                     var $element = $(step_data.selector);
@@ -103,6 +115,20 @@ var EnjoyHint = function (_options) {
                     if (step_data.showSkip == true){
 
                     }
+
+
+                    if (step_data.nextButton){
+                        $(".enjoyhint_next_btn").addClass(step_data.nextButton.className || "");
+                        $(".enjoyhint_next_btn").text(step_data.nextButton.text || "Next");
+                        that.nextUserClass = step_data.nextButton.className
+                    }
+
+                    if (step_data.skipButton){
+                        $(".enjoyhint_skip_btn").addClass(step_data.skipButton.className || "");
+                        $(".enjoyhint_skip_btn").text(step_data.skipButton.text || "Skip");
+                        that.skipUserClass = step_data.skipButton.className
+                    }
+
                     if (step_data.event_type) {
                         switch (step_data.event_type) {
                             case 'auto':
@@ -282,7 +308,7 @@ var EnjoyHint = function (_options) {
                     hide: 'enjoyhint_hide',
                     disable_events_element: 'enjoyhint_disable_events',
                     btn: 'enjoyhint_btn',
-                    skip_btn: 'enjoyhint_next_btn',
+                    skip_btn: 'enjoyhint_skip_btn',
                     close_btn: 'enjoyhint_close_btn',
                     next_btn: 'enjoyhint_next_btn',
                     main_canvas: 'enjoyhint_canvas',
