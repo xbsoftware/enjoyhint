@@ -79,8 +79,19 @@ var enjoyhint_script_steps = [
 * `bottom` - bottom margin for the shape of "rect" type  
 * `left` - left margin for the shape of "rect" type
 * `scrollAnimationSpeed` - sets the auto scroll speed (ms).
+* `nextButton` - allows applying its classes and names for the button Nеxt.
+* `skipButton` - allows applying its classes and names for the button Skip. For the example :
+```javascript
+	var options = {
+                    "next #block": 'Hello.',
+                    "nextButton" : {className: "myNext", text: "NEXT"},
+                    "skipButton" : {className: "mySkip", text: "SKIP"},
+
+                }
+  ```
 * `showSkip` - shows or hides the Skip button (true|false)
 * `showNext` - shows or hides the Next button (true|false)
+
 
 
 
@@ -129,5 +140,21 @@ var enjoyhint_script_steps = [
   }
 ];
 ```
+
+#### Release notes
+
+##### v.3
+
+* New and simplified description of EnjoyHint steps
+* Auto scroll to the element
+* Possibility to hide or display the buttons showNext, showSkip.
+* HTML usage allowed in description 
+* Destructor
+* Simplified property names 
+* Grunt  to compress and merge files 
+* New examples
+* You can learn the step you are on by the class enjoyhint-step-* ( where * stands for the step number).
+
+
 
 
