@@ -113,7 +113,8 @@ $.get('/load/some_data', function(data){
 * `set` - set current steps configuration. Arguments: config  
 * `run` - run the current script. Has no arguments  
 * `resume` - resume the script from the step where it was stopped. Has no arguments  
-* `getCurrentStep` - returns the current step index  
+* `getCurrentStep` - returns the current step index
+* `trigger` -  After writing this code you can either move to the next step or finish with EnjoyHint (next|skip)
 
 #### Events
 **Script Events**:
