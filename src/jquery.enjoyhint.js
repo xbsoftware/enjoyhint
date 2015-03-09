@@ -14,7 +14,6 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
 (function ($) {
     var methods = {
         init: function (options) {
-            console.log(options,'-------------');
             return this.each(function () {
                 var defaults = {
                     onNextClick: function () {
@@ -81,7 +80,6 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
                     width: that.canvas_size.w,
                     height: that.canvas_size.h
                 });
-                console.log(that.enjoyhint);
 
                 that.layer = new Kinetic.Layer();
                 that.rect = new Kinetic.Rect({
@@ -111,11 +109,9 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
                 });
 
                 that.$canvas.mousedown(function (e) {
-                    console.log('cl')
                     $('canvas').css({left: '4000px'});
 
                     var BottomElement = document.elementFromPoint(e.clientX, e.clientY);
-                    console.log(BottomElement.tagName)
                     $('canvas').css({left: '0px'});
 
                     $(BottomElement).click();
@@ -544,7 +540,6 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
                         top: label_y + label_height + 20
                     });
                     var left_skip = label_x + that.$next_btn.width() + 10;
-                    console.log(that.nextBtn);
                     if (that.nextBtn == "hide"){
                         left_skip = label_x;
                     }
@@ -747,7 +742,6 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
     };
 
     $.fn.enjoyhint = function (method) {
-        console.log(method);
         if (methods[method]) {
             return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
         } else if (typeof method === 'object' || !method) {

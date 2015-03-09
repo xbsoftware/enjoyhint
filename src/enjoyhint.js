@@ -26,15 +26,10 @@ var EnjoyHint = function (_options) {
 
         $body.enjoyhint({
             onNextClick: function () {
-                current_step++;
-                stepAction();
+                nextStep();
             },
             onSkipClick: function () {
-                var step_data = data[current_step];
-                var $element = $(step_data.selector);
-                off(step_data.event);
-                $element.off(makeEventName(step_data.event));
-                destroyEnjoy();
+                skipAll();
             }
         });
     };
@@ -208,6 +203,18 @@ var EnjoyHint = function (_options) {
 
     };
 
+    var nextStep = function(){
+        current_step++;
+        stepAction();
+    };
+    var skipAll = function(){
+        var step_data = data[current_step];
+        var $element = $(step_data.selector);
+        off(step_data.event);
+        $element.off(makeEventName(step_data.event));
+        destroyEnjoy();
+    };
+
     var makeEventName = function (name, is_custom) {
         return name + (is_custom ? 'custom' : '') + '.enjoy_hint';
     };
@@ -234,9 +241,15 @@ var EnjoyHint = function (_options) {
         return current_step;
     };
 
-
     that.trigger = function (event_name) {
-        $body.trigger(makeEventName(event_name, true));
+        switch (event_name) {
+            case 'next':
+                nextStep();
+                break
+            case 'skip':
+                skipAll();
+                break
+        }
     };
 
     that.setScript = function (_data) {
