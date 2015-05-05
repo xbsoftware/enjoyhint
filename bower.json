@@ -1,6 +1,9 @@
 {
   "name": "enjoyhint",
-  "main": "enjoyhint.js",
+  "main": [
+    "enjoyhint.js",
+    "enjoyhint.css"
+  ],
   "version": "3.1.0",
   "homepage": "https://github.com/xbsoftware/enjoyhint",
   "authors": [
