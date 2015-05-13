@@ -69,10 +69,11 @@ var EnjoyHint = function (_options) {
                 if (!step_data.selector) {
                     for (var prop in step_data) {
                         if (step_data.hasOwnProperty(prop) && prop.split(" ")[1]) {
-                            step_data.selector = prop.split(" ")[1];
-                            step_data.event = prop.split(" ")[0];
-                            if (prop.split(" ")[0] == 'next' || prop.split(" ")[0] == 'auto' || prop.split(" ")[0] == 'custom') {
-                                step_data.event_type = prop.split(" ")[0];
+                            var space_index = prop.indexOf(" ");
+                            step_data.event = prop.slice(0, space_index);
+                            step_data.selector = prop.slice(space_index + 1);
+                            if (step_data.event == 'next' || step_data.event == 'auto' || step_data.event == 'custom') {
+                                step_data.event_type = step_data.event;
                             }
                             step_data.description = step_data[prop];
                         }
