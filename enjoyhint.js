@@ -7,6 +7,9 @@ var EnjoyHint = function (_options) {
         },
         onEnd: function () {
 
+        },
+        onSkip: function () {
+
         }
     };
     var options = $.extend(defaults, _options);
@@ -69,10 +72,11 @@ var EnjoyHint = function (_options) {
                 if (!step_data.selector) {
                     for (var prop in step_data) {
                         if (step_data.hasOwnProperty(prop) && prop.split(" ")[1]) {
-                            step_data.selector = prop.split(" ")[1];
-                            step_data.event = prop.split(" ")[0];
-                            if (prop.split(" ")[0] == 'next' || prop.split(" ")[0] == 'auto' || prop.split(" ")[0] == 'custom') {
-                                step_data.event_type = prop.split(" ")[0];
+                            var space_index = prop.indexOf(" ");
+                            step_data.event = prop.slice(0, space_index);
+                            step_data.selector = prop.slice(space_index + 1);
+                            if (step_data.event == 'next' || step_data.event == 'auto' || step_data.event == 'custom') {
+                                step_data.event_type = step_data.event;
                             }
                             step_data.description = step_data[prop];
                         }
@@ -115,13 +119,13 @@ var EnjoyHint = function (_options) {
 
                     if (step_data.nextButton){
                         $(".enjoyhint_next_btn").addClass(step_data.nextButton.className || "");
-                        $(".enjoyhint_next_btn").html(step_data.nextButton.text || "Next");
+                        $(".enjoyhint_next_btn").text(step_data.nextButton.text || "Next");
                         that.nextUserClass = step_data.nextButton.className
                     }
 
                     if (step_data.skipButton){
                         $(".enjoyhint_skip_btn").addClass(step_data.skipButton.className || "");
-                        $(".enjoyhint_skip_btn").html(step_data.skipButton.text || "Skip");
+                        $(".enjoyhint_skip_btn").text(step_data.skipButton.text || "Skip");
                         that.skipUserClass = step_data.skipButton.className
                     }
 
@@ -212,6 +216,7 @@ var EnjoyHint = function (_options) {
         var $element = $(step_data.selector);
         off(step_data.event);
         $element.off(makeEventName(step_data.event));
+        options.onSkip();
         destroyEnjoy();
     };
 

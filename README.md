@@ -120,6 +120,7 @@ $.get('/load/some_data', function(data){
 **Script Events**:
 * `onStart` - fires on the first step.
 * `onEnd` - fires after the last step in script.
+* `onSkip` - fires after user has clicked skip.
 ```javascript
 var enjoyhint_instance = new EnjoyHint({
   onStart:function(){
