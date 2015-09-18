@@ -7,6 +7,9 @@ var EnjoyHint = function (_options) {
         },
         onEnd: function () {
 
+        },
+        onSkip: function () {
+
         }
     };
     var options = $.extend(defaults, _options);
@@ -213,6 +216,7 @@ var EnjoyHint = function (_options) {
         var $element = $(step_data.selector);
         off(step_data.event);
         $element.off(makeEventName(step_data.event));
+        options.onSkip();
         destroyEnjoy();
     };
 
