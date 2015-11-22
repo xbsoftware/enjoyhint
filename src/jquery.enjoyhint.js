@@ -548,7 +548,7 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
                         left: left_skip,
                         top: label_y + label_height + 20
                     });
-                    that.$close_btn.css({
+                    that.$close_btn.css(data.close_css || {
                         right : 10,
                         top: 10
                     });
@@ -752,4 +752,3 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
         return this;
     };
 })(window.jQuery);
-
