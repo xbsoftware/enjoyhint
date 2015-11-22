@@ -185,7 +185,8 @@ var EnjoyHint = function (_options) {
                         left: step_data.left,
                         right: step_data.right,
                         margin: step_data.margin,
-                        scroll: step_data.scroll
+                        scroll: step_data.scroll,
+                        close_css: step_data.closeButton
                     };
 
                     if (step_data.shape && step_data.shape == 'circle') {

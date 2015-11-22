@@ -3,7 +3,7 @@ EnjoyHint
 **EnjoyHint** is a web-tool that provides the simplest way to create interactive tutorials and hints for your site or web-application. It can also be used to highlight and sign application elements.  
 
 EnjoyHint is free software distributed under the terms of MIT license.
-  
+
 #### Demo
 * [TODO app demo](http://xbsoftware.github.io/enjoyhint/) ([downloadable package](http://xbsoftware.github.io/enjoyhint/enjoyhint_todo_demo.zip))
 * [A small guide on EnjoyHint](http://xbsoftware.github.io/enjoyhint/example1.html)
@@ -34,8 +34,8 @@ Alternative way:
 //initialize instance
 var enjoyhint_instance = new EnjoyHint({});
 
-//simple config. 
-//Only one step - highlighting(with description) "New" button 
+//simple config.
+//Only one step - highlighting(with description) "New" button
 //hide EnjoyHint after a click on the button.
 var enjoyhint_script_steps = [
   {
@@ -53,7 +53,7 @@ enjoyhint_instance.run();
 #### Script Configuration
 The sequence of steps can be only linear for now. So, the script config is an array. Every element of this array is the config for some step.
 
-#### Example of script configuration 
+#### Example of script configuration
 Highlight some button and after you click on it, highlight some panel:
 ```javascript
 var enjoyhint_script_steps = [
@@ -79,6 +79,7 @@ var enjoyhint_script_steps = [
 * `bottom` - bottom margin for the shape of "rect" type  
 * `left` - left margin for the shape of "rect" type
 * `scrollAnimationSpeed` - sets the auto scroll speed (ms).
+* `closeButton` - allows applying its css for the button Close.
 * `nextButton` - allows applying its classes and names for the button Nеxt.
 * `skipButton` - allows applying its classes and names for the button Skip. For the example :
 ```javascript
@@ -86,7 +87,7 @@ var enjoyhint_script_steps = [
                     "next #block": 'Hello.',
                     "nextButton" : {className: "myNext", text: "NEXT"},
                     "skipButton" : {className: "mySkip", text: "SKIP"},
-
+                    "closeButton": {left: 10, top: 10}
                 }
   ```
 * `showSkip` - shows or hides the Skip button (true|false)
@@ -150,13 +151,9 @@ var enjoyhint_script_steps = [
 * New and simplified description of EnjoyHint steps
 * Auto scroll to the element
 * Possibility to hide or display the buttons showNext, showSkip.
-* HTML usage allowed in description 
+* HTML usage allowed in description
 * Destructor
-* Simplified property names 
-* Grunt  to compress and merge files 
+* Simplified property names
+* Grunt  to compress and merge files
 * New examples
 * You can learn the step you are on by the class enjoyhint-step-* ( where * stands for the step number).
-
-
-
-
