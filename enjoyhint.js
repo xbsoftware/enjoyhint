@@ -254,6 +254,9 @@ var EnjoyHint = function (_options) {
             case 'skip':
                 skipAll();
                 break
+            default:
+                nextStep();
+                break
         }
     };
 
