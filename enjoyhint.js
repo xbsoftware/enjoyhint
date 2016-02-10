@@ -903,7 +903,13 @@ var EnjoyHint = function (_options) {
                         } else if (is_bottom) {
                             setArrowData('top', 'bottom', 'bottom');
                         } else {
-                            return;
+                            sideStatements(
+                                ['left', 'top', 'top'],//top
+                                ['left', 'top', 'top'],//mid_top
+                                ['left', 'top', 'top'],//mid
+                                ['top', 'right', 'top'],//mid_bot
+                                ['left', 'bottom', 'bottom']//bot
+                            );
                         }
                     } else if (is_left) {
                         sideStatements(
