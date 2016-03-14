@@ -155,7 +155,7 @@ var EnjoyHint = function (_options) {
                         }
 
                     } else {
-                        $body.on(event, step_data.selector, function (e) {
+                        $body.on(event, step_data.event_selector || step_data.selector, function (e) {
                             if (step_data.keyCode && e.keyCode != step_data.keyCode) {
                                 return;
                             }
