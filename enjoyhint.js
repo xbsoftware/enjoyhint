@@ -254,6 +254,9 @@ var EnjoyHint = function (_options) {
             case 'skip':
                 skipAll();
                 break
+            default:
+                nextStep();
+                break
         }
     };
 
@@ -896,11 +899,17 @@ var EnjoyHint = function (_options) {
 
                     if (is_center) {
                         if (is_top) {
-                            setArrowData('bottom', 'top', 'top');
+                            setArrowData('left', 'top', 'top');
                         } else if (is_bottom) {
                             setArrowData('top', 'bottom', 'bottom');
                         } else {
-                            return;
+                            sideStatements(
+                                ['left', 'top', 'top'],//top
+                                ['left', 'top', 'top'],//mid_top
+                                ['left', 'top', 'top'],//mid
+                                ['top', 'right', 'top'],//mid_bot
+                                ['left', 'bottom', 'bottom']//bot
+                            );
                         }
                     } else if (is_left) {
                         sideStatements(
@@ -914,7 +923,7 @@ var EnjoyHint = function (_options) {
                         sideStatements(
                             ['left', 'top', 'top'],//top
                             ['bottom', 'right', 'bottom'],//mid_top
-                            ['left', 'right', 'top'],//mid
+                            ['left', 'top', 'top'],//mid
                             ['top', 'right', 'top'],//mid_bot
                             ['left', 'bottom', 'bottom']//bot
                         );
