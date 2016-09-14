@@ -296,6 +296,12 @@ var EnjoyHint = function (_options) {
         stepAction();
     };
 
+    var prevStep = function() {
+
+        current_step--;
+        stepAction();
+    };
+
     var skipAll = function() {
 
         var step_data = data[current_step];
@@ -378,6 +384,10 @@ var EnjoyHint = function (_options) {
             case 'skip':
 
                 skipAll();
+                break;
+            case 'previous':
+
+                prevStep();
                 break;
         }
     };
