@@ -801,7 +801,7 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
                             data.center_y = sides_pos.top + half_h;
 
                             shape_data = that.renderRect({
-                                x: data.center_x,
+                                x: data.center_x -1,
                                 y: data.center_y,
                                 w: data.width,
                                 h: data.height,
