@@ -859,7 +859,7 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
                     });
 
                     that.$next_btn.css({
-                        left: label_x,
+                        left: label_x + label_width - that.$next_btn.width(),
                         top: label_y + label_height + 20
                     });
 
