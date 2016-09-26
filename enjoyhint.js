@@ -196,6 +196,13 @@ var EnjoyHint = function (_options) {
                     that.skipUserClass = step_data.skipButton.className;
                 }
 
+                if (step_data.labelClass) {
+
+                    var $label = $('#enjoyhint_label');
+
+                    $label.addClass(step_data.labelClass || "");
+                }
+
                 if (step_data.event_type) {
 
                     switch (step_data.event_type) {
