@@ -302,3 +302,15 @@
 div.kineticjs-content{
   position: absolute !important;
 }
+
+
+.enjoyhint_skip_btn {
+    position: fixed;
+}
+
+.enjoy_hint_label {
+    display: inline-block;
+    min-width: 200px;
+    text-align: center;
+    max-width: 80%;
+}

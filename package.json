@@ -30,6 +30,7 @@
   },
   "dependencies": {
     "grunt": "^0.4.5",
+    "jquery.scrollto": "^2.1.2",
     "kinetic": "^5.2.0"
   }
 }
