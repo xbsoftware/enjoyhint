@@ -801,7 +801,7 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
                             data.center_y = sides_pos.top + half_h;
 
                             shape_data = that.renderRect({
-                                x: data.center_x,
+                                x: data.center_x -1,
                                 y: data.center_y,
                                 w: data.width,
                                 h: data.height,
@@ -859,7 +859,7 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
                     });
 
                     that.$next_btn.css({
-                        left: label_x,
+                        left: label_x + label_width - that.$next_btn.width(),
                         top: label_y + label_height + 20
                     });
 
