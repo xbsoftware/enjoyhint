@@ -1,5 +1,7 @@
-**This fork is https://github.com/xbsoftware/enjoyhint**
+**Autor EnjoyHint is https://github.com/xbsoftware/enjoyhint**
+
 **New Features in EnjoyHint**
+
 * Add function .close()
 * Refactor function onEnd()
 
