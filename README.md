@@ -1,4 +1,5 @@
-**EnjoyHint autor https://github.com/xbsoftware/enjoyhint**
+EnjoyHint
+=========
 
 **EnjoyHint New Features**
 
@@ -8,12 +9,9 @@
 
 * Method stop
 
-`stop` - **New** Close the current tutorial. Has no arguments. **It's not mine**
+`stop` - **New** Close the current tutorial. Has no arguments.
 
-
-EnjoyHint
-=========
-**EnjoyHint** is a web-tool that provides the simplest way to create interactive tutorials and hints for your site or web-application. It can also be used to highlight and sign application elements.
+**EnjoyHint** is a web-tool that provides the simplest way to create interactive tutorials and hints for your site or web-application. It can also be used to highlight and sign application elements.  
 
 EnjoyHint is free software distributed under the terms of MIT license.
   
@@ -29,19 +27,9 @@ EnjoyHint require the following plugins and libs:
 
 #### Installation
 You can install it through `bower` package manager:
-
-**Package bower autor**
-
-This package bower haven't content the new function onEnd
-
 ```
 bower install enjoyhint
 ```
-**Me Package bower**
-```
-bower install enjoyhint-luchooo
-```
-
 Alternative way:
 - Download the latest version of EnjoyHint
 - Extract the archive with EnjoyHint.
@@ -138,7 +126,7 @@ $.get('/load/some_data', function(data){
 * `resume` - resume the script from the step where it was stopped. Has no arguments  
 * `getCurrentStep` - returns the current step index
 * `trigger` -  After writing this code you can either move to the next step or finish with EnjoyHint (next|skip)
-* `stop` - **New** Close the current tutorial. Has no arguments. **It's not mine**
+* `stop` - **New** Close the current tutorial. Has no arguments.
 
 #### Events
 **Script Events**:
@@ -169,5 +157,20 @@ var enjoyhint_script_steps = [
 
 #### Release notes
 
-* New function stop()
-* Refactor function onEnd()
+##### v.3
+
+* New and simplified description of EnjoyHint steps
+* Auto scroll to the element
+* Possibility to hide or display the buttons showNext, showSkip.
+* HTML usage allowed in description 
+* Destructor
+* Simplified property names 
+* Grunt  to compress and merge files 
+* New examples
+* You can learn the step you are on by the class enjoyhint-step-* ( where * stands for the step number).
+* **New** function stop()
+* **New** Refactor function onEnd()
+
+
+
+
