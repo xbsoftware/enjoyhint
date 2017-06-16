@@ -67,6 +67,7 @@ var EnjoyHint = function (_options) {
         $('.enjoyhint').remove();
         $body.css({'overflow':'auto'});
         $(document).off("touchmove", lockTouch);
+        options.onEnd();
     };
 
     that.clear = function(){
