@@ -602,8 +602,6 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
 
                 that.renderArrow = function (data) {
 
-                    if (window.innerWidth >= 640) {
-
                         var x_from = data.x_from || 0;
                         var y_from = data.y_from || 0;
                         var x_to = data.x_to || 0;
@@ -611,6 +609,9 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
                         var by_top_side = data.by_top_side;
                         var control_point_x = 0;
                         var control_point_y = 0;
+                    
+                    if (window.innerWidth >= 640) {
+
                         if (by_top_side) {
 
                             if (y_from >= y_to) {
