@@ -1,5 +1,18 @@
 EnjoyHint
 =========
+
+**EnjoyHint New Features**
+
+* Function onEnd
+
+`onEnd` - fires after the last step in script, fires after user has clicked skip and fires after click close button.
+
+* Method stop
+
+`stop` - **New** Close the current tutorial. Has no arguments.
+
+______________________________________________________________________________________________________________
+
 **EnjoyHint** is a web-tool that provides the simplest way to create interactive tutorials and hints for your site or web-application. It can also be used to highlight and sign application elements.  
 
 EnjoyHint is free software distributed under the terms of MIT license.
@@ -115,11 +128,12 @@ $.get('/load/some_data', function(data){
 * `resume` - resume the script from the step where it was stopped. Has no arguments  
 * `getCurrentStep` - returns the current step index
 * `trigger` -  After writing this code you can either move to the next step or finish with EnjoyHint (next|skip)
+* `stop` - **New** Close the current tutorial. Has no arguments.
 
 #### Events
 **Script Events**:
 * `onStart` - fires on the first step.
-* `onEnd` - fires after the last step in script.
+* `onEnd` - **New** fires after the last step in script, fires after user has clicked skip and fires after click close button.
 * `onSkip` - fires after user has clicked skip.
 ```javascript
 var enjoyhint_instance = new EnjoyHint({
@@ -156,6 +170,8 @@ var enjoyhint_script_steps = [
 * Grunt  to compress and merge files 
 * New examples
 * You can learn the step you are on by the class enjoyhint-step-* ( where * stands for the step number).
+* **New** function stop()
+* **New** Refactor function onEnd()
 
 
 
