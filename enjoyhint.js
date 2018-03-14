@@ -1239,32 +1239,16 @@ var EnjoyHint = function (_options) {
                     var label_width = label.outerWidth();
                     var label_height = label.outerHeight();
                     label.remove();
-                    var top_offset = data.center_y - half_h;
-                    var bottom_offset = body_size.h - (data.center_y + half_h);
-                    var left_offset = data.center_x - half_w;
-                    var right_offset = body_size.w - (data.center_x + half_w);
 
-                    var label_hor_side = (body_size.w - data.center_x) < data.center_x ? 'left' : 'right';
+                    //var label_hor_side = (body_size.w - data.center_x) < data.center_x ? 'left' : 'right';
                     var label_ver_side = (body_size.h - data.center_y) < data.center_y ? 'top' : 'bottom';
                     var label_shift = 150;
-                    var label_margin = 40;
-                    var label_shift_with_label_width = label_shift + label_width + label_margin;
-                    var label_shift_with_label_height = label_shift + label_height + label_margin;
-                    var label_hor_offset = half_w + label_shift;
+                    //var label_hor_offset = half_w + label_shift;
                     var label_ver_offset = half_h + label_shift;
 
                     //original: var label_x = (label_hor_side == 'left') ? data.center_x - label_hor_offset - label_width : data.center_x + label_hor_offset;
                     var label_y = (label_ver_side == 'top') ? data.center_y - label_ver_offset - label_height : data.center_y + label_ver_offset;
                     var label_x = window.innerWidth / 2 - label_width / 2;
-
-                    if (top_offset < label_shift_with_label_height && bottom_offset < label_shift_with_label_height) {
-
-                        label_y = data.center_y + label_margin;
-                    }
-
-                    if (window.innerWidth <= 640) {
-
-                    }
 
                     var label_data = that.renderLabel({
                         x: label_x,
