@@ -19,14 +19,16 @@ var EnjoyHint = function (_options) {
 
         onNext: function () {
 
-        }
+        },
+
+        container: 'body'
     };
 
     var options = $.extend(defaults, _options);
     var data = [];
     var current_step = 0;
 
-    $body = $('body');
+    $body = $(options.container);
 
 
     /********************* PRIVATE METHODS ***************************************/

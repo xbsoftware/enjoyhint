@@ -19,14 +19,16 @@ var EnjoyHint = function (_options) {
 
         onNext: function () {
 
-        }
+        },
+
+        container: 'body'
     };
 
     var options = $.extend(defaults, _options);
     var data = [];
     var current_step = 0;
 
-    $body = $('body');
+    $body = $(options.container);
 
 
     /********************* PRIVATE METHODS ***************************************/
@@ -327,7 +329,7 @@ var EnjoyHint = function (_options) {
 
     window.addEventListener('resize', function() {
 
-        if ($event_element != null) {
+        if ($event_element) {
 
             $body.enjoyhint('redo_events_near_rect', $event_element[0].getBoundingClientRect());
         }
