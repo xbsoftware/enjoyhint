@@ -997,8 +997,8 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
                 };
 
                 that.clear = function () {
-
-                    that.ctx.clearRect(0, 0, 3000, 2000);
+                  $('#enjoyhint_arrpw_line').remove();
+                  $('#enjoyhint_label').remove();
                 };
 
                 return this;

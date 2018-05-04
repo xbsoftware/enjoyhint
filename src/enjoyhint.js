@@ -40,10 +40,6 @@ var EnjoyHint = function (_options) {
             $('.enjoyhint').remove();
         }
 
-        $body.css({'overflow':'hidden'});
-
-        $(document).on("touchmove",lockTouch);
-
         $body.enjoyhint({
 
             onNextClick: function () {
@@ -65,8 +61,8 @@ var EnjoyHint = function (_options) {
     };
 
     var destroyEnjoy = function () {
-
-        $('.enjoyhint').remove();
+        options.onEnd();
+        $body.enjoyhint('clear');
         $body.css({'overflow':'auto'});
         $(document).off("touchmove", lockTouch);
     };
@@ -87,7 +83,6 @@ var EnjoyHint = function (_options) {
         if (!(data && data[current_step])) {
 
             $body.enjoyhint('hide');
-            options.onEnd();
             destroyEnjoy();
             return;
         }
@@ -346,6 +341,8 @@ var EnjoyHint = function (_options) {
     };
 
     that.runScript = function () {
+        $body.css({'overflow':'hidden'});
+        $(document).on("touchmove",lockTouch);
 
         current_step = 0;
         options.onStart();
