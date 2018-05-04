@@ -1,3 +1,8 @@
+[![npm version](https://badge.fury.io/js/enjoyhint.js.svg)](https://badge.fury.io/js/enjoyhint.js)
+[![monthly](https://img.shields.io/npm/dm/enjoyhint.js.svg)](https://badge.fury.io/js/enjoyhint.js)
+[![total](https://img.shields.io/npm/dt/enjoyhint.js.svg)](https://badge.fury.io/js/enjoyhint.js)
+
+
 EnjoyHint
 =========
 **EnjoyHint** is a web-tool that provides the simplest way to create interactive tutorials and hints for your site or web-application. It can also be used to highlight and sign application elements.  
