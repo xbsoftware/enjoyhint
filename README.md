@@ -70,6 +70,29 @@ var enjoyhint_script_steps = [
 ];
 ```
 
+#### Properties of instance configuration
+* `container` - scrollable container (default `body`)
+
+```javascript
+//initialize instance
+var enjoyhint_instance = new EnjoyHint({
+  container: '.main-panel'
+});
+```
+
+#### Events
+**Script Events**:
+* `onStart` - fires on the first step.
+* `onEnd` - fires after the last step in script.
+* `onSkip` - fires after user has clicked skip.
+```javascript
+var enjoyhint_instance = new EnjoyHint({
+  onStart:function(){
+    //do something
+  }
+});
+```
+
 #### Properties of the step configuration
 * `"event selector" : "description"` - to describe a step you should set an event type, selecte element and add description for this element (hint)
 * `keyCode` - the code of a button, which triggers the next EnjoyHint step upon a click. Defined by the “key” event. (“key #block” : “hello”).
@@ -121,17 +144,6 @@ $.get('/load/some_data', function(data){
 * `trigger` -  After writing this code you can either move to the next step or finish with EnjoyHint (next|skip)
 
 #### Events
-**Script Events**:
-* `onStart` - fires on the first step.
-* `onEnd` - fires after the last step in script.
-* `onSkip` - fires after user has clicked skip.
-```javascript
-var enjoyhint_instance = new EnjoyHint({
-  onStart:function(){
-    //do something
-  }
-});
-```
 **Step Events**:  
 * `onBeforeStart` - fires before the step is started.
 ```javascript
