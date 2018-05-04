@@ -161,6 +161,9 @@ var enjoyhint_script_steps = [
 
 #### Changelogs
 
+##### 1.0.4
+* Add instance option `container`
+
 ##### 1.0.3
 
 * Fix auto scroll to the element
