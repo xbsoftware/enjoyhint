@@ -161,6 +161,10 @@ var enjoyhint_script_steps = [
 
 #### Changelogs
 
+##### 1.0.6
+* Fix `getBoundingClientRect()` error bug
+* Change label CSS text-align from `center` to `left`
+
 ##### 1.0.5
 * Add instance option `container`
 
