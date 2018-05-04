@@ -133,7 +133,7 @@ var EnjoyHint = function (_options) {
                 that.clear();
             }, 250);
 
-            $(document.body).scrollTop(step_data.selector, step_data.scrollAnimationSpeed || 250, {offset: -100});
+            $(document.body).scrollTo(step_data.selector, step_data.scrollAnimationSpeed || 250, {offset: -100});
 
             setTimeout(function () {
 
@@ -412,7 +412,8 @@ var EnjoyHint = function (_options) {
     };
 
     init();
-};;CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
+};
+;CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
 
     if (w < 2 * r) r = w / 2;
     if (h < 2 * r) r = h / 2;
@@ -675,13 +676,15 @@ var EnjoyHint = function (_options) {
 
                             originalArrowLeft = [];
                             var attr = $('#enjoyhint_arrpw_line').attr('d');
-                            originalArrowLeft.push(attr.substr(1).split(',')[0]);
-                            originalArrowLeft.push(attr.substr(attr.indexOf('Q') + 1).split(',')[0]);
-                            originalArrowLeft.push(attr.split(' ')[2].split(',')[0]);
-                            originalArrowTop = [];
-                            originalArrowTop.push(attr.split(',')[1].split(' ')[0]);
-                            originalArrowTop.push(attr.split(',')[2].split(' ')[0]);
-                            originalArrowTop.push(attr.split(',')[3]);
+                            if(attr) {
+                              originalArrowLeft.push(attr.substr(1).split(',')[0]);
+                              originalArrowLeft.push(attr.substr(attr.indexOf('Q') + 1).split(',')[0]);
+                              originalArrowLeft.push(attr.split(' ')[2].split(',')[0]);
+                              originalArrowTop = [];
+                              originalArrowTop.push(attr.split(',')[1].split(' ')[0]);
+                              originalArrowTop.push(attr.split(',')[2].split(' ')[0]);
+                              originalArrowTop.push(attr.split(',')[3]);
+                            }
                         }
 
                         var labelElement = $('.enjoy_hint_label');
@@ -1023,7 +1026,7 @@ var EnjoyHint = function (_options) {
                         var by_top_side = data.by_top_side;
                         var control_point_x = 0;
                         var control_point_y = 0;
-                    
+
                     if (window.innerWidth >= 640) {
 
                         if (by_top_side) {
