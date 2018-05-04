@@ -3,10 +3,10 @@ EnjoyHint
 **EnjoyHint** is a web-tool that provides the simplest way to create interactive tutorials and hints for your site or web-application. It can also be used to highlight and sign application elements.  
 
 EnjoyHint is free software distributed under the terms of MIT license.
-  
+
 #### Demo
-* [TODO app demo](http://xbsoftware.github.io/enjoyhint/) ([downloadable package](http://xbsoftware.github.io/enjoyhint/enjoyhint_todo_demo.zip))
-* [A small guide on EnjoyHint](http://xbsoftware.github.io/enjoyhint/example1.html)
+* [TODO app demo](http://darron1217.github.io/enjoyhint.js/) ([downloadable package](http://darron1217.github.io/enjoyhint.js/enjoyhint_todo_demo.zip))
+* [A small guide on EnjoyHint](http://darron1217.github.io/enjoyhint.js/example1.html)
 
 #### Dependencies
 EnjoyHint require the following plugins and libs:
@@ -15,9 +15,9 @@ EnjoyHint require the following plugins and libs:
 * KineticJS v5.1.0 (included into js file)
 
 #### Installation
-You can install it through `bower` package manager:
+You can install it through `npm` package manager:
 ```
-bower install enjoyhint
+npm install enjoyhint.js
 ```
 Alternative way:
 - Download the latest version of EnjoyHint
@@ -34,8 +34,8 @@ Alternative way:
 //initialize instance
 var enjoyhint_instance = new EnjoyHint({});
 
-//simple config. 
-//Only one step - highlighting(with description) "New" button 
+//simple config.
+//Only one step - highlighting(with description) "New" button
 //hide EnjoyHint after a click on the button.
 var enjoyhint_script_steps = [
   {
@@ -53,7 +53,7 @@ enjoyhint_instance.run();
 #### Script Configuration
 The sequence of steps can be only linear for now. So, the script config is an array. Every element of this array is the config for some step.
 
-#### Example of script configuration 
+#### Example of script configuration
 Highlight some button and after you click on it, highlight some panel:
 ```javascript
 var enjoyhint_script_steps = [
@@ -150,13 +150,9 @@ var enjoyhint_script_steps = [
 * New and simplified description of EnjoyHint steps
 * Auto scroll to the element
 * Possibility to hide or display the buttons showNext, showSkip.
-* HTML usage allowed in description 
+* HTML usage allowed in description
 * Destructor
-* Simplified property names 
-* Grunt  to compress and merge files 
+* Simplified property names
+* Grunt  to compress and merge files
 * New examples
 * You can learn the step you are on by the class enjoyhint-step-* ( where * stands for the step number).
-
-
-
-
