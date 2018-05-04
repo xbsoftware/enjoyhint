@@ -327,7 +327,7 @@ var EnjoyHint = function (_options) {
 
     window.addEventListener('resize', function() {
 
-        if ($event_element != null) {
+        if ($event_element) {
 
             $body.enjoyhint('redo_events_near_rect', $event_element[0].getBoundingClientRect());
         }
