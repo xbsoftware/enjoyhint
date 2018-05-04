@@ -5,8 +5,7 @@ EnjoyHint
 EnjoyHint is free software distributed under the terms of MIT license.
 
 #### Demo
-* [TODO app demo](http://darron1217.github.io/enjoyhint.js/) ([downloadable package](http://darron1217.github.io/enjoyhint.js/enjoyhint_todo_demo.zip))
-* [A small guide on EnjoyHint](http://darron1217.github.io/enjoyhint.js/example1.html)
+* [A guide on EnjoyHint](http://darron1217.github.io/enjoyhint.js/index.html)
 
 #### Dependencies
 EnjoyHint require the following plugins and libs:
@@ -143,16 +142,10 @@ var enjoyhint_script_steps = [
 ];
 ```
 
-#### Release notes
+#### Changelogs
 
-##### v.3
+##### 1.0.3
 
-* New and simplified description of EnjoyHint steps
-* Auto scroll to the element
-* Possibility to hide or display the buttons showNext, showSkip.
-* HTML usage allowed in description
-* Destructor
-* Simplified property names
-* Grunt  to compress and merge files
-* New examples
-* You can learn the step you are on by the class enjoyhint-step-* ( where * stands for the step number).
+* Fix auto scroll to the element
+* Fix demo page scroll error
+* Change z-indexes from 10xx to 20xx
