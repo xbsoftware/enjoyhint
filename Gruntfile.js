@@ -6,14 +6,14 @@ module.exports = function(grunt){
                 separator: ';'
             },
             dist:{
-                src:['src/*.js', 'lib/kineticjs/kinetic.min.js', 'lib/jquery.scrollTo/jquery.scrollTo.min.js'],
-                dest: '<%= pkg.name %>.js'
+                src:['src/*.js', 'node_modules/kinetic/kinetic.min.js', 'node_modules/jquery.scrollTo/jquery.scrollTo.min.js'],
+                dest: 'dist/<%= pkg.name %>.js'
             }
         },
         uglify: {
             main: {
                 files: {
-                    '<%= pkg.name %>.min.js': ['<%= concat.dist.dest %>']
+                    'dist/<%= pkg.name %>.min.js': ['<%= concat.dist.dest %>']
                 }
             }
         },
@@ -31,7 +31,7 @@ module.exports = function(grunt){
         cssmin: {
             combine: {
                 files: {
-                    'enjoyhint.css': ['src/jquery.enjoyhint.css']
+                    'dist/enjoyhint.css': ['src/jquery.enjoyhint.css']
                 }
             }
         }
