@@ -329,8 +329,7 @@ var EnjoyHint = function (_options) {
 
     window.addEventListener('resize', function() {
 
-        if ($event_element) {
-
+        if ($event_element[0]) {
             $body.enjoyhint('redo_events_near_rect', $event_element[0].getBoundingClientRect());
         }
     });
