@@ -161,7 +161,7 @@ var enjoyhint_script_steps = [
 
 #### Changelogs
 
-##### 1.0.4
+##### 1.0.5
 * Add instance option `container`
 
 ##### 1.0.3

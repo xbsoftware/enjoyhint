@@ -1,6 +1,6 @@
 {
   "name": "enjoyhint.js",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Web-tool that provides the simplest way to create interactive tutorials and hints.",
   "main": "enjoyhint.js",
   "scripts": {
@@ -28,7 +28,7 @@
     "grunt-contrib-jshint": "^0.11.2",
     "grunt-contrib-uglify": "^0.9.1"
   },
-  "dependencies": {
+  "dependencies": {W
     "grunt": "^0.4.5",
     "jquery.scrollto": "^2.1.2",
     "kinetic": "^5.2.0"
