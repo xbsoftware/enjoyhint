@@ -1,6 +1,6 @@
-[![npm version](https://badge.fury.io/js/enjoyhint.js.svg)](https://badge.fury.io/js/enjoyhint.js)
-[![monthly](https://img.shields.io/npm/dm/enjoyhint.js.svg)](https://badge.fury.io/js/enjoyhint.js)
-[![total](https://img.shields.io/npm/dt/enjoyhint.js.svg)](https://badge.fury.io/js/enjoyhint.js)
+[![npm version](https://badge.fury.io/js/enjoyhint.js.svg)](https://www.npmjs.com/package/enjoyhint.js)
+[![monthly](https://img.shields.io/npm/dm/enjoyhint.js.svg)](https://www.npmjs.com/package/enjoyhint.js)
+[![total](https://img.shields.io/npm/dt/enjoyhint.js.svg)](https://www.npmjs.com/package/enjoyhint.js)
 
 
 EnjoyHint
