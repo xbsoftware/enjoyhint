@@ -142,6 +142,7 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
                 var $bottom_dis_events = $top_dis_events.clone().appendTo(that.enjoyhint);
                 var $left_dis_events = $top_dis_events.clone().appendTo(that.enjoyhint);
                 var $right_dis_events = $top_dis_events.clone().appendTo(that.enjoyhint);
+                that.$element_dis_events = $top_dis_events.clone().appendTo(that.enjoyhint);
 
                 var stopPropagation = function(e) {
 
@@ -153,6 +154,7 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
                 $bottom_dis_events.click(stopPropagation);
                 $left_dis_events.click(stopPropagation);
                 $right_dis_events.click(stopPropagation);
+                that.$element_dis_events.click(stopPropagation);
 
 
                 that.$skip_btn = $('<div>', {'class': that.cl.skip_btn}).appendTo(that.enjoyhint).html('Skip').click(function (e) {
@@ -339,7 +341,6 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
                                 y1 = labelRect.top;
                                 bezX = x1;
                                 bezY = y1;
-                                console.log("ok");
                             }
 
                             if (window.innerWidth < 900) {
@@ -381,7 +382,8 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
                     $top_dis_events,
                     $bottom_dis_events,
                     $left_dis_events,
-                    $right_dis_events
+                    $right_dis_events,
+                    that.$element_dis_events
                 ];
 
                 that.show = function () {
@@ -425,6 +427,10 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
                 that.showSkipBtn = function () {
 
                     that.$skip_btn.removeClass(that.cl.hide);
+                };
+
+                that.disableEventsOfRect = function () {
+                    that.$element_dis_events.show();
                 };
 
                 that.renderCircle = function (data) {
@@ -686,6 +692,15 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
                         top: '0',
                         left: rect.right + 'px'
                     });
+
+                    that.$element_dis_events.css({
+                        top: rect.top + 'px',
+                        left: rect.left + 'px'
+                    })
+                    .width(rect.right - rect.left)
+                    .height(rect.bottom - rect.top)
+                    .hide();
+
                 };
 
                 (function($) {
@@ -1134,7 +1149,17 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
             });
 
             return this;
+        },
+
+        disable_element_events: function () {
+
+            this.each(function () {
+                this.enjoyhint_obj.disableEventsOfRect();
+            });
+
+            return this;
         }
+
     };
 
     $.fn.enjoyhint = function (method) {

@@ -283,6 +283,11 @@ var EnjoyHint = function (_options) {
                 }
 
                 $body.enjoyhint('render_label_with_shape', shape_data, that.stop);
+
+                if (step_data.event == "next") {
+
+                    $body.enjoyhint('disable_element_events');
+                }
             }, step_data.scrollAnimationSpeed + 20 || 270);
         }, timeout);
     };
@@ -555,6 +560,7 @@ var EnjoyHint = function (_options) {
                 var $bottom_dis_events = $top_dis_events.clone().appendTo(that.enjoyhint);
                 var $left_dis_events = $top_dis_events.clone().appendTo(that.enjoyhint);
                 var $right_dis_events = $top_dis_events.clone().appendTo(that.enjoyhint);
+                that.$element_dis_events = $top_dis_events.clone().appendTo(that.enjoyhint);
 
                 var stopPropagation = function(e) {
 
@@ -566,6 +572,7 @@ var EnjoyHint = function (_options) {
                 $bottom_dis_events.click(stopPropagation);
                 $left_dis_events.click(stopPropagation);
                 $right_dis_events.click(stopPropagation);
+                that.$element_dis_events.click(stopPropagation);
 
 
                 that.$skip_btn = $('<div>', {'class': that.cl.skip_btn}).appendTo(that.enjoyhint).html('Skip').click(function (e) {
@@ -752,7 +759,6 @@ var EnjoyHint = function (_options) {
                                 y1 = labelRect.top;
                                 bezX = x1;
                                 bezY = y1;
-                                console.log("ok");
                             }
 
                             if (window.innerWidth < 900) {
@@ -794,7 +800,8 @@ var EnjoyHint = function (_options) {
                     $top_dis_events,
                     $bottom_dis_events,
                     $left_dis_events,
-                    $right_dis_events
+                    $right_dis_events,
+                    that.$element_dis_events
                 ];
 
                 that.show = function () {
@@ -838,6 +845,10 @@ var EnjoyHint = function (_options) {
                 that.showSkipBtn = function () {
 
                     that.$skip_btn.removeClass(that.cl.hide);
+                };
+
+                that.disableEventsOfRect = function () {
+                    that.$element_dis_events.show();
                 };
 
                 that.renderCircle = function (data) {
@@ -1099,6 +1110,15 @@ var EnjoyHint = function (_options) {
                         top: '0',
                         left: rect.right + 'px'
                     });
+
+                    that.$element_dis_events.css({
+                        top: rect.top + 'px',
+                        left: rect.left + 'px'
+                    })
+                    .width(rect.right - rect.left)
+                    .height(rect.bottom - rect.top)
+                    .hide();
+
                 };
 
                 (function($) {
@@ -1547,7 +1567,17 @@ var EnjoyHint = function (_options) {
             });
 
             return this;
+        },
+
+        disable_element_events: function () {
+
+            this.each(function () {
+                this.enjoyhint_obj.disableEventsOfRect();
+            });
+
+            return this;
         }
+
     };
 
     $.fn.enjoyhint = function (method) {

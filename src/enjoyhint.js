@@ -283,6 +283,11 @@ var EnjoyHint = function (_options) {
                 }
 
                 $body.enjoyhint('render_label_with_shape', shape_data, that.stop);
+
+                if (step_data.event == "next") {
+
+                    $body.enjoyhint('disable_element_events');
+                }
             }, step_data.scrollAnimationSpeed + 20 || 270);
         }, timeout);
     };
