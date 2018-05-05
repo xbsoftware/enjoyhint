@@ -161,6 +161,9 @@ var enjoyhint_script_steps = [
 
 #### Changelogs
 
+##### 1.1.1
+* Disable element click when next button shown
+
 ##### 1.1.0
 * Allow multiple run() on one instance
 
