@@ -1,8 +1,9 @@
 {
   "name": "enjoyhint.js",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Web-tool that provides the simplest way to create interactive tutorials and hints.",
-  "main": "enjoyhint.js",
+  "main": "dist/enjoyhint.js",
+  "module": "dist/enjoyhint.es.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

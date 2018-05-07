@@ -1,19 +1,19 @@
 module.exports = function(grunt){
     grunt.initConfig({
-        pkg: grunt.file.readJSON('bower.json'),
+        pkg: grunt.file.readJSON('package.json'),
         concat:{
             options: {
                 separator: ';'
             },
             dist:{
                 src:['src/*.js', 'node_modules/kinetic/kinetic.min.js', 'node_modules/jquery.scrollTo/jquery.scrollTo.min.js'],
-                dest: 'dist/<%= pkg.name %>.js'
+                dest: 'dist/enjoyhint.js'
             }
         },
         uglify: {
             main: {
                 files: {
-                    'dist/<%= pkg.name %>.min.js': ['<%= concat.dist.dest %>']
+                    'dist/enjoyhint.min.js': ['<%= concat.dist.dest %>']
                 }
             }
         },
