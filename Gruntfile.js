@@ -8,12 +8,17 @@ module.exports = function(grunt){
             dist:{
                 src:['src/*.js', 'node_modules/kinetic/kinetic.min.js', 'node_modules/jquery.scrollTo/jquery.scrollTo.min.js'],
                 dest: 'dist/enjoyhint.js'
-            }
+            },
+            all: {
+              src: ['node_modules/jquery/dist/jquery.min.js', 'dist/enjoyhint.js'],
+              dest: 'dist/all.js',
+            },
         },
         uglify: {
             main: {
                 files: {
-                    'dist/enjoyhint.min.js': ['<%= concat.dist.dest %>']
+                    'dist/enjoyhint.min.js': ['<%= concat.dist.dest %>'],
+                    'dist/all.min.js': ['<%= concat.all.dest %>']
                 }
             }
         },
