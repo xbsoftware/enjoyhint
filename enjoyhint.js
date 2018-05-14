@@ -133,7 +133,7 @@ var EnjoyHint = function (_options) {
                 that.clear();
             }, 250);
 
-            $(document.body).scrollTop(step_data.selector, step_data.scrollAnimationSpeed || 250, {offset: -100});
+            $(document.body).scrollTo(step_data.selector, step_data.scrollAnimationSpeed || 250, {offset: -100});
 
             setTimeout(function () {
 
@@ -675,13 +675,16 @@ var EnjoyHint = function (_options) {
 
                             originalArrowLeft = [];
                             var attr = $('#enjoyhint_arrpw_line').attr('d');
-                            originalArrowLeft.push(attr.substr(1).split(',')[0]);
-                            originalArrowLeft.push(attr.substr(attr.indexOf('Q') + 1).split(',')[0]);
-                            originalArrowLeft.push(attr.split(' ')[2].split(',')[0]);
-                            originalArrowTop = [];
-                            originalArrowTop.push(attr.split(',')[1].split(' ')[0]);
-                            originalArrowTop.push(attr.split(',')[2].split(' ')[0]);
-                            originalArrowTop.push(attr.split(',')[3]);
+
+									 if (attr) {
+									     originalArrowLeft.push(attr.substr(1).split(',')[0]);
+										  originalArrowLeft.push(attr.substr(attr.indexOf('Q') + 1).split(',')[0]);
+										  originalArrowLeft.push(attr.split(' ')[2].split(',')[0]);
+										  originalArrowTop = [];
+										  originalArrowTop.push(attr.split(',')[1].split(' ')[0]);
+										  originalArrowTop.push(attr.split(',')[2].split(' ')[0]);
+										  originalArrowTop.push(attr.split(',')[3]);
+									 }
                         }
 
                         var labelElement = $('.enjoy_hint_label');
