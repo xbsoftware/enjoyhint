@@ -218,12 +218,12 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
                 that.layer.add(that.shape);
                 that.kinetic_stage.add(that.layer);
 
-                $(window).on('resize', function() {
+                $(window).on('resize.enjoy_hint', function() {
 
                     if (!($(that.stepData.enjoyHintElementSelector).is(":visible"))) {
 
                         that.stopFunction();
-                        $(window).off('resize');
+                        $(window).off('resize.enjoy_hint');
                         return;
                     }
 
@@ -1147,6 +1147,7 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
 
                 this.enjoyhint_obj.closePopdown();
             });
+            $(window).off('resize.enjoy_hint');
 
             return this;
         },

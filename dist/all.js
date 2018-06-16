@@ -23,7 +23,9 @@
 
         },
 
-        container: 'body'
+        container: 'body',
+
+        animation_time: 800
     };
 
     var options = $.extend(defaults, _options);
@@ -53,7 +55,9 @@
 
                 options.onSkip();
                 skipAll();
-            }
+            },
+
+            animation_time: options.animation_time
         });
     };
 
@@ -115,11 +119,13 @@
                     if (step_data.hasOwnProperty(prop) && prop.split(" ")[1]) {
 
                         step_data.selector = prop.split(" ")[1];
-                        step_data.event = prop.split(" ")[0];
+                        var tempEvent = prop.split(" ")[0];
 
-                        if (prop.split(" ")[0] == 'next' || prop.split(" ")[0] == 'auto' || prop.split(" ")[0] == 'custom') {
+                        if (tempEvent === 'next' || tempEvent === 'auto' || tempEvent === 'custom') {
 
-                            step_data.event_type = prop.split(" ")[0];
+                            step_data.event_type = tempEvent;
+                        } else {
+                            step_data.event = tempEvent;
                         }
 
                         step_data.description = step_data[prop];
@@ -307,6 +313,7 @@
 
         off(step_data.event);
         $element.off(makeEventName(step_data.event));
+        $element.off(makeEventName(step_data.event), true);
 
         destroyEnjoy();
     };
@@ -329,7 +336,7 @@
 
     /********************* PUBLIC METHODS ***************************************/
 
-    window.addEventListener('resize', function() {
+    window.addEventListener('resize.enjoy_hint', function() {
 
         if ($event_element[0]) {
             $body.enjoyhint('redo_events_near_rect', $event_element[0].getBoundingClientRect());
@@ -383,6 +390,11 @@
             case 'skip':
 
                 skipAll();
+                break;
+
+            // Trigger a custom event
+            default:
+                $body.trigger(makeEventName(event_name, true));
                 break;
         }
     };
@@ -638,12 +650,12 @@
                 that.layer.add(that.shape);
                 that.kinetic_stage.add(that.layer);
 
-                $(window).on('resize', function() {
+                $(window).on('resize.enjoy_hint', function() {
 
                     if (!($(that.stepData.enjoyHintElementSelector).is(":visible"))) {
 
                         that.stopFunction();
-                        $(window).off('resize');
+                        $(window).off('resize.enjoy_hint');
                         return;
                     }
 
@@ -1567,6 +1579,7 @@
 
                 this.enjoyhint_obj.closePopdown();
             });
+            $(window).off('resize.enjoy_hint');
 
             return this;
         },

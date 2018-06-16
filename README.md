@@ -72,6 +72,7 @@ var enjoyhint_script_steps = [
 
 #### Properties of instance configuration
 * `container` - scrollable container (default `body`)
+* `animation_time` - time between scroll animation and arrow render (default ms `800`)
 
 ```javascript
 //initialize instance
@@ -84,7 +85,8 @@ var enjoyhint_instance = new EnjoyHint({
 **Script Events**:
 * `onStart` - fires on the first step.
 * `onEnd` - fires after the last step in script.
-* `onSkip` - fires after user has clicked skip.
+* `onSkip` - fires after user has clicked skip, or close.
+* `onNext` - fires at the start of each step.
 ```javascript
 var enjoyhint_instance = new EnjoyHint({
   onStart:function(){
@@ -95,6 +97,7 @@ var enjoyhint_instance = new EnjoyHint({
 
 #### Properties of the step configuration
 * `"event selector" : "description"` - to describe a step you should set an event type, selecte element and add description for this element (hint)
+* `description
 * `keyCode` - the code of a button, which triggers the next EnjoyHint step upon a click. Defined by the “key” event. (“key #block” : “hello”).
 * `event_selector` - if you need to attach an event (that was set in "event" property) to other selector, you can use this one  
 * `timeout` - delay before the moment, when an element is highlighted   
@@ -123,25 +126,38 @@ var enjoyhint_instance = new EnjoyHint({
 
 
 #### Non-standard events:
-**auto** - for example, you need to click on the same button on the second step imediatelly after the first step and go to the next step after it. Then you can use "auto" in the "event_type" property and "click" in "event" property.
-* `custom` - this value is very usefull if you need to go to the next step by event in your app code. For example, you want to go to the next step only after some data have been loaded in your application. Then you should use the "custom" event_type and the "trigger" method of the EnjoyHint instance.  
+* `auto` - Triggers event on selector automatically, and continues to the next step.  For example, you need to click on the same button on the second step imediatelly after the first step and go to the next step after it. Then you can use "auto" in the "event_type" property and "click" in 'event' property.
 ```javascript
-//Example of using custom event_type
-$.get('/load/some_data', function(data){
-  //trigger method has only one argument: event_name.(equal to the value of event property in step config)
-  enjoyhint_instance.trigger('custom_event_name');
-});
-```  
-* `next` - when you set value of event_type to "next", you will see the "Next" btn on this step.
-* `key` - tells EnjoyHint to go to the next step when you click on the button defined by the keyCode
+enjoyhint_instance.set( [ {
+    'auto selector' : 'This is what happens when you click this button.',
+    event: 'click'
+} ] );
+```
+* `custom` - this value is very usefull if you need to go to the next step by event in your app code. For example, you want to go to the next step only after some data have been loaded in your application. Then you should use the "custom" event_type and the "trigger" method of the EnjoyHint instance.
+```javascript
+enjoyhint_instance.set( [ {
+    'custom selector' : 'This element is loading',
+    event: 'custom_event_name',
+    onBeforeStart: function () {
+        $.get('/load/some_data', function(data){
+          enjoyhint_instance.trigger('custom_event_name');
+        });
+    }
+} ] );
+```
+* `next` - Wait for next button to be pushed.
+* `key` - Wait for button defined by the `keyCode` step parameter to be triggered on element.
 
 
-#### Methods
-* `set` - set current steps configuration. Arguments: config  
-* `run` - run the current script. Has no arguments  
-* `resume` - resume the script from the step where it was stopped. Has no arguments  
-* `getCurrentStep` - returns the current step index
-* `trigger` -  After writing this code you can either move to the next step or finish with EnjoyHint (next|skip)
+#### Tour Methods
+* `stop()` - End script
+* `reRunScript(current_step)` - Restart script at current_step.
+* `set(steps_array)` - Set current steps configuration.
+* `setCurrentStep(current_step)` - Set the step to resume at.
+* `run()` - Run the current script.
+* `resume()` - Resume the script from the step where it was stopped.
+* `getCurrentStep()` - Returns the current step index.
+* `trigger( "next" | "skip" | custom_event_name )` - Trigger the relevant script action.
 
 #### Events
 **Step Events**:  
@@ -160,6 +176,12 @@ var enjoyhint_script_steps = [
 ```
 
 #### Changelogs
+
+##### 1.1.4
+* Be more careful with calls to .off()
+* Improve Documentation
+* Add animation_time as a parameter
+* Allow .trigger() to trigger custom events
 
 ##### 1.1.1
 * Disable element click when next button shown
