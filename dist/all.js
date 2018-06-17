@@ -336,7 +336,7 @@
 
     /********************* PUBLIC METHODS ***************************************/
 
-    window.addEventListener('resize.enjoy_hint', function() {
+    $(window).on('resize.enjoy_hint_permanent', function() {
 
         if ($event_element[0]) {
             $body.enjoyhint('redo_events_near_rect', $event_element[0].getBoundingClientRect());
@@ -1446,6 +1446,7 @@
                 that.clear = function () {
                   $('#enjoyhint_arrpw_line').remove();
                   $('#enjoyhint_label').remove();
+                  $(window).off('resize.enjoy_hint');
                 };
 
                 return this;
@@ -1579,7 +1580,6 @@
 
                 this.enjoyhint_obj.closePopdown();
             });
-            $(window).off('resize.enjoy_hint');
 
             return this;
         },

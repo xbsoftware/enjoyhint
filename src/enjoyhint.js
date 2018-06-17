@@ -334,7 +334,7 @@ var EnjoyHint = function (_options) {
 
     /********************* PUBLIC METHODS ***************************************/
 
-    window.addEventListener('resize.enjoy_hint', function() {
+    $(window).on('resize.enjoy_hint_permanent', function() {
 
         if ($event_element[0]) {
             $body.enjoyhint('redo_events_near_rect', $event_element[0].getBoundingClientRect());

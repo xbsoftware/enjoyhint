@@ -1014,6 +1014,7 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
                 that.clear = function () {
                   $('#enjoyhint_arrpw_line').remove();
                   $('#enjoyhint_label').remove();
+                  $(window).off('resize.enjoy_hint');
                 };
 
                 return this;
@@ -1147,7 +1148,6 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
 
                 this.enjoyhint_obj.closePopdown();
             });
-            $(window).off('resize.enjoy_hint');
 
             return this;
         },
