@@ -69,6 +69,7 @@
     var destroyEnjoy = function () {
         options.onEnd();
         $body.enjoyhint('clear');
+        $body.enjoyhint('hide');
         $body.css({'overflow':'auto'});
         $(document).off("touchmove", lockTouch);
     };
@@ -87,8 +88,6 @@
     var stepAction = function () {
 
         if (!(data && data[current_step])) {
-
-            $body.enjoyhint('hide');
             destroyEnjoy();
             return;
         }
@@ -254,11 +253,12 @@
                     });
                 }
 
-                var max_habarites = Math.max($element.outerWidth(), $element.outerHeight());
+                var rect = $element[0].getBoundingClientRect();
+                var w = rect.width;
+                var h = rect.height;
+                var max_habarites = Math.max(w, h);
                 var radius = step_data.radius || Math.round(max_habarites / 2) + 5;
                 var offset = $element.offset();
-                var w = $element.outerWidth();
-                var h = $element.outerHeight();
                 var shape_margin = (step_data.margin !== undefined) ? step_data.margin : 10;
 
                 var coords = {
