@@ -183,6 +183,9 @@ var enjoyhint_script_steps = [
 * Add animation_time as a parameter
 * Allow .trigger() to trigger custom events
 
+##### 1.1.2
+* Add dist folder to improve build process
+
 ##### 1.1.1
 * Disable element click when next button shown
 
