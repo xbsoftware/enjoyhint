@@ -177,7 +177,7 @@ var enjoyhint_script_steps = [
 
 #### Changelogs
 
-##### 1.1.4
+##### 1.2.1
 * Be more careful with calls to .off()
 * Improve Documentation
 * Add animation_time as a parameter
