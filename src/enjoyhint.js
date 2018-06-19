@@ -251,44 +251,50 @@ var EnjoyHint = function (_options) {
                     });
                 }
 
-                var rect = $element[0].getBoundingClientRect();
-                var w = rect.width;
-                var h = rect.height;
-                var max_habarites = Math.max(w, h);
-                var radius = step_data.radius || Math.round(max_habarites / 2) + 5;
-                var offset = $element.offset();
-                var shape_margin = (step_data.margin !== undefined) ? step_data.margin : 10;
+                var updateShapeData = function () {
+                    $element = $(step_data.selector);
 
-                var coords = {
-                    x: offset.left + Math.round(w / 2),
-                    y: offset.top + Math.round(h / 2) - $(document).scrollTop()
+                    var rect = $element[0].getBoundingClientRect();
+                    var w = rect.width;
+                    var h = rect.height;
+                    var max_habarites = Math.max(w, h);
+                    var radius = step_data.radius || Math.round(max_habarites / 2) + 5;
+                    var offset = $element.offset();
+                    var shape_margin = (step_data.margin !== undefined) ? step_data.margin : 10;
+
+                    var coords = {
+                        x: offset.left + Math.round(w / 2),
+                        y: offset.top + Math.round(h / 2) - $(document).scrollTop()
+                    };
+
+                    var shape_data = {
+                        enjoyHintElementSelector: step_data.selector,
+                        center_x: coords.x,
+                        center_y: coords.y,
+                        text: step_data.description,
+                        top: step_data.top,
+                        bottom: step_data.bottom,
+                        left: step_data.left,
+                        right: step_data.right,
+                        margin: step_data.margin,
+                        scroll: step_data.scroll
+                    };
+
+                    if (step_data.shape && step_data.shape == 'circle') {
+
+                        shape_data.shape = 'circle';
+                        shape_data.radius = radius;
+                    } else {
+
+                        shape_data.radius = 0;
+                        shape_data.width = w + shape_margin;
+                        shape_data.height = h + shape_margin;
+                    }
+                    return shape_data;
                 };
+                var _shape_data = updateShapeData();
 
-                var shape_data = {
-                    enjoyHintElementSelector: step_data.selector,
-                    center_x: coords.x,
-                    center_y: coords.y,
-                    text: step_data.description,
-                    top: step_data.top,
-                    bottom: step_data.bottom,
-                    left: step_data.left,
-                    right: step_data.right,
-                    margin: step_data.margin,
-                    scroll: step_data.scroll
-                };
-
-                if (step_data.shape && step_data.shape == 'circle') {
-
-                    shape_data.shape = 'circle';
-                    shape_data.radius = radius;
-                } else {
-
-                    shape_data.radius = 0;
-                    shape_data.width = w + shape_margin;
-                    shape_data.height = h + shape_margin;
-                }
-
-                $body.enjoyhint('render_label_with_shape', shape_data, that.stop);
+                $body.enjoyhint('render_label_with_shape', _shape_data, that.stop, updateShapeData);
 
                 if (step_data.event == "next") {
 
