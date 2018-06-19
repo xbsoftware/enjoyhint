@@ -218,156 +218,23 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
                 that.layer.add(that.shape);
                 that.kinetic_stage.add(that.layer);
 
-                $(window).on('resize', function() {
-
+                $(window).on('resize.enjoy_hint', function() {
                     if (!($(that.stepData.enjoyHintElementSelector).is(":visible"))) {
 
                         that.stopFunction();
-                        $(window).off('resize');
+                        $(window).off('resize.enjoy_hint');
                         return;
                     }
 
-                    prevWindowWidth = window.innerWidth;
-                    prevWindowHeight = window.innerHeight;
-
-                    var boundingClientRect = $(that.stepData.enjoyHintElementSelector)[0].getBoundingClientRect();
-
-                    that.shape.attrs.center_x = Math.round(boundingClientRect.left + boundingClientRect.width / 2);
-                    that.shape.attrs.center_y = Math.round(boundingClientRect.top + boundingClientRect.height / 2);
-                    that.shape.attrs.width = boundingClientRect.width + 11;
-                    that.shape.attrs.height = boundingClientRect.height + 11;
-
                     var newWidth = window.innerWidth;
                     var newHeight = window.innerHeight;
-                    var scaleX = newWidth / originalWidth;
-                    var scaleY = newHeight / originalHeight;
-
-                    that.kinetic_stage.setAttr('width', originalWidth * scaleX);
-                    that.kinetic_stage.setAttr('height', originalHeight * scaleY);
-
-                    if (that.stepData != null) {
-
-                        prevWindowWidth = window.innerWidth;
-                        prevWindowHeight = window.innerHeight;
-
-
-                        /* Init */
-
-                        if (!originalCenterX) {
-
-                            originalCenterX = that.shape.attrs.center_x;
-                            originalCenterY = that.shape.attrs.center_y;
-                        }
-
-                        if (!originalArrowLeft) {
-
-                            originalArrowLeft = [];
-                            var attr = $('#enjoyhint_arrpw_line').attr('d');
-                            if(attr) {
-                              originalArrowLeft.push(attr.substr(1).split(',')[0]);
-                              originalArrowLeft.push(attr.substr(attr.indexOf('Q') + 1).split(',')[0]);
-                              originalArrowLeft.push(attr.split(' ')[2].split(',')[0]);
-                              originalArrowTop = [];
-                              originalArrowTop.push(attr.split(',')[1].split(' ')[0]);
-                              originalArrowTop.push(attr.split(',')[2].split(' ')[0]);
-                              originalArrowTop.push(attr.split(',')[3]);
-                            }
-                        }
-
-                        var labelElement = $('.enjoy_hint_label');
-
-                        if (!originalLabelLeft) {
-
-                            originalLabelLeft = labelElement[0].getBoundingClientRect().left;
-                            originalLabelTop = labelElement[0].getBoundingClientRect().top;
-                        }
-
-                        var skipButton = $('.enjoyhint_skip_btn');
-
-                        if (!originalSkipbuttonLeft) {
-
-                            originalSkipbuttonLeft = skipButton[0].getBoundingClientRect().left;
-                            originalSkipbuttonTop = skipButton[0].getBoundingClientRect().top;
-                        }
-
-
-                        /* Resizing label */
-
-                        labelElement.css('left', window.innerWidth / 2 - labelElement.outerWidth() / 2);
-
-
-                        /* Resizing arrow */
-
-                        var labelRect = labelElement[0].getBoundingClientRect();
-
-                        if (window.innerWidth < 640) {
-
-                            $('#enjoyhint_arrpw_line').hide();
-                            labelElement.css('top', window.innerHeight / 2 - labelElement.outerHeight() / 2);
-                        } else {
-
-                            $('#enjoyhint_arrpw_line').show();
-
-                            labelElement.css('top', originalLabelTop);
-
-                            var x1, x2, y1, y2;
-
-                            var labelLeftOfShape = labelRect.left + labelRect.width / 2 < that.shape.attrs.center_x;
-                            var labelAboveShape = labelRect.top + labelRect.height / 2 < that.shape.attrs.center_y;
-
-                            if (window.innerWidth < 900) {
-
-                                x1 = Math.round(labelRect.left + (labelRect.width / 2 + 15) * (labelRect.left + labelRect.width / 2 < that.shape.attrs.center_x ? 1 : -1));
-                                y1 = Math.round(labelRect.top + labelRect.height * (labelRect.top + labelRect.height / 2 < that.shape.attrs.center_y ? 1 : -1));
-                                x2 = Math.round(that.shape.attrs.center_x + (that.shape.attrs.radius + 15) * (labelLeftOfShape ? -1 : 1));
-                                y2 = Math.round(that.shape.attrs.center_y);
-                            } else {
-
-                                x1 = Math.round((labelRect.left + (labelRect.width / 2)) + ((labelRect.width / 2 + 15) * (labelLeftOfShape ? 1 : -1)));
-                                y1 = Math.round(labelRect.top + labelRect.height / 2);
-                                x2 = Math.round(that.shape.attrs.center_x);
-                                y2 = Math.round(that.shape.attrs.center_y + (((that.shape.attrs.height / 2) + 15) * (labelAboveShape ? -1 : 1)));
-                            }
-
-                            var midX = x1 + (x2 - x1) / 2;
-                            var midY = y1 + (y2 - y1) / 2;
-
-                            var bezX = x1 < x2 ? x2 : x1;
-                            var bezY = y1 < y2 ? y1 : y2;
-
-                            if (Math.abs(labelRect.left + labelRect.width / 2 - that.shape.attrs.center_x) < 200) {
-
-                                x1 = x2 = labelRect.left + labelRect.width / 2;
-                                y1 = labelRect.top;
-                                bezX = x1;
-                                bezY = y1;
-                            }
-
-                            if (window.innerWidth < 900) {
-
-                                bezX = x1 < x2 ? x1 : x2;
-                                bezY = y1 < y2 ? y2 : y1;
-                            }
-
-                            var newCoordsLine = "M%d1,%d2 Q%d3,%d4 %d5,%d6"
-                                .replace("%d1", x1).replace("%d2", y1)
-                                .replace("%d3", bezX).replace("%d4", bezY)
-                                .replace("%d5", x2).replace("%d6", y2);
-                            $('#enjoyhint_arrpw_line')[0].setAttribute('d', newCoordsLine);
-                        }
-
-
-                        /* Resizing skip button */
-
-                        var newSkipbuttonLeft = +originalSkipbuttonLeft + (that.shape.attrs.center_x - originalCenterX) / 2;
-                        skipButton.css('left', newSkipbuttonLeft < 15 ? 15 : newSkipbuttonLeft);
-                        skipButton.css('top', labelRect.top + labelRect.height + 20);
-                    }
+                    that.kinetic_stage.setAttr('width', newWidth );
+                    that.kinetic_stage.setAttr('height', newHeight );
 
                     that.rect = new Kinetic.Rect({
                         fill: 'rgba(0,0,0,0.6)',
-                        width: window.innerWidth,
-                        height: window.innerHeight
+                        width: newWidth,
+                        height: newHeight
                     });
 
                     that.layer.removeChildren();
@@ -375,6 +242,8 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
                     that.layer.add(that.shape);
                     that.layer.draw();
                     that.kinetic_stage.draw();
+
+                    that.renderLabelWithShape(that.updateShapeData());
                 });
 
                 var enjoyhint_elements = [
@@ -1014,6 +883,7 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
                 that.clear = function () {
                   $('#enjoyhint_arrpw_line').remove();
                   $('#enjoyhint_label').remove();
+                  $(window).off('resize.enjoy_hint');
                 };
 
                 return this;
@@ -1110,11 +980,12 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
             return this;
         },
 
-        render_label_with_shape: function (data, stopFunction) {
+        render_label_with_shape: function (data, stopFunction, updateShapeData) {
 
             this.each(function () {
 
                 that.stopFunction = stopFunction;
+                that.updateShapeData = updateShapeData;
                 this.enjoyhint_obj.renderLabelWithShape(data);
             });
 

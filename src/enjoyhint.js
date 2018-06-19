@@ -21,7 +21,9 @@ var EnjoyHint = function (_options) {
 
         },
 
-        container: 'body'
+        container: 'body',
+
+        animation_time: 800
     };
 
     var options = $.extend(defaults, _options);
@@ -51,7 +53,9 @@ var EnjoyHint = function (_options) {
 
                 options.onSkip();
                 skipAll();
-            }
+            },
+
+            animation_time: options.animation_time
         });
     };
 
@@ -63,6 +67,7 @@ var EnjoyHint = function (_options) {
     var destroyEnjoy = function () {
         options.onEnd();
         $body.enjoyhint('clear');
+        $body.enjoyhint('hide');
         $body.css({'overflow':'auto'});
         $(document).off("touchmove", lockTouch);
     };
@@ -81,8 +86,6 @@ var EnjoyHint = function (_options) {
     var stepAction = function () {
 
         if (!(data && data[current_step])) {
-
-            $body.enjoyhint('hide');
             destroyEnjoy();
             return;
         }
@@ -113,11 +116,13 @@ var EnjoyHint = function (_options) {
                     if (step_data.hasOwnProperty(prop) && prop.split(" ")[1]) {
 
                         step_data.selector = prop.split(" ")[1];
-                        step_data.event = prop.split(" ")[0];
+                        var tempEvent = prop.split(" ")[0];
 
-                        if (prop.split(" ")[0] == 'next' || prop.split(" ")[0] == 'auto' || prop.split(" ")[0] == 'custom') {
+                        if (tempEvent === 'next' || tempEvent === 'auto' || tempEvent === 'custom') {
 
-                            step_data.event_type = prop.split(" ")[0];
+                            step_data.event_type = tempEvent;
+                        } else {
+                            step_data.event = tempEvent;
                         }
 
                         step_data.description = step_data[prop];
@@ -246,43 +251,50 @@ var EnjoyHint = function (_options) {
                     });
                 }
 
-                var max_habarites = Math.max($element.outerWidth(), $element.outerHeight());
-                var radius = step_data.radius || Math.round(max_habarites / 2) + 5;
-                var offset = $element.offset();
-                var w = $element.outerWidth();
-                var h = $element.outerHeight();
-                var shape_margin = (step_data.margin !== undefined) ? step_data.margin : 10;
+                var updateShapeData = function () {
+                    $element = $(step_data.selector);
 
-                var coords = {
-                    x: offset.left + Math.round(w / 2),
-                    y: offset.top + Math.round(h / 2) - $(document).scrollTop()
+                    var rect = $element[0].getBoundingClientRect();
+                    var w = rect.width;
+                    var h = rect.height;
+                    var max_habarites = Math.max(w, h);
+                    var radius = step_data.radius || Math.round(max_habarites / 2) + 5;
+                    var offset = $element.offset();
+                    var shape_margin = (step_data.margin !== undefined) ? step_data.margin : 10;
+
+                    var coords = {
+                        x: offset.left + Math.round(w / 2),
+                        y: offset.top + Math.round(h / 2) - $(document).scrollTop()
+                    };
+
+                    var shape_data = {
+                        enjoyHintElementSelector: step_data.selector,
+                        center_x: coords.x,
+                        center_y: coords.y,
+                        text: step_data.description,
+                        top: step_data.top,
+                        bottom: step_data.bottom,
+                        left: step_data.left,
+                        right: step_data.right,
+                        margin: step_data.margin,
+                        scroll: step_data.scroll
+                    };
+
+                    if (step_data.shape && step_data.shape == 'circle') {
+
+                        shape_data.shape = 'circle';
+                        shape_data.radius = radius;
+                    } else {
+
+                        shape_data.radius = 0;
+                        shape_data.width = w + shape_margin;
+                        shape_data.height = h + shape_margin;
+                    }
+                    return shape_data;
                 };
+                var _shape_data = updateShapeData();
 
-                var shape_data = {
-                    enjoyHintElementSelector: step_data.selector,
-                    center_x: coords.x,
-                    center_y: coords.y,
-                    text: step_data.description,
-                    top: step_data.top,
-                    bottom: step_data.bottom,
-                    left: step_data.left,
-                    right: step_data.right,
-                    margin: step_data.margin,
-                    scroll: step_data.scroll
-                };
-
-                if (step_data.shape && step_data.shape == 'circle') {
-
-                    shape_data.shape = 'circle';
-                    shape_data.radius = radius;
-                } else {
-
-                    shape_data.radius = 0;
-                    shape_data.width = w + shape_margin;
-                    shape_data.height = h + shape_margin;
-                }
-
-                $body.enjoyhint('render_label_with_shape', shape_data, that.stop);
+                $body.enjoyhint('render_label_with_shape', _shape_data, that.stop, updateShapeData);
 
                 if (step_data.event == "next") {
 
@@ -305,6 +317,7 @@ var EnjoyHint = function (_options) {
 
         off(step_data.event);
         $element.off(makeEventName(step_data.event));
+        $element.off(makeEventName(step_data.event), true);
 
         destroyEnjoy();
     };
@@ -327,7 +340,7 @@ var EnjoyHint = function (_options) {
 
     /********************* PUBLIC METHODS ***************************************/
 
-    window.addEventListener('resize', function() {
+    $(window).on('resize.enjoy_hint_permanent', function() {
 
         if ($event_element[0]) {
             $body.enjoyhint('redo_events_near_rect', $event_element[0].getBoundingClientRect());
@@ -381,6 +394,11 @@ var EnjoyHint = function (_options) {
             case 'skip':
 
                 skipAll();
+                break;
+
+            // Trigger a custom event
+            default:
+                $body.trigger(makeEventName(event_name, true));
                 break;
         }
     };
