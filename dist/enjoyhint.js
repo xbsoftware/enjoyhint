@@ -305,21 +305,22 @@ var EnjoyHint = function (_options) {
     };
 
     var nextStep = function() {
-
         current_step++;
         stepAction();
     };
 
     var skipAll = function() {
+       stopRunningStep();
+       destroyEnjoy();
+    };
 
-        var step_data = data[current_step];
-        var $element = $(step_data.selector);
+    var stopRunningStep = function() {
+       var step_data = data[current_step];
+       var $element = $(step_data.selector);
 
-        off(step_data.event);
-        $element.off(makeEventName(step_data.event));
-        $element.off(makeEventName(step_data.event), true);
-
-        destroyEnjoy();
+       off(step_data.event);
+       $element.off(makeEventName(step_data.event));
+       $element.off(makeEventName(step_data.event), true);
     };
 
     var makeEventName = function (name, is_custom) {
@@ -353,7 +354,7 @@ var EnjoyHint = function (_options) {
     };
 
     that.reRunScript = function(cs) {
-
+        stopRunningStep();
         current_step = cs;
         stepAction();
     };
@@ -409,6 +410,22 @@ var EnjoyHint = function (_options) {
 
             data = _data;
         }
+    };
+
+    // Goes to the most recent valid user triggered step
+    that.previousStep = function () {
+        current_step--;
+
+        // If the element of this step is no longer visible (like a modal, or a different tab) we want to keep going back.
+        while (current_step > 0 && (data[current_step].event_type === "auto" || $(data[current_step].selector).is(':visible') === false)) {
+            current_step--;
+        }
+
+        if (current_step <= 0) {
+            current_step = 0;
+        }
+
+        that.reRunScript(current_step);
     };
 
     //support deprecated API methods
@@ -922,31 +939,39 @@ var EnjoyHint = function (_options) {
                         var by_top_side = data.by_top_side;
                         var control_point_x = 0;
                         var control_point_y = 0;
+                        var control_point_x1 = 0;
+                        var control_point_y1 = 0;
+
 
                     if (window.innerWidth >= 640) {
 
                         if (by_top_side) {
 
                             if (y_from >= y_to) {
-
                                 control_point_y = y_to;
-                                control_point_x = x_from;
+                                control_point_x = .9 * x_from + .1 * x_to;
+                                control_point_x1 = .9 * x_from + .1 * x_to;
+                                control_point_y1 = .8 * y_to + .2 * y_from;
                             } else {
-
-                                control_point_y = y_from;
+                                control_point_y = .9 * y_from + .1 * y_to;
                                 control_point_x = x_to;
+                                control_point_y1 = .9 * y_from + .1 * y_to;
+                                control_point_x1 = .8 * x_to + .2 * x_from;
                             }
                         } else {
 
                             if (y_from >= y_to) {
-
-                                control_point_y = y_from;
+                                control_point_y = .9 * y_from + .1 * y_to;
                                 control_point_x = x_to;
+                                control_point_y1 = .9 * y_from + .1 * y_to;
+                                control_point_x1 = .8 * x_to + .2 * x_from;
                             } else {
-
                                 control_point_y = y_to;
-                                control_point_x = x_from;
+                                control_point_x = .9 * x_from + .1 * x_to;
+                                control_point_x1 = .9 * x_from + .1 * x_to;
+                                control_point_y1 = .8 * y_to + .2 * y_from;
                             }
+
                         }
                     }
 
@@ -958,7 +983,8 @@ var EnjoyHint = function (_options) {
 
                         $('#enjoyhint_arrpw_line').remove();
 
-                        var d = 'M' + x_from + ',' + y_from + ' Q' + control_point_x + ',' + control_point_y + ' ' + x_to + ',' + y_to;
+                        var d = 'M' + x_from + ',' + y_from + ' C' + control_point_x1 + "," + control_point_y1 + " " + control_point_x + ',' + control_point_y + ' ' + x_to + ',' + y_to;
+
                         that.$svg.append(makeSVG('path', {style: "fill:none; stroke:rgb(255,255,255); stroke-width:3", 'marker-end': "url(#arrowMarker)", d: d, id: 'enjoyhint_arrpw_line'}));
                         that.enjoyhint.removeClass(that.cl.svg_transparent);
 
@@ -1148,32 +1174,26 @@ var EnjoyHint = function (_options) {
                     var label_width = label.outerWidth();
                     var label_height = label.outerHeight();
                     label.remove();
-                    var top_offset = data.center_y - half_h;
-                    var bottom_offset = body_size.h - (data.center_y + half_h);
-                    var left_offset = data.center_x - half_w;
-                    var right_offset = body_size.w - (data.center_x + half_w);
 
-                    var label_hor_side = (body_size.w - data.center_x) < data.center_x ? 'left' : 'right';
                     var label_ver_side = (body_size.h - data.center_y) < data.center_y ? 'top' : 'bottom';
                     var label_shift = 150;
-                    var label_margin = 40;
-                    var label_shift_with_label_width = label_shift + label_width + label_margin;
-                    var label_shift_with_label_height = label_shift + label_height + label_margin;
-                    var label_hor_offset = half_w + label_shift;
                     var label_ver_offset = half_h + label_shift;
 
-                    //original: var label_x = (label_hor_side == 'left') ? data.center_x - label_hor_offset - label_width : data.center_x + label_hor_offset;
                     var label_y = (label_ver_side == 'top') ? data.center_y - label_ver_offset - label_height : data.center_y + label_ver_offset;
+                    var button_spacing = 20;
+                    var button_height = 40;
+                    var total_label_height = label_height + button_spacing + button_height + 20 // Top of label to bottom of buttons
+
+                    // Attempt to cleanly prevent y axis overflow
+                    if (label_y + total_label_height > window.innerHeight) {
+                        label_y = window.innerHeight - total_label_height;
+                    }
+                    if (label_y < 0) {
+                        label_y = 0;
+                    }
+
                     var label_x = window.innerWidth / 2 - label_width / 2;
 
-                    if (top_offset < label_shift_with_label_height && bottom_offset < label_shift_with_label_height) {
-
-                        label_y = data.center_y + label_margin;
-                    }
-
-                    if (window.innerWidth <= 640) {
-
-                    }
 
                     var label_data = that.renderLabel({
                         x: label_x,

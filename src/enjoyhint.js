@@ -305,21 +305,22 @@ var EnjoyHint = function (_options) {
     };
 
     var nextStep = function() {
-
         current_step++;
         stepAction();
     };
 
     var skipAll = function() {
+       stopRunningStep();
+       destroyEnjoy();
+    };
 
-        var step_data = data[current_step];
-        var $element = $(step_data.selector);
+    var stopRunningStep = function() {
+       var step_data = data[current_step];
+       var $element = $(step_data.selector);
 
-        off(step_data.event);
-        $element.off(makeEventName(step_data.event));
-        $element.off(makeEventName(step_data.event), true);
-
-        destroyEnjoy();
+       off(step_data.event);
+       $element.off(makeEventName(step_data.event));
+       $element.off(makeEventName(step_data.event), true);
     };
 
     var makeEventName = function (name, is_custom) {
@@ -353,7 +354,7 @@ var EnjoyHint = function (_options) {
     };
 
     that.reRunScript = function(cs) {
-
+        stopRunningStep();
         current_step = cs;
         stepAction();
     };
@@ -409,6 +410,22 @@ var EnjoyHint = function (_options) {
 
             data = _data;
         }
+    };
+
+    // Goes to the most recent valid user triggered step
+    that.previousStep = function () {
+        current_step--;
+
+        // If the element of this step is no longer visible (like a modal, or a different tab) we want to keep going back.
+        while (current_step > 0 && (data[current_step].event_type === "auto" || $(data[current_step].selector).is(':visible') === false)) {
+            current_step--;
+        }
+
+        if (current_step <= 0) {
+            current_step = 0;
+        }
+
+        that.reRunScript(current_step);
     };
 
     //support deprecated API methods
