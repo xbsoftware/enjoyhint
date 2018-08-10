@@ -1,14 +1,14 @@
 {
-  "name": "enjoyhint",
-  "version": "1.0.0",
+  "name": "enjoyhint.js",
+  "version": "1.2.1",
   "description": "Web-tool that provides the simplest way to create interactive tutorials and hints.",
-  "main": "enjoyhint.js",
+  "main": "dist/enjoyhint.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/xbsoftware/enjoyhint.git"
+    "url": "https://github.com/darron1217/enjoyhint.js.git"
   },
   "keywords": [
     "enjoyhint",
@@ -16,12 +16,12 @@
     "xbs",
     "tutorials"
   ],
-  "author": "XB Software",
+  "author": "Darron Park",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/xbsoftware/enjoyhint/issues"
+    "url": "https://github.com/darron1217/enjoyhint.js/issues"
   },
-  "homepage": "https://github.com/xbsoftware/enjoyhint",
+  "homepage": "https://github.com/darron1217/enjoyhint.js",
   "devDependencies": {
     "grunt-contrib-concat": "^0.5.1",
     "grunt-contrib-cssmin": "^0.11.0",
@@ -30,6 +30,7 @@
   },
   "dependencies": {
     "grunt": "^0.4.5",
+    "jquery": "^3.3.1",
     "jquery.scrollto": "^2.1.2",
     "kinetic": "^5.2.0"
   }

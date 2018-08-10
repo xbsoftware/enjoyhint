@@ -19,14 +19,18 @@ var EnjoyHint = function (_options) {
 
         onNext: function () {
 
-        }
+        },
+
+        container: 'body',
+
+        animation_time: 800
     };
 
     var options = $.extend(defaults, _options);
     var data = [];
     var current_step = 0;
 
-    $body = $('body');
+    $body = $(options.container);
 
 
     /********************* PRIVATE METHODS ***************************************/
@@ -37,10 +41,6 @@ var EnjoyHint = function (_options) {
 
             $('.enjoyhint').remove();
         }
-
-        $body.css({'overflow':'hidden'});
-
-        $(document).on("touchmove",lockTouch);
 
         $body.enjoyhint({
 
@@ -53,7 +53,9 @@ var EnjoyHint = function (_options) {
 
                 options.onSkip();
                 skipAll();
-            }
+            },
+
+            animation_time: options.animation_time
         });
     };
 
@@ -63,8 +65,9 @@ var EnjoyHint = function (_options) {
     };
 
     var destroyEnjoy = function () {
-
-        $('.enjoyhint').remove();
+        options.onEnd();
+        $body.enjoyhint('clear');
+        $body.enjoyhint('hide');
         $body.css({'overflow':'auto'});
         $(document).off("touchmove", lockTouch);
     };
@@ -83,9 +86,6 @@ var EnjoyHint = function (_options) {
     var stepAction = function () {
 
         if (!(data && data[current_step])) {
-
-            $body.enjoyhint('hide');
-            options.onEnd();
             destroyEnjoy();
             return;
         }
@@ -116,11 +116,13 @@ var EnjoyHint = function (_options) {
                     if (step_data.hasOwnProperty(prop) && prop.split(" ")[1]) {
 
                         step_data.selector = prop.split(" ")[1];
-                        step_data.event = prop.split(" ")[0];
+                        var tempEvent = prop.split(" ")[0];
 
-                        if (prop.split(" ")[0] == 'next' || prop.split(" ")[0] == 'auto' || prop.split(" ")[0] == 'custom') {
+                        if (tempEvent === 'next' || tempEvent === 'auto' || tempEvent === 'custom') {
 
-                            step_data.event_type = prop.split(" ")[0];
+                            step_data.event_type = tempEvent;
+                        } else {
+                            step_data.event = tempEvent;
                         }
 
                         step_data.description = step_data[prop];
@@ -133,7 +135,7 @@ var EnjoyHint = function (_options) {
                 that.clear();
             }, 250);
 
-            $(document.body).scrollTop(step_data.selector, step_data.scrollAnimationSpeed || 250, {offset: -100});
+            $body.scrollTo(step_data.selector, step_data.scrollAnimationSpeed || 250, {offset: -100});
 
             setTimeout(function () {
 
@@ -249,62 +251,76 @@ var EnjoyHint = function (_options) {
                     });
                 }
 
-                var max_habarites = Math.max($element.outerWidth(), $element.outerHeight());
-                var radius = step_data.radius || Math.round(max_habarites / 2) + 5;
-                var offset = $element.offset();
-                var w = $element.outerWidth();
-                var h = $element.outerHeight();
-                var shape_margin = (step_data.margin !== undefined) ? step_data.margin : 10;
+                var updateShapeData = function () {
+                    $element = $(step_data.selector);
 
-                var coords = {
-                    x: offset.left + Math.round(w / 2),
-                    y: offset.top + Math.round(h / 2) - $(document).scrollTop()
+                    var rect = $element[0].getBoundingClientRect();
+                    var w = rect.width;
+                    var h = rect.height;
+                    var max_habarites = Math.max(w, h);
+                    var radius = step_data.radius || Math.round(max_habarites / 2) + 5;
+                    var offset = $element.offset();
+                    var shape_margin = (step_data.margin !== undefined) ? step_data.margin : 10;
+
+                    var coords = {
+                        x: offset.left + Math.round(w / 2),
+                        y: offset.top + Math.round(h / 2) - $(document).scrollTop()
+                    };
+
+                    var shape_data = {
+                        enjoyHintElementSelector: step_data.selector,
+                        center_x: coords.x,
+                        center_y: coords.y,
+                        text: step_data.description,
+                        top: step_data.top,
+                        bottom: step_data.bottom,
+                        left: step_data.left,
+                        right: step_data.right,
+                        margin: step_data.margin,
+                        scroll: step_data.scroll
+                    };
+
+                    if (step_data.shape && step_data.shape == 'circle') {
+
+                        shape_data.shape = 'circle';
+                        shape_data.radius = radius;
+                    } else {
+
+                        shape_data.radius = 0;
+                        shape_data.width = w + shape_margin;
+                        shape_data.height = h + shape_margin;
+                    }
+                    return shape_data;
                 };
+                var _shape_data = updateShapeData();
 
-                var shape_data = {
-                    enjoyHintElementSelector: step_data.selector,
-                    center_x: coords.x,
-                    center_y: coords.y,
-                    text: step_data.description,
-                    top: step_data.top,
-                    bottom: step_data.bottom,
-                    left: step_data.left,
-                    right: step_data.right,
-                    margin: step_data.margin,
-                    scroll: step_data.scroll
-                };
+                $body.enjoyhint('render_label_with_shape', _shape_data, that.stop, updateShapeData);
 
-                if (step_data.shape && step_data.shape == 'circle') {
+                if (step_data.event == "next") {
 
-                    shape_data.shape = 'circle';
-                    shape_data.radius = radius;
-                } else {
-
-                    shape_data.radius = 0;
-                    shape_data.width = w + shape_margin;
-                    shape_data.height = h + shape_margin;
+                    $body.enjoyhint('disable_element_events');
                 }
-
-                $body.enjoyhint('render_label_with_shape', shape_data, that.stop);
             }, step_data.scrollAnimationSpeed + 20 || 270);
         }, timeout);
     };
 
     var nextStep = function() {
-
         current_step++;
         stepAction();
     };
 
     var skipAll = function() {
+       stopRunningStep();
+       destroyEnjoy();
+    };
 
-        var step_data = data[current_step];
-        var $element = $(step_data.selector);
+    var stopRunningStep = function() {
+       var step_data = data[current_step];
+       var $element = $(step_data.selector);
 
-        off(step_data.event);
-        $element.off(makeEventName(step_data.event));
-
-        destroyEnjoy();
+       off(step_data.event);
+       $element.off(makeEventName(step_data.event));
+       $element.off(makeEventName(step_data.event), true);
     };
 
     var makeEventName = function (name, is_custom) {
@@ -325,10 +341,9 @@ var EnjoyHint = function (_options) {
 
     /********************* PUBLIC METHODS ***************************************/
 
-    window.addEventListener('resize', function() {
+    $(window).on('resize.enjoy_hint_permanent', function() {
 
-        if ($event_element != null) {
-
+        if ($event_element[0]) {
             $body.enjoyhint('redo_events_near_rect', $event_element[0].getBoundingClientRect());
         }
     });
@@ -339,12 +354,14 @@ var EnjoyHint = function (_options) {
     };
 
     that.reRunScript = function(cs) {
-
+        stopRunningStep();
         current_step = cs;
         stepAction();
     };
 
     that.runScript = function () {
+        $body.css({'overflow':'hidden'});
+        $(document).on("touchmove",lockTouch);
 
         current_step = 0;
         options.onStart();
@@ -379,6 +396,11 @@ var EnjoyHint = function (_options) {
 
                 skipAll();
                 break;
+
+            // Trigger a custom event
+            default:
+                $body.trigger(makeEventName(event_name, true));
+                break;
         }
     };
 
@@ -388,6 +410,22 @@ var EnjoyHint = function (_options) {
 
             data = _data;
         }
+    };
+
+    // Goes to the most recent valid user triggered step
+    that.previousStep = function () {
+        current_step--;
+
+        // If the element of this step is no longer visible (like a modal, or a different tab) we want to keep going back.
+        while (current_step > 0 && (data[current_step].event_type === "auto" || $(data[current_step].selector).is(':visible') === false)) {
+            current_step--;
+        }
+
+        if (current_step <= 0) {
+            current_step = 0;
+        }
+
+        that.reRunScript(current_step);
     };
 
     //support deprecated API methods
