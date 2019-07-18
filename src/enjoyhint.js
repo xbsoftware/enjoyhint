@@ -147,9 +147,15 @@ var EnjoyHint = function (configs) {
 
                 that.clear();
             }, 250);
-
-            $(document.body).scrollTop(step_data.selector, step_data.scrollAnimationSpeed || 250, {offset: -100});
-
+            
+            
+            //$(document.body).scrollTop(step_data.selector, step_data.scrollAnimationSpeed || 250, {offset: -100});
+            var elemToScroll = document.querySelector(step_data.selector);
+            if(elemToScroll){
+                let {x, y} = elemToScroll.getClientRects();
+                window.scrollTo(x, y);
+            }
+           
             setTimeout(function () {
 
                 var $element = $(step_data.selector);
