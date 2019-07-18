@@ -1,7 +1,21 @@
-var EnjoyHint = function (_options) {
+//TODO: localization support
+/**
+ * 
+ * @param {*} configs 
+ */
+var EnjoyHint = function (configs) {
+    
 
     var $event_element;
     var that = this;
+    var _options = configs || {};
+    var BTN_NEXT_TEXT = _options.btnNextText || "Next";
+    var BTN_SKIP_TEXT = _options.btnSkipText || "Skip";
+
+    var SHAPE_BACKGROUND_COLOR = _options.backgroundColor || "rgba(0,0,0,0.6)";
+
+
+    var body = 'body';// TODO: Is it possible case when we need to define enjoyhint somewhere else? 
 
     var defaults = {
 
@@ -26,7 +40,7 @@ var EnjoyHint = function (_options) {
     var data = [];
     var current_step = 0;
 
-    $body = $('body');
+    $body = $(body);
 
 
     /********************* PRIVATE METHODS ***************************************/
@@ -41,7 +55,7 @@ var EnjoyHint = function (_options) {
         $body.css({'overflow':'hidden'});
 
         $(document).on("touchmove",lockTouch);
-
+        
         $body.enjoyhint({
 
             onNextClick: function () {
@@ -53,7 +67,8 @@ var EnjoyHint = function (_options) {
 
                 options.onSkip();
                 skipAll();
-            }
+            },
+            fill: SHAPE_BACKGROUND_COLOR
         });
     };
 
@@ -75,9 +90,9 @@ var EnjoyHint = function (_options) {
         var $skipBtn = $('.enjoyhint_skip_btn');
 
         $nextBtn.removeClass(that.nextUserClass);
-        $nextBtn.text("Next");
+        $nextBtn.text(BTN_NEXT_TEXT);
         $skipBtn.removeClass(that.skipUserClass);
-        $skipBtn.text("Skip");
+        $skipBtn.text(BTN_SKIP_TEXT);
     };
 
     var stepAction = function () {
@@ -331,7 +346,7 @@ var EnjoyHint = function (_options) {
 
             $body.enjoyhint('redo_events_near_rect', $event_element[0].getBoundingClientRect());
         }
-    });
+    }, false);
 
     that.stop = function() {
 
@@ -383,14 +398,17 @@ var EnjoyHint = function (_options) {
     };
 
     that.setScript = function (_data) {
-
-        if (_data) {
-
-            data = _data;
+        if(!(_data instanceof Array) && _data.length < 1){
+            throw new Error("Configurations list isn't correct.")
         }
+        
+        data = _data;      
     };
 
     //support deprecated API methods
+    /**
+     * Configure data list 
+    */
     that.set = function (_data) {
 
         that.setScript(_data);

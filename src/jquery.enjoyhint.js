@@ -132,8 +132,9 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
                 });
 
                 that.layer = new Kinetic.Layer();
+         
                 that.rect = new Kinetic.Rect({
-                    fill: 'rgba(0,0,0,0.6)',
+                    fill: options.fill,
                     width: that.canvas_size.w,
                     height: that.canvas_size.h
                 });
@@ -362,7 +363,7 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
                     }
 
                     that.rect = new Kinetic.Rect({
-                        fill: 'rgba(0,0,0,0.6)',
+                        fill: options.fill,
                         width: window.innerWidth,
                         height: window.innerHeight
                     });
@@ -1141,7 +1142,6 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
 
             return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
         } else if (typeof method === 'object' || !method) {
-
             return methods.init.apply(this, arguments);
         } else {
 

@@ -42,7 +42,6 @@
   -webkit-box-sizing: content-box;
   -moz-box-sizing: content-box;
   box-sizing: content-box;
-  width: 100px;
   height: 40px;
   cursor: pointer;
   margin: 0 auto;
@@ -85,7 +84,6 @@
     -webkit-box-sizing: content-box;
     -moz-box-sizing: content-box;
     box-sizing: content-box;
-    width: 100px;
     height: 40px;
     cursor: pointer;
     margin: 0 auto;
