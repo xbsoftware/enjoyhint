@@ -35,6 +35,7 @@
 }
 
 .enjoyhint_next_btn{
+  min-width: 100px;
   position:absolute;
   z-index: 1012;
   /*display: none;*/
@@ -81,6 +82,7 @@
     z-index: 1012;
     /*display: none;*/
     pointer-events: all;
+    min-width: 100px;
     -webkit-box-sizing: content-box;
     -moz-box-sizing: content-box;
     box-sizing: content-box;

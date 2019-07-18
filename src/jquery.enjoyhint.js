@@ -262,13 +262,16 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
 
                             originalArrowLeft = [];
                             var attr = $('#enjoyhint_arrpw_line').attr('d');
-                            originalArrowLeft.push(attr.substr(1).split(',')[0]);
-                            originalArrowLeft.push(attr.substr(attr.indexOf('Q') + 1).split(',')[0]);
-                            originalArrowLeft.push(attr.split(' ')[2].split(',')[0]);
-                            originalArrowTop = [];
-                            originalArrowTop.push(attr.split(',')[1].split(' ')[0]);
-                            originalArrowTop.push(attr.split(',')[2].split(' ')[0]);
-                            originalArrowTop.push(attr.split(',')[3]);
+                            
+                            if(attr){
+                                originalArrowLeft.push(attr.substr(1).split(',')[0]);
+                                originalArrowLeft.push(attr.substr(attr.indexOf('Q') + 1).split(',')[0]);
+                                originalArrowLeft.push(attr.split(' ')[2].split(',')[0]);
+                                originalArrowTop = [];
+                                originalArrowTop.push(attr.split(',')[1].split(' ')[0]);
+                                originalArrowTop.push(attr.split(',')[2].split(' ')[0]);
+                                originalArrowTop.push(attr.split(',')[3]);
+                            }
                         }
 
                         var labelElement = $('.enjoy_hint_label');
