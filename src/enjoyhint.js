@@ -30,7 +30,7 @@ var EnjoyHint = function(configs) {
   var data = [];
   var current_step = 0;
 
-  $body = $(body);
+  var $body = $(body);
 
   /********************* PRIVATE METHODS ***************************************/
 
@@ -74,6 +74,14 @@ var EnjoyHint = function(configs) {
     $nextBtn.text(BTN_NEXT_TEXT);
     $skipBtn.removeClass(that.skipUserClass);
     $skipBtn.text(BTN_SKIP_TEXT);
+  };
+
+  function hideCurrentHint(){
+    $body.enjoyhint('render_circle', []);
+    $('#enjoyhint_label').remove();
+    $('#enjoyhint_arrpw_line').remove();
+    $body.enjoyhint('hide_next');
+    $body.enjoyhint('hide_skip');
   };
 
   var stepAction = function() {
@@ -127,11 +135,10 @@ var EnjoyHint = function(configs) {
         that.clear();
       }, 250);
 
-      //$(document.body).scrollTop(step_data.selector, step_data.scrollAnimationSpeed || 250, {offset: -100});
-      var elemToScroll = document.querySelector(step_data.selector);
-      if (elemToScroll) {
-        let { x, y } = elemToScroll.getClientRects();
-        window.scrollTo(x, y);
+      var isHintInViewport = $(step_data.selector).get(0).getBoundingClientRect();
+      if(isHintInViewport.top < 0 || isHintInViewport.bottom > (window.innerHeight || document.documentElement.clientHeight)){
+          hideCurrentHint();
+          $(document.body).scrollTo(step_data.selector, step_data.scrollAnimationSpeed || 250, {offset: -200});
       }
 
       setTimeout(function() {
