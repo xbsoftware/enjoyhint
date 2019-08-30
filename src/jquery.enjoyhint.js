@@ -950,7 +950,7 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
             var distance = label_x;
 
             if (summoryButtonWidth + label_x > arrowFinishX) {
-             distance = window.innerWidth / 2 + 20;
+             distance = label_x + label_width/2 + 20;
             }
 
             that.$next_btn.css({
