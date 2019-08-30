@@ -11,9 +11,20 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
   return this;
 };
 
-(function($) {
+(function(factory) {
+  'use strict';
+	if (typeof define === 'function' && define.amd) {
+		// AMD
+		define(['jquery', 'kinetic'], factory);
+	} else if (typeof module !== 'undefined' && module.exports) {
+		// CommonJS
+		module.exports = factory(require('jquery'), require('kinetic'));
+	} else {
+		// Global
+		factory(jQuery, Kinetic);
+	}
+})(function($, Kinetic) {
   var that;
-
   var originalLabelLeft, originalLabelTop;
   var originalArrowLeft, originalArrowTop;
   var originalCenterX, originalCenterY;
@@ -51,7 +62,7 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
         };
 
         var $that = $(this);
-        that.options = jQuery.extend(defaults, options);
+        that.options = $.extend(defaults, options);
 
         //general classes
         that.gcl = {
@@ -414,7 +425,6 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
                 y1 = labelRect.top;
                 bezX = x1;
                 bezY = y1;
-                console.log("ok");
               }
 
               if (window.innerWidth < 900) {
@@ -778,7 +788,7 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
               }
             }
           };
-        })(jQuery);
+        })($);
 
         that.renderLabelWithShape = function(data) {
           that.stepData = data;
@@ -1203,4 +1213,4 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
 
     return this;
   };
-})(window.jQuery);
+});
