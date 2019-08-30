@@ -414,7 +414,6 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
                 y1 = labelRect.top;
                 bezX = x1;
                 bezY = y1;
-                console.log("ok");
               }
 
               if (window.innerWidth < 900) {
@@ -671,6 +670,8 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
           };
         };
 
+        var arrowFinishX;
+
         that.renderArrow = function(data) {
           var x_from = data.x_from || 0;
           var y_from = data.y_from || 0;
@@ -703,9 +704,11 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
           var text = data.text || "";
           that.enjoyhint.addClass(that.cl.svg_transparent);
 
+          arrowFinishX = x_to;
+
           setTimeout(function() {
             $("#enjoyhint_arrpw_line").remove();
-
+            
             var d =
               "M" +
               x_from +
@@ -942,21 +945,30 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
             text: data.text
           });
 
-          that.$next_btn.css({
-            left: label_x,
-            top: label_y + label_height + 20
-          });
+          setTimeout(function(){
+            var summoryButtonWidth = that.$next_btn.width() + that.$skip_btn.width() + 10;
+            var distance = label_x;
 
-          var left_skip = label_x + that.$next_btn.width() + 10;
+            if (summoryButtonWidth + label_x > arrowFinishX) {
+             distance = window.innerWidth / 2 + 20;
+            }
 
-          if (that.nextBtn == "hide") {
-            left_skip = label_x;
-          }
+            that.$next_btn.css({
+              left: distance,
+              top: label_y + label_height + 20
+            });
 
-          that.$skip_btn.css({
-            left: left_skip,
-            top: label_y + label_height + 20
-          });
+            var left_skip = distance + that.$next_btn.width() + 10;
+
+            if (that.nextBtn == "hide") {
+              left_skip = distance;
+            }
+
+            that.$skip_btn.css({
+              left: left_skip,
+              top: label_y + label_height + 20
+            });
+          }, 0)
 
           that.$close_btn.css({
             right: 10,
