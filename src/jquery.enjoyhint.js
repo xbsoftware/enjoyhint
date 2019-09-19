@@ -192,6 +192,7 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
             that.hide();
             that.options.onSkipClick();
           });
+
         that.$next_btn = $("<div>", { class: that.cl.next_btn })
           .appendTo(that.enjoyhint)
           .html("Next")
@@ -243,7 +244,7 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
               this.attrs.height,
               this.attrs.radius
             );
-            ctx.fillStyle = "red";
+
             ctx.fill();
 
             ctx.globalCompositeOperation = def_comp;
@@ -624,7 +625,7 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
           var label_left = label.offset().left;
           var label_right = label.offset().left + label_w;
           var label_top = label.offset().top - $(document).scrollTop();
-          var label_bottom = label.offset().top + label_h;
+          var label_bottom = label.offset().top - $(document).scrollTop() + label_h;
 
           var margin = 10;
 
@@ -908,9 +909,28 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
           var bottom_offset = body_size.h - (data.center_y + half_h);
           var left_offset = data.center_x - half_w;
           var right_offset = body_size.w - (data.center_x + half_w);
+          
+          var label_hor_side;
+          // find out the biggest side for showing hint
+          var offsetsObj = {
+            'top_offset' : top_offset,
+            'bottom_offset' : bottom_offset,
+            'right_offset' : right_offset,
+            'left_offset' : left_offset
+          };
+          var sortedOffsets = [];
 
-          var label_hor_side =
-            body_size.w - data.center_x < data.center_x ? "left" : "right";
+          for(var offset in offsetsObj) {
+            sortedOffsets.push([offset, offsetsObj[offset]])
+          }
+          sortedOffsets.sort(function(a,b){
+            return a[1] - b[1]
+          });
+
+          (sortedOffsets[3][0] === 'bottom_offset' || sortedOffsets[3][0] === 'top_offset') ? 
+          label_hor_side = 'center' : (sortedOffsets[3][0] === 'right_offset') ?
+          label_hor_side = 'right' : label_hor_side = 'left';
+
           var label_ver_side =
             body_size.h - data.center_y < data.center_y ? "top" : "bottom";
           var label_shift = 150;
@@ -922,12 +942,57 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
           var label_hor_offset = half_w + label_shift;
           var label_ver_offset = half_h + label_shift;
 
-          //original: var label_x = (label_hor_side == 'left') ? data.center_x - label_hor_offset - label_width : data.center_x + label_hor_offset;
           var label_y =
             label_ver_side == "top"
               ? data.center_y - label_ver_offset - label_height
               : data.center_y + label_ver_offset;
-          var label_x = window.innerWidth / 2 - label_width / 2;
+
+          var label_x;
+          // if hint body bigger than available space change hint styles and label position
+          function changeHintStyles(){
+            setTimeout(function(){
+              $('.enjoy_hint_label').css({
+                'border-radius': '40px',
+                '-webkit-border-radius': '40px',
+                '-moz-border-radius': '40px',
+                'background-color': '#272A26',
+                '-webkit-transition': 'background-color ease-out 0.5s',
+                '-moz-transition': 'background-color ease-out 0.5s',
+                '-o-transition': 'background-color ease-out 0.5s',
+                'transition': 'background-color ease-out 0.5s'
+              })
+            }, 500)
+            label_x = window.innerWidth / 2 - label_width / 2
+          }
+
+          if(label_hor_side === 'center') {
+            if(sortedOffsets[3][1] <= label_shift_with_label_height){
+              changeHintStyles();  
+            }
+            else {
+              label_x = window.innerWidth / 2 - label_width / 2
+            }
+          }
+          else if (label_hor_side === 'left') {
+            if(sortedOffsets[3][1] <= label_width + label_margin){
+              changeHintStyles();
+            }
+            else {
+              data.width ? 
+                label_x = data.center_x - label_width - data.width/2 - 20 :
+                label_x = data.center_x - label_width - data.radius/2 - 20;
+            }
+          }
+          else {
+            if(sortedOffsets[3][1] <= label_width + label_margin){
+              changeHintStyles();
+            }
+            else {
+              data.width ? 
+                label_x = data.center_x + data.width/2 + 20 :
+                label_x = data.center_x + data.radius/2 + 20;
+            }
+          }
 
           if (
             top_offset < label_shift_with_label_height &&
@@ -946,7 +1011,7 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
           });
 
           setTimeout(function(){
-            var summoryButtonWidth = that.$next_btn.width() + that.$skip_btn.width() + 10;
+            var summoryButtonWidth = that.$next_btn.width() + that.$skip_btn.width() + 20;
             var distance = label_x;
 
             if (summoryButtonWidth + label_x > arrowFinishX) {
@@ -955,7 +1020,7 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
 
             that.$next_btn.css({
               left: distance,
-              top: label_y + label_height + 20
+              top: label_y + label_height + 40
             });
 
             var left_skip = distance + that.$next_btn.width() + 10;
@@ -966,7 +1031,7 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
 
             that.$skip_btn.css({
               left: left_skip,
-              top: label_y + label_height + 20
+              top: label_y + label_height + 40
             });
           }, 0)
 

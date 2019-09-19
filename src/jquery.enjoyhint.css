@@ -9,6 +9,7 @@
   font-weight: normal;
   font-style: normal;
 }
+
 .enjoyhint {
   position: fixed;
   width: 100%;
@@ -321,6 +322,9 @@
 
 .enjoy_hint_label {
   position: absolute;
+  max-width: 90%;
+  max-height: 90%;
+  overflow: hidden;
   color: white;
   z-index: 107;
   font-size: 22px;
