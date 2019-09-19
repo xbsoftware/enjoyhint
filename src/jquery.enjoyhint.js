@@ -11,9 +11,20 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
   return this;
 };
 
-(function($) {
+(function(factory) {
+  'use strict';
+	if (typeof define === 'function' && define.amd) {
+		// AMD
+		define(['jquery', 'kinetic'], factory);
+	} else if (typeof module !== 'undefined' && module.exports) {
+		// CommonJS
+		module.exports = factory(require('jquery'), require('kinetic'));
+	} else {
+		// Global
+		factory(jQuery, Kinetic);
+	}
+})(function($, Kinetic) {
   var that;
-
   var originalLabelLeft, originalLabelTop;
   var originalArrowLeft, originalArrowTop;
   var originalCenterX, originalCenterY;
@@ -51,7 +62,7 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
         };
 
         var $that = $(this);
-        that.options = jQuery.extend(defaults, options);
+        that.options = $.extend(defaults, options);
 
         //general classes
         that.gcl = {
@@ -782,7 +793,7 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
               }
             }
           };
-        })(jQuery);
+        })($);
 
         that.renderLabelWithShape = function(data) {
           that.stepData = data;
@@ -1011,7 +1022,11 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
           });
 
           setTimeout(function(){
+<<<<<<< HEAD
             var summoryButtonWidth = that.$next_btn.width() + that.$skip_btn.width() + 20;
+=======
+            var summoryButtonWidth = that.$next_btn.width() + that.$skip_btn.width() + 10;
+>>>>>>> 7335cea66483cc59ae039d8c2b41b881f6b4cfd2
             var distance = label_x;
 
             if (summoryButtonWidth + label_x > arrowFinishX) {
@@ -1020,7 +1035,11 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
 
             that.$next_btn.css({
               left: distance,
+<<<<<<< HEAD
               top: label_y + label_height + 40
+=======
+              top: label_y + label_height + 20
+>>>>>>> 7335cea66483cc59ae039d8c2b41b881f6b4cfd2
             });
 
             var left_skip = distance + that.$next_btn.width() + 10;
@@ -1031,7 +1050,11 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
 
             that.$skip_btn.css({
               left: left_skip,
+<<<<<<< HEAD
               top: label_y + label_height + 40
+=======
+              top: label_y + label_height + 20
+>>>>>>> 7335cea66483cc59ae039d8c2b41b881f6b4cfd2
             });
           }, 0)
 
@@ -1280,4 +1303,4 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
 
     return this;
   };
-})(window.jQuery);
+});
