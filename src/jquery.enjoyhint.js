@@ -682,8 +682,6 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
           };
         };
 
-        var arrowFinishX;
-
         that.renderArrow = function(data) {
           var x_from = data.x_from || 0;
           var y_from = data.y_from || 0;
@@ -692,31 +690,17 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
           var by_top_side = data.by_top_side;
           var control_point_x = 0;
           var control_point_y = 0;
-
-          if (window.innerWidth >= 640) {
-            if (by_top_side) {
-              if (y_from >= y_to) {
-                control_point_y = y_to;
-                control_point_x = x_from;
-              } else {
-                control_point_y = y_from;
-                control_point_x = x_to;
-              }
-            } else {
-              if (y_from >= y_to) {
-                control_point_y = y_from;
-                control_point_x = x_to;
-              } else {
-                control_point_y = y_to;
-                control_point_x = x_from;
-              }
-            }
+  
+          if (by_top_side === 'hor') {
+            control_point_x = x_to
+            control_point_y = y_from
+          }
+          else {
+            control_point_x = x_from
+            control_point_y = y_to
           }
 
-          var text = data.text || "";
           that.enjoyhint.addClass(that.cl.svg_transparent);
-
-          arrowFinishX = x_to;
 
           setTimeout(function() {
             $("#enjoyhint_arrpw_line").remove();
@@ -921,101 +905,146 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
           var left_offset = data.center_x - half_w;
           var right_offset = body_size.w - (data.center_x + half_w);
           
-          var label_hor_side;
-          // find out the biggest side for showing hint
-          var offsetsObj = {
-            'top_offset' : top_offset,
-            'bottom_offset' : bottom_offset,
-            'right_offset' : right_offset,
-            'left_offset' : left_offset
-          };
-          var sortedOffsets = [];
-
-          for(var offset in offsetsObj) {
-            sortedOffsets.push([offset, offsetsObj[offset]])
-          }
-          sortedOffsets.sort(function(a,b){
-            return a[1] - b[1]
-          });
-
-          (sortedOffsets[3][0] === 'bottom_offset' || sortedOffsets[3][0] === 'top_offset') ? 
-          label_hor_side = 'center' : (sortedOffsets[3][0] === 'right_offset') ?
-          label_hor_side = 'right' : label_hor_side = 'left';
-
-          var label_ver_side =
-            body_size.h - data.center_y < data.center_y ? "top" : "bottom";
           var label_shift = 150;
           var label_margin = 40;
-          var label_shift_with_label_width =
-            label_shift + label_width + label_margin;
           var label_shift_with_label_height =
             label_shift + label_height + label_margin;
-          var label_hor_offset = half_w + label_shift;
           var label_ver_offset = half_h + label_shift;
 
-          var label_y =
-            label_ver_side == "top"
-              ? data.center_y - label_ver_offset - label_height
-              : data.center_y + label_ver_offset;
+          var areas_for_label = [
+            {name: 'right_center', common_area: right_offset * window.innerHeight, width: right_offset, height: window.innerHeight},
+            {name: 'right_top', common_area: right_offset * top_offset, width: right_offset, height: top_offset},
+            {name: 'right_bottom', common_area: right_offset * bottom_offset, width: right_offset, height: bottom_offset},
+            {name: 'left_center', common_area: left_offset * window.innerHeight, width: left_offset, height: window.innerHeight},
+            {name: 'left_top', common_area: left_offset * top_offset, width: left_offset, height: top_offset},
+            {name: 'left_bottom', common_area: left_offset * bottom_offset, width: left_offset, height: bottom_offset},
+            {name: 'center_top', common_area: window.innerWidth * top_offset, width: window.innerWidth, height: top_offset},
+            {name: 'center_bottom', common_area: window.innerWidth * bottom_offset, width: window.innerWidth, height: bottom_offset},
+          ];
 
-          var label_x;
-          // if hint body bigger than available space change hint styles and label position
-          function changeHintStyles(){
-            setTimeout(function(){
-              $('.enjoy_hint_label').css({
-                'border-radius': '40px',
-                '-webkit-border-radius': '40px',
-                '-moz-border-radius': '40px',
-                'background-color': '#272A26',
-                '-webkit-transition': 'background-color ease-out 0.5s',
-                '-moz-transition': 'background-color ease-out 0.5s',
-                '-o-transition': 'background-color ease-out 0.5s',
-                'transition': 'background-color ease-out 0.5s'
-              })
-            }, 500)
-            label_x = window.innerWidth / 2 - label_width / 2
+          var label_horizontal_space_required = label_width;
+          var label_vertical_space_required = label_shift_with_label_height + 20;
+
+          var areas_priority = areas_for_label
+            .sort(function(area1, area2){return area1.common_area - area2.common_area})
+            .map(function(area){return area.name});
+
+          var label_hor_side = 'oversized';
+          for (var i = 0; i < areas_priority.length; i++) {
+              var area_name = areas_priority[i];
+              var area = areas_for_label.find(function(area) {return area.name === area_name});
+              if (area.width > label_horizontal_space_required && area.height > label_vertical_space_required) {
+                  label_hor_side = area_name;
+                  if(area_name === areas_priority[areas_priority.length - 1]) {
+                    break;
+                  }
+              }
+          } 
+
+          var data_width_size = data.width ? data.width : data.radius * 2;
+          var data_height_size = data.height ? data.height : data.radius * 2;
+
+          var right_position = data.center_x + data_width_size/2 + 80;
+          var left_position = data.center_x - label_width - data_width_size/2 - 80;
+          var central_position = window.innerWidth / 2 - label_width / 2;
+          var top_position = data.center_y - label_ver_offset - label_height;
+          var bottom_position = data.center_y + label_ver_offset;
+          var central_ver_position = window.innerHeight/2 - label_vertical_space_required/2 + 20;
+          
+          var label_x, label_y, x_to, y_to, x_from, y_from;
+          
+          var by_top_side = "hor"
+
+          switch(label_hor_side) {
+            case "center_top":
+                label_y = top_position;
+                label_x = central_position;
+                x_to = data.center_x;
+                y_to = data.center_y - data_height_size/2 - 20;
+                break;
+            case "center_bottom":
+                label_y = bottom_position;
+                label_x = central_position;
+                x_to = data.center_x;
+                y_to = data.center_y + data_height_size/2 + 20;
+                break;
+            case 'left_center':
+                label_y = central_ver_position;
+                label_x = left_position;
+                x_to = data.center_x - data_width_size/2 - 20;
+                y_to = data.center_y;
+                by_top_side = "ver";  
+                break;
+            case 'left_top':
+                label_y = top_position;
+                label_x = left_position;
+                x_to = data.center_x - data_width_size/2;
+                y_to = data.center_y - 20;
+                break;
+            case 'left_bottom':
+                label_y = bottom_position;
+                label_x = left_position;
+                x_to = data.center_x - data_width_size/2;
+                y_to = data.center_y + 20;
+                by_top_side = "ver";  
+                break;
+            case 'right_center':
+                label_y = central_ver_position;
+                label_x = right_position;
+                x_to = data.center_x + data_width_size/2 + 20;
+                y_to = data.center_y;
+                by_top_side = "ver";  
+                break;
+            case 'right_top':
+                label_y = top_position;
+                label_x = right_position;
+                x_to = data.center_x + data_width_size/2;
+                y_to = data.center_y - 20;
+                break;            
+            case 'right_bottom':
+                label_y = bottom_position;
+                label_x = right_position;
+                x_to = data.center_x + data_width_size/2;
+                y_to = data.center_y + 20;
+                by_top_side = "ver";  
+                break;
+            case 'oversized':
+              setTimeout(function(){
+                $("#enjoyhint_arrpw_line").remove();
+                $('.enjoy_hint_label').css({
+                  'border-radius': '20px',
+                  '-webkit-border-radius': '20px',
+                  '-moz-border-radius': '20px',
+                  'background-color': '#272A26',
+                  '-webkit-transition': 'background-color ease-out 0.5s',
+                  '-moz-transition': 'background-color ease-out 0.5s',
+                  '-o-transition': 'background-color ease-out 0.5s',
+                  'transition': 'background-color ease-out 0.5s'
+                })
+              }, 450)
+                label_y = central_ver_position
+                label_x = central_position;
+                break;
           }
 
-          if(label_hor_side === 'center') {
-            if(sortedOffsets[3][1] <= label_shift_with_label_height){
-              changeHintStyles();  
-            }
-            else {
-              label_x = window.innerWidth / 2 - label_width / 2
-            }
+          x_from = label_x + label_width/2;
+          y_from = (data.center_y > label_y + label_height/2) ? label_y + label_height : label_y;
+
+          // if data center out of window y scale
+          if(data.center_y < 0) {
+            y_to = 20
           }
-          else if (label_hor_side === 'left') {
-            if(sortedOffsets[3][1] <= label_width + label_margin){
-              changeHintStyles();
-            }
-            else {
-              data.width ? 
-                label_x = data.center_x - label_width - data.width/2 - 20 :
-                label_x = data.center_x - label_width - data.radius/2 - 20;
-            }
-          }
-          else {
-            if(sortedOffsets[3][1] <= label_width + label_margin){
-              changeHintStyles();
-            }
-            else {
-              data.width ? 
-                label_x = data.center_x + data.width/2 + 20 :
-                label_x = data.center_x + data.radius/2 + 20;
-            }
+          else if ( data.center_y > window.innerHeight + 20 ) {
+            y_to = window.innerHeight - 20
+          };
+
+          // if element at the same position as hint
+          if(data.center_y >= label_y && data.center_y <= label_y + label_height) {
+            x_from = data.center_x > label_x ? label_x + label_width : label_x;
+            y_from = data.center_y;
           }
 
-          if (
-            top_offset < label_shift_with_label_height &&
-            bottom_offset < label_shift_with_label_height
-          ) {
-            label_y = data.center_y + label_margin;
-          }
-
-          if (window.innerWidth <= 640) {
-          }
-
-          var label_data = that.renderLabel({
+          that.renderLabel({
             x: label_x,
             y: label_y,
             text: data.text
@@ -1023,15 +1052,21 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
 
           setTimeout(function(){
             var summoryButtonWidth = that.$next_btn.width() + that.$skip_btn.width() + 20;
-            var distance = label_x;
-
-            if (summoryButtonWidth + label_x > arrowFinishX) {
-             distance = label_x + label_width/2 + 20;
+            var distance = label_x - 20;
+            var ver_button_position = label_y + label_height + 40
+            
+            if (summoryButtonWidth + label_x > x_to) {
+            distance = x_to >= x_from ? x_to + 20 : label_x + label_width/2
+            }
+              
+            if (summoryButtonWidth + distance > window.innerWidth) {
+              distance = label_x;
+              ver_button_position = y_from < y_to ? label_y - 80 : label_y + label_height + 40
             }
 
             that.$next_btn.css({
               left: distance,
-              top: label_y + label_height + 40
+              top: ver_button_position
             });
 
             var left_skip = distance + that.$next_btn.width() + 10;
@@ -1042,7 +1077,7 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
 
             that.$skip_btn.css({
               left: left_skip,
-              top: label_y + label_height + 40
+              top: ver_button_position
             });
           }, 0)
 
@@ -1058,107 +1093,12 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
             right: shape_data.right
           });
 
-          var x_to = 0;
-          var y_to = 0;
-          var arrow_side = false;
-          var conn_label_side = "left";
-          var conn_circle_side = "left";
-
-          var is_center =
-            label_data.left <= shape_data.x && label_data.right >= shape_data.x;
-          var is_left = label_data.right < shape_data.x;
-          var is_right = label_data.left > shape_data.x;
-
-          var is_abs_left = label_data.right < shape_data.left;
-          var is_abs_right = label_data.left > shape_data.right;
-
-          var is_top = label_data.bottom < shape_data.top;
-          var is_bottom = label_data.top > shape_data.bottom;
-          var is_mid =
-            label_data.bottom >= shape_data.y && label_data.top <= shape_data.y;
-          var is_mid_top = label_data.bottom <= shape_data.y && !is_top;
-          var is_mid_bottom = label_data.top >= shape_data.y && !is_bottom;
-
-          function setArrowData(l_s, c_s, a_s) {
-            conn_label_side = l_s;
-            conn_circle_side = c_s;
-            arrow_side = a_s;
-          }
-
-          function sideStatements(
-            top_s,
-            mid_top_s,
-            mid_s,
-            mid_bottom_s,
-            bottom_s
-          ) {
-            var statement = [];
-
-            if (is_top) {
-              statement = top_s;
-            } else if (is_mid_top) {
-              statement = mid_top_s;
-            } else if (is_mid) {
-              statement = mid_s;
-            } else if (is_mid_bottom) {
-              statement = mid_bottom_s;
-            } else {
-              //bottom
-
-              statement = bottom_s;
-            }
-
-            if (!statement) {
-              return;
-            } else {
-              setArrowData(statement[0], statement[1], statement[2]);
-            }
-          }
-
-          if (is_center) {
-            if (is_top) {
-              setArrowData("bottom", "top", "top");
-            } else if (is_bottom) {
-              setArrowData("top", "bottom", "bottom");
-            } else {
-              return;
-            }
-          } else if (is_left) {
-            sideStatements(
-              ["right", "top", "top"], //top
-              ["bottom", "left", "bottom"], //mid_top
-              ["right", "left", "top"], //mid
-              ["top", "left", "top"], //mid_bot
-              ["right", "bottom", "bottom"] //bot
-            );
-          } else {
-            //right
-
-            sideStatements(
-              ["left", "top", "top"], //top
-              ["bottom", "right", "bottom"], //mid_top
-              ["left", "right", "top"], //mid
-              ["top", "right", "top"], //mid_bot
-              ["left", "bottom", "bottom"] //bot
-            );
-          }
-
-          var label_conn_coordinates = label_data.conn[conn_label_side];
-          var circle_conn_coordinates = shape_data.conn[conn_circle_side];
-          var by_top_side = arrow_side == "top";
-
           that.renderArrow({
-            x_from: label_conn_coordinates.x,
-            y_from: label_conn_coordinates.y,
-            x_to:
-              window.innerWidth < 640
-                ? shape_data.left + (shape_data.left > 0)
-                : circle_conn_coordinates.x,
-            y_to:
-              window.innerWidth < 640
-                ? shape_data.conn.left.y
-                : circle_conn_coordinates.y,
-            by_top_side: by_top_side
+            x_from: x_from,
+            y_from: y_from,
+            x_to: x_to,
+            y_to: y_to,
+            by_top_side: by_top_side,
           });
         };
 
