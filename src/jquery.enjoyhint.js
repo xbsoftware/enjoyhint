@@ -39,6 +39,7 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
         var defaults = {
           onNextClick: function() {},
           onSkipClick: function() {},
+          onPrevClick: function() {},
 
           animation_time: 800
         };
@@ -78,6 +79,7 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
           skip_btn: "enjoyhint_skip_btn",
           close_btn: "enjoyhint_close_btn",
           next_btn: "enjoyhint_next_btn",
+          previous_btn: "enjoyhint_prev_btn",
           main_canvas: "enjoyhint_canvas",
           main_svg: "enjoyhint_svg",
           svg_wrapper: "enjoyhint_svg_wrapper",
@@ -218,6 +220,14 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
             that.hide();
             that.options.onSkipClick();
           });
+
+          that.$prev_btn = $("<div>", { class: that.cl.previous_btn })
+          .appendTo(that.enjoyhint)
+          .html("Previous")
+          .click(function(e) {
+            that.options.onPrevClick();
+          });
+
 
         that.$canvas.mousedown(function(e) {
           $("canvas").css({ left: "4000px" });
@@ -498,6 +508,16 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
         that.hideNextBtn = function() {
           that.$next_btn.addClass(that.cl.hide);
           that.nextBtn = "hide";
+        };
+
+        that.hidePrevBtn = function() {
+          that.$prev_btn.addClass(that.cl.hide);
+          that.prevBtn = "hide";
+        };
+
+        that.showPrevBtn = function() {
+          that.$prev_btn.removeClass(that.cl.hide);
+          that.prevBtn = "show";
         };
 
         that.showNextBtn = function() {
@@ -1051,29 +1071,40 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
           });
 
           setTimeout(function(){
-            var summoryButtonWidth = that.$next_btn.width() + that.$skip_btn.width() + 20;
-            var distance = label_x - 20;
+            var summoryButtonWidth = that.$next_btn.width() + that.$skip_btn.width() + that.$prev_btn.width() + 30;
+            var distance = label_x - 100;
             var ver_button_position = label_y + label_height + 40
             
             if (summoryButtonWidth + label_x > x_to) {
             distance = x_to >= x_from ? x_to + 20 : label_x + label_width/2
             }
               
-            if (summoryButtonWidth + distance > window.innerWidth) {
-              distance = label_x;
+            if (summoryButtonWidth + distance > window.innerWidth || distance < 0) {
+              distance = 10;
               ver_button_position = y_from < y_to ? label_y - 80 : label_y + label_height + 40
-            }
+            } 
 
             that.$next_btn.css({
               left: distance,
               top: ver_button_position
             });
 
-            var left_skip = distance + that.$next_btn.width() + 10;
+            var prev_skip = distance + that.$next_btn.width() + 10;
+            var left_skip = distance + that.$next_btn.width() + that.$prev_btn.width() + 20;
 
-            if (that.nextBtn == "hide") {
-              left_skip = distance;
+            if (that.nextBtn === "hide") {
+              prev_skip = distance;
+              left_skip = distance + that.$prev_btn.width() + 10;
             }
+
+            if(that.prevBtn === "hide") {
+              left_skip = distance + that.$next_btn.width() + 10
+            }
+
+            that.$prev_btn.css({
+              left: prev_skip,
+              top: ver_button_position
+            })
 
             that.$skip_btn.css({
               left: left_skip,
@@ -1137,6 +1168,22 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
     hide_next: function() {
       this.each(function() {
         this.enjoyhint_obj.hideNextBtn();
+      });
+
+      return this;
+    },
+
+    hide_prev: function() {
+      this.each(function() {
+        this.enjoyhint_obj.hidePrevBtn();
+      });
+
+      return this;
+    },
+
+    show_prev: function() {
+      this.each(function() {
+        this.enjoyhint_obj.showPrevBtn();
       });
 
       return this;
