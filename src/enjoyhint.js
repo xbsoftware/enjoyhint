@@ -17,8 +17,8 @@
     var $event_element;
     var that = this;
     var _options = configs || {};
-    var BTN_NEXT_TEXT = _options.btnNextText || "Next";
-    var BTN_SKIP_TEXT = _options.btnSkipText || "Skip";
+    var BTN_NEXT_TEXT = _options.btnNextText;
+    var BTN_SKIP_TEXT = _options.btnSkipText;
   
     var SHAPE_BACKGROUND_COLOR = _options.backgroundColor || "rgba(0,0,0,0.6)";
   

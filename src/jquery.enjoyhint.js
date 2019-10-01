@@ -221,7 +221,7 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
             that.options.onSkipClick();
           });
 
-          that.$prev_btn = $("<div>", { class: that.cl.previous_btn })
+        that.$prev_btn = $("<div>", { class: that.cl.previous_btn })
           .appendTo(that.enjoyhint)
           .html("Previous")
           .click(function(e) {
@@ -282,6 +282,7 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
         $(window).on("resize", function() {
           clearTimeout(doit);
           $('.enjoyhint_next_btn').css('visibility', 'hidden');
+          $('.enjoyhint_prev_btn').css('visibility', 'hidden');
           $('.enjoyhint_skip_btn').css('visibility', 'hidden');
           $('.enjoy_hint_label').remove()
           $("#enjoyhint_arrpw_line").remove()
@@ -314,6 +315,7 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
 
             that.renderLabelWithShape(that.stepData);
             $('.enjoyhint_next_btn').css('visibility', 'visible');
+            $('.enjoyhint_prev_btn').css('visibility', 'visible');
             $('.enjoyhint_skip_btn').css('visibility', 'visible');
           }
 
@@ -791,7 +793,7 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
           var bottom_offset = body_size.h - (data.center_y + half_h);
           var left_offset = data.center_x - half_w;
           var right_offset = body_size.w - (data.center_x + half_w);
-          
+
           var label_shift = 150;
           var label_margin = 40;
           var label_shift_with_label_height =
@@ -808,7 +810,6 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
             {name: 'center_top', common_area: window.innerWidth * top_offset, width: window.innerWidth, height: top_offset},
             {name: 'center_bottom', common_area: window.innerWidth * bottom_offset, width: window.innerWidth, height: bottom_offset},
           ];
-
           var label_horizontal_space_required = label_width;
           var label_vertical_space_required = label_shift_with_label_height + 20;
 
@@ -916,7 +917,6 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
 
           x_from = label_x + label_width/2;
           y_from = (data.center_y > label_y + label_height/2) ? label_y + label_height : label_y;
-
           // if data center out of window y scale
           if(data.center_y < 0) {
             y_to = 20
@@ -949,27 +949,43 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
             if (summoryButtonWidth + distance > window.innerWidth || distance < 0) {
               distance = 10;
               ver_button_position = y_from < y_to ? label_y - 80 : label_y + label_height + 40
-            } 
+            }
 
-            that.$next_btn.css({
+            var initial_distance = distance;
+            var initial_ver_position = ver_button_position;
+
+            if (window.innerWidth <= 640) {
+              distance = 10;
+              ver_button_position = 10;
+              that.$next_btn.html('&#8250;');
+              that.$prev_btn.html('&#8249;');
+            }
+            else {
+              distance = initial_distance;
+              ver_button_position = initial_ver_position;
+              that.$next_btn.html('Next');
+              that.$prev_btn.html('Previous');
+            }
+
+            that.$prev_btn.css({
               left: distance,
               top: ver_button_position
             });
 
-            var prev_skip = distance + that.$next_btn.width() + 10;
-            var left_skip = distance + that.$next_btn.width() + that.$prev_btn.width() + 20;
+            var left_next = distance + that.$prev_btn.width() + 10;
+            var left_skip = distance + that.$prev_btn.width() + that.$next_btn.width() + 20;
 
             if (that.nextBtn === "hide") {
-              prev_skip = distance;
               left_skip = distance + that.$prev_btn.width() + 10;
             }
 
             if(that.prevBtn === "hide") {
-              left_skip = distance + that.$next_btn.width() + 10
+              left_next = distance;
+              left_skip = distance + that.$next_btn.width() + 10;
             }
 
-            that.$prev_btn.css({
-              left: prev_skip,
+            that.$next_btn.css({
+              left: left_next,
               top: ver_button_position
             })
 
