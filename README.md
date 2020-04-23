@@ -158,6 +158,8 @@ enjoyhint_instance.set( [ {
 * `resume()` - Resume the script from the step where it was stopped.
 * `getCurrentStep()` - Returns the current step index.
 * `trigger( "next" | "skip" | custom_event_name )` - Trigger the relevant script action.
+* `previousStep()` - Go to the most recent valid step. Useful for implementing a back button.
+
 
 #### Events
 **Step Events**:  
@@ -176,6 +178,12 @@ var enjoyhint_script_steps = [
 ```
 
 #### Changelogs
+
+##### 1.2.2
+* Prevent y axis overflow when hint is near the bottom of the screen
+* Add previousStep()
+* Make reRunScript work correctly (de-register event handlers)
+* Draw the arrow with a cubic path so that when the arrow turns sharply, it turns near it's head
 
 ##### 1.2.1
 * Be more careful with calls to .off()
