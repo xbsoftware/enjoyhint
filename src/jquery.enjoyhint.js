@@ -927,12 +927,18 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
 
           var areas_priority = areas_for_label
             .sort(function(area1, area2){return area1.common_area - area2.common_area})
+            .map(function(area){return area.name});
 
           var label_hor_side = 'oversized';
           for (var i = 0; i < areas_priority.length; i++) {
-              if (areas_priority[i].width > label_horizontal_space_required && areas_priority[i].height > label_vertical_space_required) {
-                  label_hor_side = areas_priority[i].name;
-                  if(areas_priority[i].name === areas_priority[areas_priority.length - 1]) {
+              var name = areas_priority[i];
+              var area = areas_for_label.find(function(area) {return area.name === name});
+              if (
+                area.width > label_horizontal_space_required
+                && area.height > label_vertical_space_required
+              ) {
+                  label_hor_side = name;
+                  if(name === areas_priority[areas_priority.length - 1].name) {
                     break;
                   }
               }
