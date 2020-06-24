@@ -9,6 +9,7 @@
   font-weight: normal;
   font-style: normal;
 }
+
 .enjoyhint {
   position: fixed;
   width: 100%;
@@ -293,8 +294,6 @@
   left: 0;
 }
 
-.enjoyhint_svg {
-}
 .enjoyhint_svg_wrapper {
   position: absolute;
   width: 100%;
@@ -321,6 +320,7 @@
 
 .enjoy_hint_label {
   position: absolute;
+  overflow: hidden;
   color: white;
   z-index: 107;
   font-size: 22px;
