@@ -145,17 +145,14 @@ var enjoyhint_script_steps = [
 
 #### Release notes
 
-##### v.3
+##### v.4
 
-* New and simplified description of EnjoyHint steps
-* Auto scroll to the element
-* Possibility to hide or display the buttons showNext, showSkip.
-* HTML usage allowed in description 
-* Destructor
-* Simplified property names 
-* Grunt  to compress and merge files 
-* New examples
-* You can learn the step you are on by the class enjoyhint-step-* ( where * stands for the step number).
+* Fix label position bugs
+* Fix arrow position bugs
+* Fix resize bugs
+* Add responsive design
+* Add mobile support
+* Add possibility to go back to previous step
 
 
 
