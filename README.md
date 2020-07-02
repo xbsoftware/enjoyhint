@@ -11,8 +11,9 @@ EnjoyHint is free software distributed under the terms of MIT license.
 #### Dependencies
 EnjoyHint require the following plugins and libs:
 
-* jQuery > 1.7
-* KineticJS v5.1.0 (included into js file)
+* jQuery v3.5.1
+* jQuery.scrollTo v2.1.2
+* KineticJS > v5.1.0
 
 #### Installation
 You can install it through `bower` package manager:
@@ -25,6 +26,11 @@ Alternative way:
 - Move the EnjoyHint directory to somewhere on your webserver
 - Insert next lines into your page's \<head\> tag:
 ```html
+  <!-- External libraries -->
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/kineticjs/5.2.0/kinetic.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-scrollTo/2.1.2/jquery.scrollTo.min.js"></script>
+  <!-- Enjoyhint library -->
   <link href="<pathontheserver>/enjoyhint/enjoyhint.css" rel="stylesheet">
   <script src="<pathontheserver>/enjoyhint/enjoyhint.min.js"></script>
 ```
