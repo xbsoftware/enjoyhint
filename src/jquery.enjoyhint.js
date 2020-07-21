@@ -828,8 +828,11 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
               }
           }
 
-          var data_width_size = data.width ? data.width : data.radius * 2;
-          var data_height_size = data.height ? data.height : data.radius * 2;
+          var data_width_size = data.shape === "circle" ? data.radius * 2 :
+            data.width ? data.width : data.radius * 2;
+
+          var data_height_size = data.shape === "circle" ? data.radius * 2 :
+            data.height ? data.height : data.radius * 2;
 
           var right_position = data.center_x + data_width_size/2 + 80;
           var left_position = data.center_x - label_width - data_width_size/2 - 80;
