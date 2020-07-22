@@ -794,8 +794,8 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
           var left_offset = data.center_x - half_w;
           var right_offset = body_size.w - (data.center_x + half_w);
 
-          var label_shift = 150;
-          var label_margin = 40;
+          var label_shift = window.innerHeight < 670 ? 130 : 150;
+          var label_margin = window.innerHeight < 670 ? 0 : 40;
           var label_shift_with_label_height =
             label_shift + label_height + label_margin;
           var label_ver_offset = half_h + label_shift;
@@ -811,7 +811,7 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
             {name: 'center_bottom', common_area: window.innerWidth * bottom_offset, width: window.innerWidth, height: bottom_offset},
           ];
           var label_horizontal_space_required = label_width;
-          var label_vertical_space_required = label_shift_with_label_height + 20;
+          var label_vertical_space_required = window.innerHeight <= 670 ? label_shift_with_label_height : label_shift_with_label_height + 20;
 
           var areas_priority = areas_for_label
             .sort(function(area1, area2){return area1.common_area - area2.common_area})
@@ -828,8 +828,11 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
               }
           }
 
-          var data_width_size = data.width ? data.width : data.radius * 2;
-          var data_height_size = data.height ? data.height : data.radius * 2;
+          var data_width_size = data.shape === "circle" ? data.radius * 2 :
+            data.width ? data.width : data.radius * 2;
+
+          var data_height_size = data.shape === "circle" ? data.radius * 2 :
+            data.height ? data.height : data.radius * 2;
 
           var right_position = data.center_x + data_width_size/2 + 80;
           var left_position = data.center_x - label_width - data_width_size/2 - 80;

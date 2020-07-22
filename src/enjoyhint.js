@@ -281,6 +281,12 @@
             scroll: step_data.scroll
           };
   
+          if (shape_data.center_x === 0 && shape_data.center_y === 0) {
+            $body.enjoyhint("hide");
+            destroyEnjoy();
+            return console.log("Error: Element position couldn't be reached");
+          }
+  
           if (step_data.shape && step_data.shape == "circle") {
             shape_data.shape = "circle";
             shape_data.radius = radius;
@@ -379,6 +385,8 @@
         case "skip":
           skipAll();
           break;
+  
+        default: $body.trigger(makeEventName(event_name, true));
       }
     };
   
