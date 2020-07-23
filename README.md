@@ -16,20 +16,30 @@ EnjoyHint require the following plugins and libs:
 * KineticJS > v5.1.0
 
 #### Installation
-You can install it through `bower` package manager:
+You can install it through `node` or `bower`package managers:
 ```
-bower install enjoyhint
+npm install xbs-enjoyhint
+```
+```
+bower install xbs-enjoyhint
 ```
 Alternative way:
-- Download the latest version of EnjoyHint
+- Download the latest version of EnjoyHint from GitHub.
 - Extract the archive with EnjoyHint.
-- Move the EnjoyHint directory to somewhere on your webserver
+- Move the EnjoyHint directory to somewhere on your webserver.
+- Install dependencies `npm install` or `bower install` if you want to use internal libraries.
 - Insert next lines into your page's \<head\> tag:
 ```html
-  <!-- External libraries -->
+  <!-- From external libraries -->
   <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/kineticjs/5.2.0/kinetic.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-scrollTo/2.1.2/jquery.scrollTo.min.js"></script>
+
+  <!-- Or from internal libraries from node_modules-->
+  <script src="<pathontheserver>/jquery/dist/jquery.min.js"></script>
+  <script src="<pathontheserver>/kinetic/kinetic.min.js"></script>
+  <script src="<pathontheserver>/jquery.scrollto/jquery.scrollTo.min.js"></script>
+
   <!-- Enjoyhint library -->
   <link href="<pathontheserver>/enjoyhint/enjoyhint.css" rel="stylesheet">
   <script src="<pathontheserver>/enjoyhint/enjoyhint.min.js"></script>
