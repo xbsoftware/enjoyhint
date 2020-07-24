@@ -1012,7 +1012,7 @@
 
             if (isValidColor(color)){
                 return [$("#poliline"), $("#enjoyhint_arrpw_line")].forEach(function(element){
-                    element.css("stroke", that.stepData.arrowColor);
+                    element.css("stroke", color);
                 });
             }
 
