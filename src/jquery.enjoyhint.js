@@ -635,10 +635,10 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
               })
             );
 
-            $("#poliline").css("stroke", "rgb(255, 255, 255)");
-
             if(that.stepData.arrowColor) {
                 that.setMarkerColor(that.stepData.arrowColor)
+            } else {
+                $("#poliline").css("stroke", "rgb(255, 255, 255)");
             }
 
             that.enjoyhint.removeClass(that.cl.svg_transparent);
