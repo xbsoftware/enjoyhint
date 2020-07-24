@@ -84,6 +84,7 @@ var enjoyhint_script_steps = [
 
 #### Properties of the step configuration
 * `"event selector" : "description"` - to describe a step you should set an event type, selecte element and add description for this element (hint)
+* `markerColor` - the color of a marker that accepts all CSS colors.
 * `keyCode` - the code of a button, which triggers the next EnjoyHint step upon a click. Defined by the “key” event. (“key #block” : “hello”).
 * `event_selector` - if you need to attach an event (that was set in "event" property) to other selector, you can use this one  
 * `timeout` - delay before the moment, when an element is highlighted   
@@ -112,7 +113,7 @@ var enjoyhint_script_steps = [
 
 
 #### Non-standard events:
-**auto** - for example, you need to click on the same button on the second step imediatelly after the first step and go to the next step after it. Then you can use "auto" in the "event_type" property and "click" in "event" property.
+* `auto` - for example, you need to click on the same button on the second step imediatelly after the first step and go to the next step after it. Then you can use "auto" in the "event_type" property and "click" in "event" property.
 * `custom` - this value is very usefull if you need to go to the next step by event in your app code. For example, you want to go to the next step only after some data have been loaded in your application. Then you should use the "custom" event_type and the "trigger" method of the EnjoyHint instance.  
 ```javascript
 //Example of using custom event_type
@@ -169,6 +170,7 @@ var enjoyhint_script_steps = [
 * Add responsive design
 * Add mobile support
 * Add possibility to go back to previous step
+* Add possibility to select the color of a marker
 
 
 

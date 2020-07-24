@@ -273,6 +273,7 @@
             center_x: coords.x,
             center_y: coords.y,
             text: step_data.description,
+            arrowColor: step_data.arrowColor,
             top: step_data.top,
             bottom: step_data.bottom,
             left: step_data.left,

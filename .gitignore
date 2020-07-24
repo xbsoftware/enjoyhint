@@ -1,2 +1,4 @@
 node_modules/*
 lib/*
+bootstrap_test
+package-lock.json
