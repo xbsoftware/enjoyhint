@@ -84,7 +84,7 @@ var enjoyhint_script_steps = [
 
 #### Properties of the step configuration
 * `"event selector" : "description"` - to describe a step you should set an event type, selecte element and add description for this element (hint)
-* `markerColor` - the color of a marker that accepts all CSS colors.
+* `arrowColor` - the color of a marker that accepts all CSS colors.
 * `keyCode` - the code of a button, which triggers the next EnjoyHint step upon a click. Defined by the “key” event. (“key #block” : “hello”).
 * `event_selector` - if you need to attach an event (that was set in "event" property) to other selector, you can use this one  
 * `timeout` - delay before the moment, when an element is highlighted   
@@ -108,6 +108,7 @@ var enjoyhint_script_steps = [
   ```
 * `showSkip` - shows or hides the Skip button (true|false)
 * `showNext` - shows or hides the Next button (true|false)
+* `showPrev` - shows or hides the Previous button (true|false)
 
 
 

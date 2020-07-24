@@ -190,7 +190,10 @@
           if(current_step !== 0) {
             $body.enjoyhint("show_prev");
           }
-          
+
+          if (step_data.showPrev == false) {
+            $body.enjoyhint("hide_prev");
+        }
 
           if (step_data.showSkip == false) {
             $body.enjoyhint("hide_skip");
