@@ -190,7 +190,10 @@
           if(current_step !== 0) {
             $body.enjoyhint("show_prev");
           }
-          
+
+          if (step_data.showPrev == false) {
+            $body.enjoyhint("hide_prev");
+        }
 
           if (step_data.showSkip == false) {
             $body.enjoyhint("hide_skip");
@@ -273,6 +276,7 @@
             center_x: coords.x,
             center_y: coords.y,
             text: step_data.description,
+            arrowColor: step_data.arrowColor,
             top: step_data.top,
             bottom: step_data.bottom,
             left: step_data.left,

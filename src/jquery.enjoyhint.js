@@ -156,7 +156,8 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
         var polilyne = $(
           makeSVG("path", {
             style: "fill:none; stroke:rgb(255,255,255); stroke-width:2",
-            d: "M0,0 c30,11 30,9 0,20"
+            d: "M0,0 c30,11 30,9 0,20",
+            id: "poliline"
           })
         );
 
@@ -571,6 +572,24 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
           };
         };
 
+        that.setMarkerColor = function(color){
+
+            function isValidColor(value) {
+                const temp = new Option().style;
+                temp.color = value;
+                return temp.color !== '';
+            }
+
+            if (isValidColor(color)){
+                return [$("#poliline"), $("#enjoyhint_arrpw_line")].forEach(function(element){
+                    element.css("stroke", color);
+                });
+            }
+
+            $("#poliline").css("stroke", "rgb(255,255,255)")
+            console.log("Error: invalid color name property - " + color);
+        }
+
         that.renderArrow = function(data) {
           var x_from = data.x_from || 0;
           var y_from = data.y_from || 0;
@@ -615,6 +634,13 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
                 id: "enjoyhint_arrpw_line"
               })
             );
+
+            if(that.stepData.arrowColor) {
+                that.setMarkerColor(that.stepData.arrowColor)
+            } else {
+                $("#poliline").css("stroke", "rgb(255, 255, 255)");
+            }
+
             that.enjoyhint.removeClass(that.cl.svg_transparent);
           }, that.options.animation_time / 2);
         };
