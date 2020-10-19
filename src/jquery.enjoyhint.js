@@ -992,8 +992,10 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
             else {
               distance = initial_distance;
               ver_button_position = initial_ver_position;
-              that.$next_btn.html(customBtnProps.nextButton ? customBtnProps.nextButton.text : 'Next');
-              that.$prev_btn.html(customBtnProps.prevButton ? customBtnProps.prevButton.text : 'Previous');
+              that.$next_btn.html(customBtnProps.nextButton && customBtnProps.nextButton.text ? 
+                  customBtnProps.nextButton.text : 'Next');
+              that.$prev_btn.html(customBtnProps.prevButton && customBtnProps.prevButton.text ? 
+                  customBtnProps.prevButton.text : 'Previous');
             }
 
             that.$prev_btn.css({
