@@ -97,13 +97,14 @@ var enjoyhint_script_steps = [
 * `left` - left margin for the shape of "rect" type
 * `scrollAnimationSpeed` - sets the auto scroll speed (ms).
 * `nextButton` - allows applying its classes and names for the button Nеxt.
-* `skipButton` - allows applying its classes and names for the button Skip. For the example :
+* `skipButton` - allows applying its classes and names for the button Skip.
+* `prevButton` - allows applying its classes and names for the button Previous. For the example :
 ```javascript
 	var options = {
                     "next #block": 'Hello.',
-                    "nextButton" : {className: "myNext", text: "NEXT"},
-                    "skipButton" : {className: "mySkip", text: "SKIP"},
-
+                    "nextButton" : {className: "myNext", text: "myNEXT"},
+                    "skipButton" : {className: "mySkip", text: "mySKIP"},
+                    "prevButton" : {className: "myPrev", text: "myPREV"}
                 }
   ```
 * `showSkip` - shows or hides the Skip button (true|false)
@@ -165,13 +166,14 @@ var enjoyhint_script_steps = [
 
 ##### v.4
 
-* Fix label position bugs
-* Fix arrow position bugs
-* Fix resize bugs
-* Add responsive design
-* Add mobile support
-* Add possibility to go back to previous step
-* Add possibility to select the color of a marker
+* Fixed label position bugs
+* Fixed arrow position bugs
+* Fixed resize bugs
+* Added responsive design
+* Added mobile support
+* Added possibility to go back to previous step
+* Added possibility to select the color of a marker
+* Added possibility to customize previous button
 
 
 

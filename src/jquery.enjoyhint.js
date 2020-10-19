@@ -314,7 +314,7 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
             that.stepData.width = newDataCoords.width + 11;
             that.stepData.height = newDataCoords.height + 11;
 
-            that.renderLabelWithShape(that.stepData);
+            that.renderLabelWithShape(that.stepData, that.customBtnProps);
             $('.enjoyhint_next_btn').css('visibility', 'visible');
             $('.enjoyhint_prev_btn').css('visibility', 'visible');
             $('.enjoyhint_skip_btn').css('visibility', 'visible');
@@ -694,8 +694,9 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
           };
         })($);
 
-        that.renderLabelWithShape = function(data) {
+        that.renderLabelWithShape = function(data, customBtnProps) {
           that.stepData = data;
+          that.customBtnProps = customBtnProps;
 
           function findParentDialog(element) {
             if (element.tagName === "MD-DIALOG") {
@@ -991,8 +992,8 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
             else {
               distance = initial_distance;
               ver_button_position = initial_ver_position;
-              that.$next_btn.html(that.stepData.nextBtnInitValue || 'Next');
-              that.$prev_btn.html('Previous');
+              that.$next_btn.html(customBtnProps.nextButton ? customBtnProps.nextButton.text : 'Next');
+              that.$prev_btn.html(customBtnProps.prevButton ? customBtnProps.prevButton.text : 'Previous');
             }
 
             that.$prev_btn.css({
@@ -1140,10 +1141,10 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
       return this;
     },
 
-    render_label_with_shape: function(data, stopFunction) {
+    render_label_with_shape: function(data, stopFunction, customBtnProps) {
       this.each(function() {
         that.stopFunction = stopFunction;
-        this.enjoyhint_obj.renderLabelWithShape(data);
+        this.enjoyhint_obj.renderLabelWithShape(data, customBtnProps);
       });
 
       return this;

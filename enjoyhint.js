@@ -79,7 +79,9 @@
     that.clear = function() {
       var $nextBtn = $(".enjoyhint_next_btn");
       var $skipBtn = $(".enjoyhint_skip_btn");
-  
+      var $prevBtn = $(".enjoyhint_prev_btn");
+
+      $prevBtn.removeClass(that.prevUserClass);
       $nextBtn.removeClass(that.nextUserClass);
       $nextBtn.text(BTN_NEXT_TEXT);
       $skipBtn.removeClass(that.skipUserClass);
@@ -209,7 +211,15 @@
             $nextBtn.text(step_data.nextButton.text || "Next");
             that.nextUserClass = step_data.nextButton.className;
           }
-  
+
+          if (step_data.prevButton) {
+            var $prevBtn = $(".enjoyhint_prev_btn");
+
+            $prevBtn.addClass(step_data.prevButton.className || "");
+            $prevBtn.text(step_data.prevButton.text || "Previous");
+            that.prevUserClass = step_data.prevButton.className;
+          }
+
           if (step_data.skipButton) {
             var $skipBtn = $(".enjoyhint_skip_btn");
   
@@ -285,8 +295,9 @@
             scroll: step_data.scroll
           };
 
-          if (step_data.nextButton) {
-            shape_data.nextBtnInitValue = step_data.nextButton.text
+          var customBtnProps = {
+              nextButton: step_data.nextButton,
+              prevButton: step_data.prevButton
           }
 
           if (shape_data.center_x === 0 && shape_data.center_y === 0) {
@@ -304,7 +315,7 @@
             shape_data.height = h + shape_margin;
           }
   
-          $body.enjoyhint("render_label_with_shape", shape_data, that.stop);
+          $body.enjoyhint("render_label_with_shape", shape_data, that.stop, customBtnProps);
           
         }, scrollSpeed + 20 || 270);
       }, timeout);
@@ -748,7 +759,7 @@
             that.stepData.width = newDataCoords.width + 11;
             that.stepData.height = newDataCoords.height + 11;
 
-            that.renderLabelWithShape(that.stepData);
+            that.renderLabelWithShape(that.stepData, that.customBtnProps);
             $('.enjoyhint_next_btn').css('visibility', 'visible');
             $('.enjoyhint_prev_btn').css('visibility', 'visible');
             $('.enjoyhint_skip_btn').css('visibility', 'visible');
@@ -1128,8 +1139,9 @@
           };
         })($);
 
-        that.renderLabelWithShape = function(data) {
+        that.renderLabelWithShape = function(data, customBtnProps) {
           that.stepData = data;
+          that.customBtnProps = customBtnProps;
 
           function findParentDialog(element) {
             if (element.tagName === "MD-DIALOG") {
@@ -1425,8 +1437,8 @@
             else {
               distance = initial_distance;
               ver_button_position = initial_ver_position;
-              that.$next_btn.html(that.stepData.nextBtnInitValue || 'Next');
-              that.$prev_btn.html('Previous');
+              that.$next_btn.html(customBtnProps.nextButton ? customBtnProps.nextButton.text : 'Next');
+              that.$prev_btn.html(customBtnProps.prevButton ? customBtnProps.prevButton.text : 'Previous');
             }
 
             that.$prev_btn.css({
@@ -1574,10 +1586,10 @@
       return this;
     },
 
-    render_label_with_shape: function(data, stopFunction) {
+    render_label_with_shape: function(data, stopFunction, customBtnProps) {
       this.each(function() {
         that.stopFunction = stopFunction;
-        this.enjoyhint_obj.renderLabelWithShape(data);
+        this.enjoyhint_obj.renderLabelWithShape(data, customBtnProps);
       });
 
       return this;
