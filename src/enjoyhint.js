@@ -284,7 +284,11 @@
             margin: step_data.margin,
             scroll: step_data.scroll
           };
-  
+
+          if (step_data.nextButton) {
+            shape_data.nextBtnInitValue = step_data.nextButton.text
+          }
+
           if (shape_data.center_x === 0 && shape_data.center_y === 0) {
             $body.enjoyhint("hide");
             destroyEnjoy();

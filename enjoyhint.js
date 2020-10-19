@@ -284,7 +284,11 @@
             margin: step_data.margin,
             scroll: step_data.scroll
           };
-  
+
+          if (step_data.nextButton) {
+            shape_data.nextBtnInitValue = step_data.nextButton.text
+          }
+
           if (shape_data.center_x === 0 && shape_data.center_y === 0) {
             $body.enjoyhint("hide");
             destroyEnjoy();
@@ -1421,8 +1425,8 @@
             else {
               distance = initial_distance;
               ver_button_position = initial_ver_position;
-            //   that.$next_btn.html('Next');
-            //   that.$prev_btn.html('Previous');
+              that.$next_btn.html(that.stepData.nextBtnInitValue || 'Next');
+              that.$prev_btn.html('Previous');
             }
 
             that.$prev_btn.css({
