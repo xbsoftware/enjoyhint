@@ -30,8 +30,10 @@
       onEnd: function() {},
   
       onSkip: function() {},
-  
-      onNext: function() {}
+
+      onNext: function () { },
+
+      elementToScroll: document.body
     };
   
     var options = $.extend(defaults, _options);
@@ -62,7 +64,8 @@
           options.onSkip();
           skipAll();
         },
-        fill: SHAPE_BACKGROUND_COLOR
+        fill: SHAPE_BACKGROUND_COLOR,
+        elementToScroll: options.elementToScroll
       });
     };
   
@@ -154,7 +157,7 @@
         var isHintInViewport = $(step_data.selector).get(0).getBoundingClientRect();
         if(isHintInViewport.top < 0 || isHintInViewport.bottom > (window.innerHeight || document.documentElement.clientHeight)){
             hideCurrentHint();
-            $(document.body).scrollTo(step_data.selector, step_data.scrollAnimationSpeed || 250, {offset: -200});
+            $(options.elementToScroll).scrollTo(step_data.selector, step_data.scrollAnimationSpeed || 250, {offset: -200});
         }
         else {
           // if previous button has been clicked and element are in viewport to prevent custom step scrollAnimationSpeed set scrollSpeed to default
@@ -255,13 +258,20 @@
                 break;
             }
           } else {
-            $event_element.on(event, function(e) {
-              if (step_data.keyCode && e.keyCode != step_data.keyCode) {
-                return;
-              }
-  
-              current_step++;
-              stepAction(); // clicked
+              var alreadyTriggered = false;
+              $event_element.one(event, function (e) {    //one should ensure that event is handled only once, but that's not always enough
+                  if (alreadyTriggered)                   //make sure that the step is not changed twice handling the same event
+                      return;
+
+                  alreadyTriggered = true;                
+                  if (step_data.keyCode && e.keyCode != step_data.keyCode) {
+                    return;
+                  }
+
+                  $event_element.off(event);              //unregister the event
+                  
+                  current_step++;
+                  stepAction();                           //move to the next step
             });
           }
 
