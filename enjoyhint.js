@@ -31,7 +31,7 @@
   
       onSkip: function() {},
 
-      onNext: function () { },
+      onNext: function() {},
 
       elementToScroll: document.body
     };
@@ -305,7 +305,8 @@
             left: step_data.left,
             right: step_data.right,
             margin: step_data.margin,
-            scroll: step_data.scroll
+            scroll: step_data.scroll,
+            preventEvents: step_data.preventEvents
           };
 
           var customBtnProps = {
@@ -1116,16 +1117,27 @@
             .appendTo(that.enjoyhint);
         };
 
-        that.disableEventsNearRect = function(rect) {
+        that.disableEventsNearRect = function(rect, alsoDisableRect) {
+          var top = rect.top;
+          var left = rect.left;
+          var right = rect.right;
+          var bottom = rect.bottom;
+
+          //to disable events also within highlighted rectable, simply remove the gap
+          if (alsoDisableRect === true) {
+              top = bottom;
+              right = left;
+          }
+
           $top_dis_events
-            .css({
-              top: "0",
-              left: "0"
-            })
-            .height(rect.top);
+          .css({
+            top: "0",
+            left: "0"
+          })
+          .height(top);
 
           $bottom_dis_events.css({
-            top: rect.bottom + "px",
+              top: bottom + "px",
             left: "0"
           });
 
@@ -1134,11 +1146,11 @@
               top: "0",
               left: 0 + "px"
             })
-            .width(rect.left);
+              .width(left);
 
           $right_dis_events.css({
             top: "0",
-            left: rect.right + "px"
+              left: right + "px"
           });
         };
 
@@ -1494,7 +1506,7 @@
             bottom: shape_data.bottom,
             left: shape_data.left,
             right: shape_data.right
-          });
+          }, data.preventEvents);
 
           that.renderArrow({
             x_from: x_from,
