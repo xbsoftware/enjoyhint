@@ -10,6 +10,7 @@ Comparing to the original library this version was modified to support more adva
 ##### Added features
 * Pause tour until specified element becomes visible or event is triggered
 * Prevent user interaction within highlighted element
+* Ability to specify which container is being scrolled
 
 ##### Fixed Issues
 * Next button not showing with 'click' and 'custom' events
@@ -177,7 +178,18 @@ var enjoyhint_script_steps = [
 
 #### Release notes
 
-##### v.4
+##### v.4.1.0
+Improvements:
+* Disable user interaction within highlighted area (`preventEvents` step property)
+* Pause and hide overlay until element becomes visible or event is triggered (`paudedUntil1 step property)
+* Specify which container should be scrolled (`elementToScroll` option)
+
+Bug Fixes:
+* Fixed Next button not showing
+* Fixed skippind steps when event is duplicated
+* Fixed OnSkip method not called when skipping steps programmatically
+
+##### v.4.x
 
 * Fixed label position bugs
 * Fixed arrow position bugs
