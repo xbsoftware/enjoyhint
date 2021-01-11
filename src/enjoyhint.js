@@ -30,8 +30,10 @@
       onEnd: function() {},
   
       onSkip: function() {},
-  
-      onNext: function() {}
+
+      onNext: function () { },
+
+      elementToScroll: document.body
     };
   
     var options = $.extend(defaults, _options);
@@ -62,7 +64,8 @@
           options.onSkip();
           skipAll();
         },
-        fill: SHAPE_BACKGROUND_COLOR
+        fill: SHAPE_BACKGROUND_COLOR,
+        elementToScroll: options.elementToScroll
       });
     };
   
@@ -154,7 +157,7 @@
         var isHintInViewport = $(step_data.selector).get(0).getBoundingClientRect();
         if(isHintInViewport.top < 0 || isHintInViewport.bottom > (window.innerHeight || document.documentElement.clientHeight)){
             hideCurrentHint();
-            $(document.body).scrollTo(step_data.selector, step_data.scrollAnimationSpeed || 250, {offset: -200});
+            $(options.elementToScroll).scrollTo(step_data.selector, step_data.scrollAnimationSpeed || 250, {offset: -200});
         }
         else {
           // if previous button has been clicked and element are in viewport to prevent custom step scrollAnimationSpeed set scrollSpeed to default
