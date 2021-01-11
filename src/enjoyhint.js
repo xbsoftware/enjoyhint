@@ -403,6 +403,7 @@
   
         case "skip":
           skipAll();
+          options.onSkip();
           break;
   
         default: $body.trigger(makeEventName(event_name, true));

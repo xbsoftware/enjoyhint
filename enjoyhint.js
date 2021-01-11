@@ -23,7 +23,6 @@
     var SHAPE_BACKGROUND_COLOR = _options.backgroundColor || "rgba(0,0,0,0.6)";
   
     var body = "body"; // TODO: Is it possible case when we need to define enjoyhint somewhere else?
-    var elementAvailableEventName = "enjoyhint-element-available";
   
     var defaults = {
       onStart: function() {},
@@ -31,10 +30,8 @@
       onEnd: function() {},
   
       onSkip: function() {},
-
-      onNext: function() {},
-
-      elementToScroll: document.body
+  
+      onNext: function() {}
     };
   
     var options = $.extend(defaults, _options);
@@ -65,8 +62,7 @@
           options.onSkip();
           skipAll();
         },
-        fill: SHAPE_BACKGROUND_COLOR,
-        elementToScroll: options.elementToScroll
+        fill: SHAPE_BACKGROUND_COLOR
       });
     };
   
@@ -101,7 +97,7 @@
       $body.enjoyhint("hide_skip");
     };
 
-    var stepAction = function(unpause) {
+    var stepAction = function() {
       if (!(data && data[current_step])) {
         $body.enjoyhint("hide");
         options.onEnd();
@@ -117,62 +113,8 @@
       $enjoyhint.removeClass("enjoyhint-step-" + (current_step + 1));
       $enjoyhint.removeClass("enjoyhint-step-" + (current_step + 2));
       $enjoyhint.addClass("enjoyhint-step-" + (current_step + 1));
-
+  
       var step_data = data[current_step];
-
-      $body.off(elementAvailableEventName);
-
-      //loops waiting until specified element becomes visible
-      var waitUntilAvailable = function (selector, interval) {
-        if (interval == null)
-          interval = 150; 
-        
-        var triggerIfAvailable = function () {
-             if ($(selector).is(":visible")) {
-                 $body.trigger(elementAvailableEventName);
-             }
-             else {
-                 setTimeout(triggerIfAvailable, interval)
-             }
-         };
- 
-         setTimeout(triggerIfAvailable, 0);
-      }
- 
-      //if pausedUntil was specified, hide current overlay and wait until specified event occurs
-      if (!unpause && step_data.pausedUntil != null && step_data.pausedUntil.event != null) {
-            //hide current overlay during waiting time
-            $body.enjoyhint("hide");
-            
-           //if 'available' event was chosen wait for the custom event, which is triggered when the element becomes visible
-            if (step_data.pausedUntil.event === 'available') {
-                $body.on(elementAvailableEventName, function () {
-                    stepAction(true);      //restart the step without pause
-                    $body.off(elementAvailableEventName);
-                });
-
-                //check if element is available every 150ms
-                waitUntilAvailable(step_data.pausedUntil.selector);
-            }
-            else {
-                //delay the actual action until 'the event' happens on body or selector
-                if (step_data.pausedUntil.selector == null) {
-                  on(step_data.pausedUntil.event, function () {
-                      stepAction(true);     //restart the step without pause
-                      off(step_data.pausedUntil.event);
-                  });
-                }
-                else {
-                  $(step_data.pausedUntil.selector).on(step_data.pausedUntil.event, function () {
-                      stepAction(true);     //restart the step without pause
-                      $(step_data.pausedUntil.selector).off(step_data.pausedUntil.event)
-                  });
-                }
-            }
-
-            //the rest of the logic will be executed whenever the step is restarted
-            return;
-      }
 
       var scrollSpeed = step_data.scrollAnimationSpeed;
   
@@ -212,7 +154,7 @@
         var isHintInViewport = $(step_data.selector).get(0).getBoundingClientRect();
         if(isHintInViewport.top < 0 || isHintInViewport.bottom > (window.innerHeight || document.documentElement.clientHeight)){
             hideCurrentHint();
-            $(options.elementToScroll).scrollTo(step_data.selector, step_data.scrollAnimationSpeed || 250, {offset: -200});
+            $(document.body).scrollTo(step_data.selector, step_data.scrollAnimationSpeed || 250, {offset: -200});
         }
         else {
           // if previous button has been clicked and element are in viewport to prevent custom step scrollAnimationSpeed set scrollSpeed to default
@@ -243,9 +185,6 @@
   
           if (step_data.showNext !== true) {
             $body.enjoyhint("hide_next");
-          }
-          else {
-            $body.enjoyhint("show_next");
           }
           
           $body.enjoyhint("hide_prev");
@@ -316,20 +255,13 @@
                 break;
             }
           } else {
-              var alreadyTriggered = false;
-              $event_element.one(event, function (e) {    //one should ensure that event is handled only once, but that's not always enough
-                  if (alreadyTriggered)                   //make sure that the step is not changed twice handling the same event
-                      return;
-
-                  alreadyTriggered = true;                
-                  if (step_data.keyCode && e.keyCode != step_data.keyCode) {
-                    return;
-                  }
-
-                  $event_element.off(event);              //unregister the event
-                  
-                  current_step++;
-                  stepAction();                           //move to the next step
+            $event_element.on(event, function(e) {
+              if (step_data.keyCode && e.keyCode != step_data.keyCode) {
+                return;
+              }
+  
+              current_step++;
+              stepAction(); // clicked
             });
           }
 
@@ -360,8 +292,7 @@
             left: step_data.left,
             right: step_data.right,
             margin: step_data.margin,
-            scroll: step_data.scroll,
-            preventEvents: step_data.preventEvents
+            scroll: step_data.scroll
           };
 
           var customBtnProps = {
@@ -837,7 +768,7 @@
 
           doit = setTimeout(function() {
             if(boundingClientRect.top < 0 || boundingClientRect.bottom > (window.innerHeight || document.documentElement.clientHeight)){
-              $(that.options.elementToScroll).scrollTo(that.stepData.enjoyHintElementSelector, 150, {offset: -200, onAfter:renderAfterResize});
+              $(document.body).scrollTo(that.stepData.enjoyHintElementSelector, 150, {offset: -200, onAfter:renderAfterResize});
             }
             else renderAfterResize();
           }, 150);
@@ -1173,27 +1104,16 @@
             .appendTo(that.enjoyhint);
         };
 
-        that.disableEventsNearRect = function(rect, alsoDisableRect) {
-          var top = rect.top;
-          var left = rect.left;
-          var right = rect.right;
-          var bottom = rect.bottom;
-
-          //to disable events also within highlighted rectable, simply remove the gap
-          if (alsoDisableRect === true) {
-              top = bottom;
-              right = left;
-          }
-
+        that.disableEventsNearRect = function(rect) {
           $top_dis_events
-          .css({
-            top: "0",
-            left: "0"
-          })
-          .height(top);
+            .css({
+              top: "0",
+              left: "0"
+            })
+            .height(rect.top);
 
           $bottom_dis_events.css({
-              top: bottom + "px",
+            top: rect.bottom + "px",
             left: "0"
           });
 
@@ -1202,11 +1122,11 @@
               top: "0",
               left: 0 + "px"
             })
-              .width(left);
+            .width(rect.left);
 
           $right_dis_events.css({
             top: "0",
-              left: right + "px"
+            left: rect.right + "px"
           });
         };
 
@@ -1562,7 +1482,7 @@
             bottom: shape_data.bottom,
             left: shape_data.left,
             right: shape_data.right
-          }, data.preventEvents);
+          });
 
           that.renderArrow({
             x_from: x_from,
