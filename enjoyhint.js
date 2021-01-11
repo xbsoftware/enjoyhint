@@ -836,7 +836,7 @@
 
           doit = setTimeout(function() {
             if(boundingClientRect.top < 0 || boundingClientRect.bottom > (window.innerHeight || document.documentElement.clientHeight)){
-              $(document.body).scrollTo(that.stepData.enjoyHintElementSelector, 150, {offset: -200, onAfter:renderAfterResize});
+              $(that.options.elementToScroll).scrollTo(that.stepData.enjoyHintElementSelector, 150, {offset: -200, onAfter:renderAfterResize});
             }
             else renderAfterResize();
           }, 150);
