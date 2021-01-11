@@ -181,7 +181,7 @@ var enjoyhint_script_steps = [
 ##### v.4.1.0
 Improvements:
 * Disable user interaction within highlighted area (`preventEvents` step property)
-* Pause and hide overlay until element becomes visible or event is triggered (`paudedUntil1 step property)
+* Pause and hide overlay until element becomes visible or event is triggered (`pausedUntil` step property)
 * Specify which container should be scrolled (`elementToScroll` option)
 
 Bug Fixes:
