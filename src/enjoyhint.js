@@ -360,7 +360,8 @@
             left: step_data.left,
             right: step_data.right,
             margin: step_data.margin,
-            scroll: step_data.scroll
+            scroll: step_data.scroll,
+            preventEvents: step_data.preventEvents
           };
 
           var customBtnProps = {
