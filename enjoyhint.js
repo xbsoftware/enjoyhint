@@ -1133,7 +1133,7 @@
               top: "0",
               left: 0 + "px"
             })
-              .width(left);
+            .width(left);
 
           $right_dis_events.css({
             top: "0",
