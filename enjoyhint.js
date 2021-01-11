@@ -189,6 +189,9 @@
           if (step_data.showNext !== true) {
             $body.enjoyhint("hide_next");
           }
+          else {
+            $body.enjoyhint("show_next");
+          }
           
           $body.enjoyhint("hide_prev");
 
