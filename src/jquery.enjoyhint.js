@@ -322,7 +322,7 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
 
           doit = setTimeout(function() {
             if(boundingClientRect.top < 0 || boundingClientRect.bottom > (window.innerHeight || document.documentElement.clientHeight)){
-              $(document.body).scrollTo(that.stepData.enjoyHintElementSelector, 150, {offset: -200, onAfter:renderAfterResize});
+              $(that.options.elementToScroll).scrollTo(that.stepData.enjoyHintElementSelector, 150, {offset: -200, onAfter:renderAfterResize});
             }
             else renderAfterResize();
           }, 150);
@@ -658,16 +658,27 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
             .appendTo(that.enjoyhint);
         };
 
-        that.disableEventsNearRect = function(rect) {
+        that.disableEventsNearRect = function(rect, alsoDisableRect) {
+          var top = rect.top;
+          var left = rect.left;
+          var right = rect.right;
+          var bottom = rect.bottom;
+
+          //to disable events also within highlighted rectable, simply remove the gap
+          if (alsoDisableRect === true) {
+              top = bottom;
+              right = left;
+          }
+
           $top_dis_events
-            .css({
-              top: "0",
-              left: "0"
-            })
-            .height(rect.top);
+          .css({
+            top: "0",
+            left: "0"
+          })
+          .height(top);
 
           $bottom_dis_events.css({
-            top: rect.bottom + "px",
+              top: bottom + "px",
             left: "0"
           });
 
@@ -676,11 +687,11 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
               top: "0",
               left: 0 + "px"
             })
-            .width(rect.left);
+            .width(left);
 
           $right_dis_events.css({
             top: "0",
-            left: rect.right + "px"
+              left: right + "px"
           });
         };
 
@@ -1036,7 +1047,7 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
             bottom: shape_data.bottom,
             left: shape_data.left,
             right: shape_data.right
-          });
+          }, data.preventEvents);
 
           that.renderArrow({
             x_from: x_from,

@@ -3,7 +3,21 @@ EnjoyHint
 **EnjoyHint** is a web-tool that provides the simplest way to create interactive tutorials and hints for your site or web-application. It can also be used to highlight and sign application elements.  
 
 EnjoyHint is free software distributed under the terms of MIT license.
-  
+
+#### Improvements
+Comparing to the original library this version was modified to support more advanced scenarios:
+
+##### Added features
+* Pause tour until specified element becomes visible or event is triggered
+* Prevent user interaction within highlighted element
+* Ability to specify which container is being scrolled
+
+##### Fixed Issues
+* Next button not showing with 'click' and 'custom' events
+* OnSkip not called when skipping steps programmatically
+* Several steps can be skipped at once if triggered event is duplicated
+
+
 #### Demo
 * [TODO app demo](http://xbsoftware.github.io/enjoyhint/) ([downloadable package](http://xbsoftware.github.io/enjoyhint/enjoyhint_todo_demo.zip))
 * [A small guide on EnjoyHint](http://xbsoftware.github.io/enjoyhint/example1.html)
@@ -164,7 +178,18 @@ var enjoyhint_script_steps = [
 
 #### Release notes
 
-##### v.4
+##### v.4.1.0
+Improvements:
+* Disable user interaction within highlighted area (`preventEvents` step property)
+* Pause and hide overlay until element becomes visible or event is triggered (`pausedUntil` step property)
+* Specify which container should be scrolled (`elementToScroll` option)
+
+Bug Fixes:
+* Fixed Next button not showing
+* Fixed skippind steps when event is duplicated
+* Fixed OnSkip method not called when skipping steps programmatically
+
+##### v.4.x
 
 * Fixed label position bugs
 * Fixed arrow position bugs
