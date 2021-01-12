@@ -23,6 +23,7 @@
     var SHAPE_BACKGROUND_COLOR = _options.backgroundColor || "rgba(0,0,0,0.6)";
   
     var body = "body"; // TODO: Is it possible case when we need to define enjoyhint somewhere else?
+    var elementAvailableEventName = "enjoyhint-element-available";
   
     var defaults = {
       onStart: function() {},
@@ -97,7 +98,7 @@
       $body.enjoyhint("hide_skip");
     };
 
-    var stepAction = function() {
+    var stepAction = function(unpause) {
       if (!(data && data[current_step])) {
         $body.enjoyhint("hide");
         options.onEnd();
@@ -113,8 +114,62 @@
       $enjoyhint.removeClass("enjoyhint-step-" + (current_step + 1));
       $enjoyhint.removeClass("enjoyhint-step-" + (current_step + 2));
       $enjoyhint.addClass("enjoyhint-step-" + (current_step + 1));
-  
+
       var step_data = data[current_step];
+
+      $body.off(elementAvailableEventName);
+
+      //loops waiting until specified element becomes visible
+      var waitUntilAvailable = function (selector, interval) {
+        if (interval == null)
+          interval = 150; 
+        
+        var triggerIfAvailable = function () {
+             if ($(selector).is(":visible")) {
+                 $body.trigger(elementAvailableEventName);
+             }
+             else {
+                 setTimeout(triggerIfAvailable, interval)
+             }
+         };
+ 
+         setTimeout(triggerIfAvailable, 0);
+      }
+ 
+      //if pausedUntil was specified, hide current overlay and wait until specified event occurs
+      if (!unpause && step_data.pausedUntil != null && step_data.pausedUntil.event != null) {
+            //hide current overlay during waiting time
+            $body.enjoyhint("hide");
+            
+           //if 'available' event was chosen wait for the custom event, which is triggered when the element becomes visible
+            if (step_data.pausedUntil.event === 'available') {
+                $body.on(elementAvailableEventName, function () {
+                    stepAction(true);      //restart the step without pause
+                    $body.off(elementAvailableEventName);
+                });
+
+                //check if element is available every 150ms
+                waitUntilAvailable(step_data.pausedUntil.selector);
+            }
+            else {
+                //delay the actual action until 'the event' happens on body or selector
+                if (step_data.pausedUntil.selector == null) {
+                  on(step_data.pausedUntil.event, function () {
+                      stepAction(true);     //restart the step without pause
+                      off(step_data.pausedUntil.event);
+                  });
+                }
+                else {
+                  $(step_data.pausedUntil.selector).on(step_data.pausedUntil.event, function () {
+                      stepAction(true);     //restart the step without pause
+                      $(step_data.pausedUntil.selector).off(step_data.pausedUntil.event)
+                  });
+                }
+            }
+
+            //the rest of the logic will be executed whenever the step is restarted
+            return;
+      }
 
       var scrollSpeed = step_data.scrollAnimationSpeed;
   
