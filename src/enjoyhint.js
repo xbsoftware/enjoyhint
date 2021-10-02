@@ -19,7 +19,8 @@
     var _options = configs || {};
     var BTN_NEXT_TEXT = _options.btnNextText;
     var BTN_SKIP_TEXT = _options.btnSkipText;
-  
+    var BTN_PREV_TEXT = _options.btnPrevText;
+
     var SHAPE_BACKGROUND_COLOR = _options.backgroundColor || "rgba(0,0,0,0.6)";
   
     var body = "body"; // TODO: Is it possible case when we need to define enjoyhint somewhere else?
@@ -216,7 +217,7 @@
             var $prevBtn = $(".enjoyhint_prev_btn");
 
             $prevBtn.addClass(step_data.prevButton.className || "");
-            $prevBtn.text(step_data.prevButton.text || "Previous");
+            $prevBtn.text(step_data.prevButton.text || BTN_PREV_TEXT || "Previous");
             that.prevUserClass = step_data.prevButton.className;
           }
 
