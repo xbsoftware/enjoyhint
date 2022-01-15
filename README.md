@@ -21,7 +21,7 @@ You can install it through `node` or `bower`package managers:
 npm install xbs-enjoyhint
 ```
 ```
-bower install xbs-enjoyhint
+bower install enjoyhint
 ```
 Alternative way:
 - Download the latest version of EnjoyHint from GitHub.
