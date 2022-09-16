@@ -200,6 +200,8 @@
 .enjoyhint_close_btn {
   display: inline-block;
   position: absolute;
+  right: 10px;
+  top: 10px;
   z-index: 1012;
   pointer-events: all;
   -webkit-box-sizing: content-box;

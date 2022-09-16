@@ -70,22 +70,28 @@
       e.preventDefault();
     };
   
+    var hideEnjoy = function () {
+      $body.css({overflow: "auto"});
+      $(document).off("touchmove", lockTouch);
+    }
+
     var destroyEnjoy = function() {
       $(".enjoyhint").remove();
-      $body.css({ overflow: "auto" });
-      $(document).off("touchmove", lockTouch);
+      hideEnjoy();
     };
   
     that.clear = function() {
       var $nextBtn = $(".enjoyhint_next_btn");
       var $skipBtn = $(".enjoyhint_skip_btn");
       var $prevBtn = $(".enjoyhint_prev_btn");
+      var $closeBtn = $(".enjoyhint_close_btn");
 
       $prevBtn.removeClass(that.prevUserClass);
       $nextBtn.removeClass(that.nextUserClass);
-      $nextBtn.text(BTN_NEXT_TEXT);
       $skipBtn.removeClass(that.skipUserClass);
+      $nextBtn.text(BTN_NEXT_TEXT);
       $skipBtn.text(BTN_SKIP_TEXT);
+      $closeBtn.removeClass(that.closeUserClass);
     };
   
     function hideCurrentHint(){
@@ -101,7 +107,7 @@
       if (!(data && data[current_step])) {
         $body.enjoyhint("hide");
         options.onEnd();
-        destroyEnjoy();
+        hideEnjoy();
         return;
       }
       
@@ -151,7 +157,12 @@
           that.clear();
         }, 250);
 
-        var isHintInViewport = $(step_data.selector).get(0).getBoundingClientRect();
+        var stepSelector = $(step_data.selector).get(0);
+        if (stepSelector && stepSelector.clientHeight && stepSelector.clientWidth) {
+          var isHintInViewport = stepSelector.getBoundingClientRect();
+        } else {
+          return console.log("Error: Element position couldn't be reached");
+        }
         if(isHintInViewport.top < 0 || isHintInViewport.bottom > (window.innerHeight || document.documentElement.clientHeight)){
             hideCurrentHint();
             $(document.body).scrollTo(step_data.selector, step_data.scrollAnimationSpeed || 250, {offset: -200});
@@ -185,6 +196,9 @@
   
           if (step_data.showNext !== true) {
             $body.enjoyhint("hide_next");
+          }
+          else {
+            $body.enjoyhint("show_next");
           }
           
           $body.enjoyhint("hide_prev");
@@ -226,6 +240,13 @@
             $skipBtn.addClass(step_data.skipButton.className || "");
             $skipBtn.text(step_data.skipButton.text || "Skip");
             that.skipUserClass = step_data.skipButton.className;
+          }
+
+          if (step_data.closeButton) {
+            var $closeBtn = $(".enjoyhint_close_btn");
+  
+            $closeBtn.addClass(step_data.closeButton.className || "");
+            that.closeUserClass = step_data.closeButton.className;
           }
   
           if (step_data.event_type) {
@@ -292,17 +313,19 @@
             left: step_data.left,
             right: step_data.right,
             margin: step_data.margin,
-            scroll: step_data.scroll
+            scroll: step_data.scroll,
+            disableSelector: step_data.disableSelector,
           };
 
           var customBtnProps = {
               nextButton: step_data.nextButton,
-              prevButton: step_data.prevButton
+              prevButton: step_data.prevButton,
+              skipButton: step_data.skipButton
           }
 
           if (shape_data.center_x === 0 && shape_data.center_y === 0) {
             $body.enjoyhint("hide");
-            destroyEnjoy();
+            hideEnjoy();
             return console.log("Error: Element position couldn't be reached");
           }
   
@@ -338,7 +361,7 @@
       off(step_data.event);
       $element.off(makeEventName(step_data.event));
   
-      destroyEnjoy();
+      hideEnjoy();
     };
   
     var makeEventName = function(name, is_custom) {
@@ -368,7 +391,7 @@
       false
     );
   
-    that.stop = function() {
+    that.skip = function() {
       skipAll();
     };
   
@@ -386,6 +409,10 @@
     that.resumeScript = function() {
       stepAction();
     };
+
+    that.destroyScript = function () {
+      destroyEnjoy();
+    }
   
     that.setCurrentStep = function(cs) {
       current_step = cs;
@@ -436,6 +463,10 @@
     that.resume = function() {
       that.resumeScript();
     };
+
+    that.destroy = function () {
+      that.destroyScript();
+    }
   
     init();
   };
@@ -564,25 +595,25 @@
         ).appendTo(that.enjoyhint);
         that.$canvas = $(
           '<canvas id="' +
-            canvas_id +
-            '" width="' +
-            that.canvas_size.w +
-            '" height="' +
-            that.canvas_size.h +
-            '" class="' +
-            that.cl.main_canvas +
-            '">'
+			canvas_id +
+			'" width="' +
+			that.canvas_size.w +
+			'" height="' +
+			that.canvas_size.h +
+			'" class="' +
+			that.cl.main_canvas +
+			'">'
         ).appendTo(that.enjoyhint);
         that.$svg = $(
           '<svg width="' +
-            that.canvas_size.w +
-            '" height="' +
-            that.canvas_size.h +
-            '" class="' +
-            that.cl.main_canvas +
-            " " +
-            that.cl.main_svg +
-            '">'
+			that.canvas_size.w +
+			'" height="' +
+			that.canvas_size.h +
+			'" class="' +
+			that.cl.main_canvas +
+			" " +
+			that.cl.main_svg +
+			'">'
         ).appendTo(that.enjoyhint_svg_wrapper);
 
         var defs = $(makeSVG("defs"));
@@ -741,7 +772,7 @@
           var boundingClientRect = $(
             that.stepData.enjoyHintElementSelector
           )[0].getBoundingClientRect();
-          
+		  
           that.shape.attrs.center_x = Math.round(
             boundingClientRect.left + boundingClientRect.width / 2
           );
@@ -769,7 +800,7 @@
             if(boundingClientRect.top < 0 || boundingClientRect.bottom > (window.innerHeight || document.documentElement.clientHeight)){
               $(document.body).scrollTo(that.stepData.enjoyHintElementSelector, 150, {offset: -200, onAfter:renderAfterResize});
             }
-            else renderAfterResize();
+			else renderAfterResize();
           }, 150);
 
 
@@ -1019,11 +1050,11 @@
 
         that.setMarkerColor = function(color){
 
-            function isValidColor(value) {
-                const temp = new Option().style;
-                temp.color = value;
-                return temp.color !== '';
-            }
+			function isValidColor(value) {
+				const temp = new Option().style;
+				temp.color = value;
+				return temp.color !== '';
+			}
 
             if (isValidColor(color)){
                 return [$("#poliline"), $("#enjoyhint_arrpw_line")].forEach(function(element){
@@ -1043,7 +1074,7 @@
           var by_top_side = data.by_top_side;
           var control_point_x = 0;
           var control_point_y = 0;
-  
+		  
           if (by_top_side === 'hor') {
             control_point_x = x_to
             control_point_y = y_from
@@ -1081,9 +1112,9 @@
             );
 
             if(that.stepData.arrowColor) {
-                that.setMarkerColor(that.stepData.arrowColor)
+				that.setMarkerColor(that.stepData.arrowColor)
             } else {
-                $("#poliline").css("stroke", "rgb(255, 255, 255)");
+				$("#poliline").css("stroke", "rgb(255, 255, 255)");
             }
 
             that.enjoyhint.removeClass(that.cl.svg_transparent);
@@ -1092,9 +1123,9 @@
 
         that.getLabelElement = function(data) {
           return $("<div>", {
-            class: "enjoy_hint_label",
-            id: "enjoyhint_label"
-          })
+			class: "enjoy_hint_label",
+			id: "enjoyhint_label"
+		  })
             .css({
               top: data.y + "px",
               left: data.x + "px"
@@ -1103,16 +1134,27 @@
             .appendTo(that.enjoyhint);
         };
 
-        that.disableEventsNearRect = function(rect) {
+        that.disableEventsNearRect = function(rect, alsoDisableRect) {
+          var top = rect.top;
+          var left = rect.left;
+          var right = rect.right;
+          var bottom = rect.bottom;
+
+          //to disable events also within highlighted rectable, simply remove the gap
+          if (alsoDisableRect === true) {
+            top = bottom;
+            right = left;
+          }
+
           $top_dis_events
             .css({
               top: "0",
               left: "0"
             })
-            .height(rect.top);
+            .height(top);
 
           $bottom_dis_events.css({
-            top: rect.bottom + "px",
+            top: bottom + "px",
             left: "0"
           });
 
@@ -1121,11 +1163,11 @@
               top: "0",
               left: 0 + "px"
             })
-            .width(rect.left);
+            .width(left);
 
           $right_dis_events.css({
             top: "0",
-            left: rect.right + "px"
+            left: right + "px"
           });
         };
 
@@ -1273,7 +1315,7 @@
           var label_ver_offset = half_h + label_shift;
 
           var areas_for_label = [
-            {name: 'right_center', common_area: right_offset * window.innerHeight, width: right_offset, height: window.innerHeight},
+			{name: 'right_center', common_area: right_offset * window.innerHeight, width: right_offset, height: window.innerHeight},
             {name: 'right_top', common_area: right_offset * top_offset, width: right_offset, height: top_offset},
             {name: 'right_bottom', common_area: right_offset * bottom_offset, width: right_offset, height: bottom_offset},
             {name: 'left_center', common_area: left_offset * window.innerHeight, width: left_offset, height: window.innerHeight},
@@ -1312,9 +1354,9 @@
           var top_position = data.center_y - label_ver_offset - label_height;
           var bottom_position = data.center_y + label_ver_offset;
           var central_ver_position = window.innerHeight/2 - label_vertical_space_required/2 + 20;
-          
+		  
           var label_x, label_y, x_to, y_to, x_from, y_from;
-          
+		  
           var by_top_side = "hor"
 
           switch(label_hor_side) {
@@ -1335,7 +1377,7 @@
                 label_x = left_position;
                 x_to = data.center_x - data_width_size/2 - 20;
                 y_to = data.center_y;
-                by_top_side = "ver";  
+                by_top_side = "ver";
                 break;
             case 'left_top':
                 label_y = top_position;
@@ -1348,27 +1390,27 @@
                 label_x = left_position;
                 x_to = data.center_x - data_width_size/2;
                 y_to = data.center_y + 20;
-                by_top_side = "ver";  
+                by_top_side = "ver";
                 break;
             case 'right_center':
                 label_y = central_ver_position;
                 label_x = right_position;
                 x_to = data.center_x + data_width_size/2 + 20;
                 y_to = data.center_y;
-                by_top_side = "ver";  
+                by_top_side = "ver";
                 break;
             case 'right_top':
                 label_y = top_position;
                 label_x = right_position;
                 x_to = data.center_x + data_width_size/2;
                 y_to = data.center_y - 20;
-                break;            
+                break;
             case 'right_bottom':
                 label_y = bottom_position;
                 label_x = right_position;
                 x_to = data.center_x + data_width_size/2;
                 y_to = data.center_y + 20;
-                by_top_side = "ver";  
+                by_top_side = "ver";
                 break;
             case 'oversized':
               setTimeout(function(){
@@ -1415,11 +1457,11 @@
             var summoryButtonWidth = that.$next_btn.width() + that.$skip_btn.width() + that.$prev_btn.width() + 30;
             var distance = label_x - 100;
             var ver_button_position = label_y + label_height + 40
-            
+			
             if (summoryButtonWidth + label_x > x_to) {
-            distance = x_to >= x_from ? x_to + 20 : label_x + label_width/2
+			  distance = x_to >= x_from ? x_to + 20 : label_x + label_width/2
             }
-              
+			
             if (summoryButtonWidth + distance > window.innerWidth || distance < 0) {
               distance = 10;
               ver_button_position = y_from < y_to ? label_y - 80 : label_y + label_height + 40
@@ -1434,13 +1476,15 @@
               that.$next_btn.html('&#8250;');
               that.$prev_btn.html('&#8249;');
             }
-            else {
+			else {
               distance = initial_distance;
               ver_button_position = initial_ver_position;
-			  that.$next_btn.html(customBtnProps.nextButton && customBtnProps.nextButton.text ? 
-					customBtnProps.nextButton.text : 'Next');
-			  that.$prev_btn.html(customBtnProps.prevButton && customBtnProps.prevButton.text ? 
-					customBtnProps.prevButton.text : 'Previous');
+              that.$next_btn.html(customBtnProps.nextButton && customBtnProps.nextButton.text ? 
+				customBtnProps.nextButton.text : 'Next');
+              that.$prev_btn.html(customBtnProps.prevButton && customBtnProps.prevButton.text ? 
+				customBtnProps.prevButton.text : 'Previous');
+			  that.$skip_btn.html(customBtnProps.skipButton && customBtnProps.skipButton.text ? 
+                customBtnProps.skipButton.text : 'Skip');
             }
 
             that.$prev_btn.css({
@@ -1471,17 +1515,12 @@
             });
           }, 0)
 
-          that.$close_btn.css({
-            right: 10,
-            top: 10
-          });
-
           that.disableEventsNearRect({
             top: shape_data.top,
             bottom: shape_data.bottom,
             left: shape_data.left,
             right: shape_data.right
-          });
+          }, data.disableSelector);
 
           that.renderArrow({
             x_from: x_from,

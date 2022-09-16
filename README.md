@@ -87,6 +87,7 @@ var enjoyhint_script_steps = [
 * `arrowColor` - the color of a marker that accepts all CSS colors.
 * `keyCode` - the code of a button, which triggers the next EnjoyHint step upon a click. Defined by the “key” event. (“key #block” : “hello”).
 * `event_selector` - if you need to attach an event (that was set in "event" property) to other selector, you can use this one  
+* `disableSelector` - disables any interaction with the element. The user is forced to use the "Next" or the "Skip" buttons.   
 * `timeout` - delay before the moment, when an element is highlighted   
 * `shape` - shape for highlighting (circle|rect)
 * `radius` -  if the shape of "circle" is specified, we can set the radius.
@@ -98,13 +99,15 @@ var enjoyhint_script_steps = [
 * `scrollAnimationSpeed` - sets the auto scroll speed (ms).
 * `nextButton` - allows applying its classes and names for the button Nеxt.
 * `skipButton` - allows applying its classes and names for the button Skip.
-* `prevButton` - allows applying its classes and names for the button Previous. For the example :
+* `prevButton` - allows applying its classes and names for the button Previous. 
+* `closeButton` - allows applying its classes for the button Close (×). For the example :
 ```javascript
 	var options = {
                     "next #block": 'Hello.',
                     "nextButton" : {className: "myNext", text: "myNEXT"},
                     "skipButton" : {className: "mySkip", text: "mySKIP"},
-                    "prevButton" : {className: "myPrev", text: "myPREV"}
+                    "prevButton" : {className: "myPrev", text: "myPREV"},
+                    "closeButton" : {className: "mySkip"},
                 }
   ```
 * `showSkip` - shows or hides the Skip button (true|false)
@@ -133,12 +136,14 @@ $.get('/load/some_data', function(data){
 * `run` - run the current script. Has no arguments  
 * `resume` - resume the script from the step where it was stopped. Has no arguments  
 * `getCurrentStep` - returns the current step index
-* `trigger` -  After writing this code you can either move to the next step or finish with EnjoyHint (next|skip)
+* `trigger` -  after writing this code you can either move to the next step or finish with EnjoyHint (next|skip)
+* `skip` - hide the current script. Has no arguments 
+* `destroy` - destroy the enjoyHint. Has no arguments 
 
 #### Events
 **Script Events**:
 * `onStart` - fires on the first step.
-* `onEnd` - fires after the last step in script.
+* `onEnd` - fires after the last step in script and click close button.
 * `onSkip` - fires after user has clicked skip.
 ```javascript
 var enjoyhint_instance = new EnjoyHint({
@@ -166,9 +171,13 @@ var enjoyhint_script_steps = [
 
 ##### v.4
 
+* Fixed bugs with "Next" button
 * Fixed label position bugs
 * Fixed arrow position bugs
 * Fixed resize bugs
+* Added possibility to disable selector
+* Added possibility to customize close button
+* Added method to destroy hint instance
 * Added responsive design
 * Added mobile support
 * Added possibility to go back to previous step
