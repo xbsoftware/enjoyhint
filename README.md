@@ -107,7 +107,7 @@ var enjoyhint_script_steps = [
                     "nextButton" : {className: "myNext", text: "myNEXT"},
                     "skipButton" : {className: "mySkip", text: "mySKIP"},
                     "prevButton" : {className: "myPrev", text: "myPREV"},
-                    "closeButton" : {className: "mySkip"},
+                    "closeButton" : {className: "myClose"},
                 }
   ```
 * `showSkip` - shows or hides the Skip button (true|false)
