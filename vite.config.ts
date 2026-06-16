@@ -5,19 +5,11 @@ import dts from "vite-plugin-dts";
 export default defineConfig({
   plugins: [dts({ rollupTypes: true })],
   build: {
+    emptyOutDir: true,
     lib: {
       entry: resolve(__dirname, "src/index.ts"),
-      name: "EnjoyHint",
-      formats: ["es", "cjs", "umd"],
-      fileName: (format) =>
-        format === "es"
-          ? "enjoyhint.js"
-          : format === "cjs"
-            ? "enjoyhint.cjs"
-            : "enjoyhint.min.js",
-    },
-    rollupOptions: {
-      output: { exports: "default" },
+      formats: ["es"],
+      fileName: () => "enjoyhint.js",
     },
     sourcemap: true,
     minify: "oxc",

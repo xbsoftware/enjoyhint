@@ -2,6 +2,7 @@
   "name": "enjoyhint",
   "version": "4.0.1",
   "description": "Web-tool that provides the simplest way to create interactive tutorials and hints.",
+  "type": "module",
   "main": "dist/enjoyhint.cjs",
   "module": "dist/enjoyhint.js",
   "types": "dist/index.d.ts",
@@ -17,7 +18,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "vite build",
+    "build": "vite build && vite build --config vite.standalone.config.ts",
     "dev": "vite build --watch",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
