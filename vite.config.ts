@@ -17,9 +17,9 @@ export default defineConfig({
             : "enjoyhint.min.js",
     },
     rollupOptions: {
-      output: { exports: "named" },
+      output: { exports: "default" },
     },
     sourcemap: true,
-    minify: "esbuild",
+    minify: "oxc",
   },
 });

@@ -5,6 +5,14 @@
   "main": "dist/enjoyhint.cjs",
   "module": "dist/enjoyhint.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/enjoyhint.js",
+      "require": "./dist/enjoyhint.cjs",
+      "default": "./dist/enjoyhint.js"
+    }
+  },
   "files": [
     "dist"
   ],
@@ -33,7 +41,6 @@
   "homepage": "https://github.com/xbsoftware/enjoyhint",
   "devDependencies": {
     "@vitest/coverage-v8": "^4.1.9",
-    "esbuild": "^0.28.1",
     "grunt": "^0.4.5",
     "grunt-contrib-concat": "^0.5.1",
     "grunt-contrib-cssmin": "^0.11.0",
