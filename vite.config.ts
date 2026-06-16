@@ -3,6 +3,9 @@ import { defineConfig } from "vite";
 import dts from "vite-plugin-dts";
 
 export default defineConfig({
+  resolve: {
+    extensions: [".ts", ".tsx", ".mjs", ".js", ".mts", ".jsx", ".json"],
+  },
   plugins: [dts({ rollupTypes: true })],
   build: {
     emptyOutDir: true,

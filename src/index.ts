@@ -1,10 +1,7 @@
+import { EnjoyHint } from "./EnjoyHint";
+
 export type { ButtonConfig, EnjoyHintOptions, NormalizedStep } from "./types";
+export { EnjoyHint } from "./EnjoyHint";
+export { normalizeStep, normalizeSteps } from "./StepNormalizer";
 
-class EnjoyHint {
-  constructor(_options: import("./types").EnjoyHintOptions = {}) {
-    throw new Error("EnjoyHint TypeScript implementation not yet wired");
-  }
-}
-
-export { EnjoyHint };
 export default EnjoyHint;
