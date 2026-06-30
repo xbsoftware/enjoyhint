@@ -1,4 +1,5 @@
 import { normalizeSteps } from "./StepNormalizer";
+import { StepController } from "./StepController";
 import type { EnjoyHintOptions, NormalizedStep } from "./types";
 
 type RawStep = Record<string, unknown>;
@@ -9,8 +10,8 @@ type RequiredCallbacks = Required<
 
 export class EnjoyHint {
   private steps: NormalizedStep[] = [];
-  private currentStep = 0;
   private options: RequiredCallbacks & EnjoyHintOptions;
+  private controller: StepController;
 
   constructor(configs: EnjoyHintOptions = {}) {
     this.options = {
@@ -20,6 +21,7 @@ export class EnjoyHint {
       onNext: configs.onNext ?? (() => {}),
       ...configs,
     };
+    this.controller = new StepController(this.steps, this.options);
   }
 
   setScript(data: RawStep[]): void {
@@ -28,6 +30,7 @@ export class EnjoyHint {
     }
 
     this.steps = normalizeSteps(data);
+    this.controller.setSteps(this.steps);
   }
 
   set = (data: RawStep[]): void => this.setScript(data);
@@ -35,52 +38,42 @@ export class EnjoyHint {
   setSteps = (data: RawStep[]): void => this.setScript(data);
 
   getCurrentStep(): number {
-    return this.currentStep;
+    return this.controller.getCurrentStep();
   }
 
   setCurrentStep(cs: number): void {
-    this.currentStep = cs;
+    this.controller.setCurrentStep(cs);
   }
 
   runScript(): void {
-    this.currentStep = 0;
-    this.options.onStart();
-    // StepController is wired in Milestone 5.
+    this.controller.run();
   }
 
   run = (): void => this.runScript();
 
   resumeScript(): void {
-    // StepController is wired in Milestone 5.
+    this.controller.resume();
   }
 
   resume = (): void => this.resumeScript();
 
+  reRunScript(cs: number): void {
+    this.controller.reRunScript(cs);
+  }
+
   trigger(eventName: string): void {
-    if (eventName === "next") {
-      if (this.currentStep < this.steps.length) {
-        this.currentStep += 1;
-      }
-      return;
-    }
-
-    if (eventName === "skip") {
-      this.stop();
-      return;
-    }
-
-    // Custom EventBus dispatch is wired in Milestone 5.
+    this.controller.trigger(eventName);
   }
 
   stop(): void {
-    this.destroy();
+    this.controller.stop();
   }
 
   clear(): void {
-    // Button reset is wired in Milestone 5.
+    this.controller.clear();
   }
 
   destroy(): void {
-    // Renderer cleanup is wired in Milestone 5.
+    this.controller.destroy();
   }
 }

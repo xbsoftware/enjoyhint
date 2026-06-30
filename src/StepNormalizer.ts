@@ -4,7 +4,9 @@ type RawStep = Record<string, unknown>;
 
 const EVENT_TYPES = new Set(["next", "auto", "custom"]);
 
-function normalizeEventType(eventName: string): NormalizedStep["eventType"] | undefined {
+function normalizeEventType(
+  eventName: string,
+): NormalizedStep["eventType"] | undefined {
   if (EVENT_TYPES.has(eventName)) {
     return eventName as NormalizedStep["eventType"];
   }
@@ -22,7 +24,8 @@ export function normalizeStep(raw: RawStep): NormalizedStep {
   if (typeof raw.selector === "string") step.selector = raw.selector;
   if (typeof raw.event === "string") step.event = raw.event;
   if (typeof raw.description === "string") step.description = raw.description;
-  if (typeof raw.event_selector === "string") step.eventSelector = raw.event_selector;
+  if (typeof raw.event_selector === "string")
+    step.eventSelector = raw.event_selector;
   if (typeof raw.event_type === "string") {
     step.eventType = raw.event_type as NormalizedStep["eventType"];
   }
