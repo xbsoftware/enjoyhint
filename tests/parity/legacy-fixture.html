@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>EnjoyHint Legacy Parity Fixture</title>
+    <link rel="stylesheet" href="../../src/jquery.enjoyhint.css" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        min-height: 900px;
+      }
+
+      .fixture {
+        margin: 120px 0 0 160px;
+        width: 520px;
+      }
+
+      .target {
+        display: inline-block;
+        width: 120px;
+        height: 48px;
+        border: 0;
+        border-radius: 4px;
+        background: #2c7be5;
+        color: #fff;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="fixture">
+      <button class="target">Target</button>
+    </main>
+
+    <script src="../../node_modules/jquery/dist/jquery.js"></script>
+    <script src="../../node_modules/kinetic/kinetic.js"></script>
+    <script src="../../node_modules/jquery.scrollto/jquery.scrollTo.js"></script>
+    <script src="../../src/legacy/jquery.enjoyhint.js"></script>
+    <script src="../../src/legacy/enjoyhint.js"></script>
+    <script>
+      window.__callbacks = [];
+      window.__createEnjoyHint = function () {
+        var Ctor = window.EnjoyHint && (window.EnjoyHint.default || window.EnjoyHint);
+        window.__hint = new Ctor({
+          onStart: function () {
+            window.__callbacks.push("start");
+          },
+          onNext: function () {
+            window.__callbacks.push("next");
+          },
+          onEnd: function () {
+            window.__callbacks.push("end");
+          },
+          onSkip: function () {
+            window.__callbacks.push("skip");
+          },
+          btnNextText: "Forward",
+          btnSkipText: "Leave",
+          backgroundColor: "rgba(0,0,0,0.6)",
+        });
+        window.__hint.set([
+          {
+            "next .target": "Inspect the target",
+            nextButton: { text: "Forward", className: "fixture-next" },
+            skipButton: { text: "Leave", className: "fixture-skip" },
+            arrowColor: "tomato",
+            margin: 10,
+          },
+        ]);
+      };
+      window.__startTour = function () {
+        if (!window.__hint) {
+          window.__createEnjoyHint();
+        }
+        window.__hint.run();
+      };
+      window.__parityReady = true;
+    </script>
+  </body>
+</html>
