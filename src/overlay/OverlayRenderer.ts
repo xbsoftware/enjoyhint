@@ -16,6 +16,9 @@ import { LEGACY_LABEL_ARROW_DELAY_MS } from "../stepTiming";
 type ClickCallback = () => void;
 
 const SVG_NS = "http://www.w3.org/2000/svg";
+const MOBILE_BUTTON_BREAKPOINT_PX = 640;
+const MOBILE_NEXT_BUTTON_TEXT = "\u203A";
+const MOBILE_PREV_BUTTON_TEXT = "\u2039";
 
 export interface SpotlightRenderOptions {
   immediate?: boolean;
@@ -43,6 +46,10 @@ export class OverlayRenderer {
   private nextUserClass?: string;
   private prevUserClass?: string;
   private skipUserClass?: string;
+  private nextButtonConfig?: ButtonConfig;
+  private prevButtonConfig?: ButtonConfig;
+  private nextDefaultText = "Next";
+  private prevDefaultText = "Previous";
   private nextVisible = true;
   private prevVisible = true;
   private spotlightState: SpotlightGeometryState = { ...LEGACY_INITIAL_SPOTLIGHT_STATE };
@@ -260,10 +267,14 @@ export class OverlayRenderer {
   }
 
   configureNextButton(config: ButtonConfig | undefined, defaultText = "Next"): void {
+    this.nextButtonConfig = config;
+    this.nextDefaultText = defaultText;
     this.nextUserClass = this.configureButton(this.nextButton, this.nextUserClass, config, defaultText);
   }
 
   configurePrevButton(config: ButtonConfig | undefined, defaultText = "Previous"): void {
+    this.prevButtonConfig = config;
+    this.prevDefaultText = defaultText;
     this.prevUserClass = this.configureButton(this.prevButton, this.prevUserClass, config, defaultText);
   }
 
@@ -366,18 +377,47 @@ export class OverlayRenderer {
       verticalPosition = input.yFrom < input.yTo ? input.labelY - 80 : input.labelY + input.labelHeight + 40;
     }
 
+    const initialDistance = distance;
+    const initialVerticalPosition = verticalPosition;
+    const isMobileViewport = input.viewportWidth <= MOBILE_BUTTON_BREAKPOINT_PX;
+
+    if (isMobileViewport) {
+      distance = 10;
+      verticalPosition = 10;
+      if (this.nextButton) {
+        this.nextButton.textContent = MOBILE_NEXT_BUTTON_TEXT;
+      }
+      if (this.prevButton) {
+        this.prevButton.textContent = MOBILE_PREV_BUTTON_TEXT;
+      }
+    } else {
+      distance = initialDistance;
+      verticalPosition = initialVerticalPosition;
+      if (this.nextButton) {
+        this.nextButton.textContent = this.nextButtonConfig?.text ?? this.nextDefaultText;
+      }
+      if (this.prevButton) {
+        this.prevButton.textContent = this.prevButtonConfig?.text ?? this.prevDefaultText;
+      }
+    }
+
+    const mobilePrevWidth = this.getButtonContentWidth(this.prevButton);
+    const mobileNextWidth = this.getButtonContentWidth(this.nextButton);
+    const resolvedPrevWidth = isMobileViewport ? mobilePrevWidth : prevWidth;
+    const resolvedNextWidth = isMobileViewport ? mobileNextWidth : nextWidth;
+
     this.setButtonPosition(this.prevButton, distance, verticalPosition);
 
-    let nextLeft = distance + prevWidth + 10;
-    let skipLeft = distance + prevWidth + nextWidth + 20;
+    let nextLeft = distance + resolvedPrevWidth + 10;
+    let skipLeft = distance + resolvedPrevWidth + resolvedNextWidth + 20;
 
     if (!this.nextVisible) {
-      skipLeft = distance + prevWidth + 10;
+      skipLeft = distance + resolvedPrevWidth + 10;
     }
 
     if (!this.prevVisible) {
       nextLeft = distance;
-      skipLeft = distance + nextWidth + 10;
+      skipLeft = distance + resolvedNextWidth + 10;
     }
 
     this.setButtonPosition(this.nextButton, nextLeft, verticalPosition);

@@ -290,4 +290,66 @@ describe("OverlayRenderer", () => {
 
     renderer.destroy();
   });
+
+  it("pins prev/next buttons to the top-left corner with chevrons on mobile", () => {
+    const renderer = new OverlayRenderer();
+
+    renderer.mount();
+    renderer.configureNextButton(undefined, "Next");
+    renderer.configurePrevButton(undefined, "Previous");
+    renderer.showNext();
+    renderer.showPrev();
+    renderer.positionButtons({
+      labelX: 200,
+      labelY: 300,
+      labelWidth: 250,
+      labelHeight: 100,
+      xFrom: 180,
+      yFrom: 250,
+      xTo: 220,
+      yTo: 350,
+      viewportWidth: 375,
+    });
+
+    const nextButton = document.querySelector<HTMLElement>(".enjoyhint_next_btn");
+    const prevButton = document.querySelector<HTMLElement>(".enjoyhint_prev_btn");
+
+    expect(prevButton?.textContent).toBe("\u2039");
+    expect(nextButton?.textContent).toBe("\u203A");
+    expect(prevButton?.style.left).toBe("10px");
+    expect(prevButton?.style.top).toBe("10px");
+    expect(nextButton?.style.top).toBe("10px");
+    expect(Number.parseFloat(nextButton?.style.left ?? "0")).toBeGreaterThan(10);
+
+    renderer.destroy();
+  });
+
+  it("restores desktop button labels outside the mobile breakpoint", () => {
+    const renderer = new OverlayRenderer();
+
+    renderer.mount();
+    renderer.configureNextButton({ text: "Continue" });
+    renderer.configurePrevButton({ text: "Back" });
+    renderer.showNext();
+    renderer.showPrev();
+    renderer.positionButtons({
+      labelX: 200,
+      labelY: 300,
+      labelWidth: 250,
+      labelHeight: 100,
+      xFrom: 180,
+      yFrom: 250,
+      xTo: 220,
+      yTo: 350,
+      viewportWidth: 1024,
+    });
+
+    const nextButton = document.querySelector<HTMLElement>(".enjoyhint_next_btn");
+    const prevButton = document.querySelector<HTMLElement>(".enjoyhint_prev_btn");
+
+    expect(nextButton?.textContent).toBe("Continue");
+    expect(prevButton?.textContent).toBe("Back");
+
+    renderer.destroy();
+  });
 });
