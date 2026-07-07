@@ -5,6 +5,7 @@ import {
   EXAMPLE1_CUSTOM_BUTTONS_STEP,
   EXAMPLE1_CUSTOM_EVENT_STEP,
   EXAMPLE1_EVENT_SELECTOR_STEP,
+  EXAMPLE1_IFRAME_STEP,
   EXAMPLE1_LARGE_CIRCLE_STEP,
   EXAMPLE1_MARGIN_STEP,
   EXAMPLE1_PREV_STEP,
@@ -94,8 +95,12 @@ test.describe("example1 browser e2e", () => {
     expect(await getExample1Step(page)).toBe(14);
     await page.locator("#buttons_ex a.btn-success").first().click();
 
-    await waitForStepPresentation(page, "showNext");
+    await waitForStepPresentation(page, "iframes");
     expect(await getExample1Step(page)).toBe(15);
+    await clickEnjoyHintNext(page);
+
+    await waitForStepPresentation(page, "showNext");
+    expect(await getExample1Step(page)).toBe(16);
     await clickEnjoyHintNext(page);
 
     await expect(page.locator(".enjoyhint")).toHaveCount(0, { timeout: 5000 });
@@ -299,8 +304,52 @@ test.describe("example1 browser e2e", () => {
     expect(await getExample1Step(page)).toBe(EXAMPLE1_EVENT_SELECTOR_STEP);
 
     await page.locator("#buttons_ex a.btn-success").first().click();
-    await waitForStepPresentation(page, "showNext");
+    await waitForStepPresentation(page, "iframes");
     expect(await getExample1Step(page)).toBe(EXAMPLE1_EVENT_SELECTOR_STEP + 1);
+  });
+
+  test("aligns iframe spotlight with the embedded target", async ({ page }) => {
+    await openExample1(page);
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await goToExample1Step(page, EXAMPLE1_IFRAME_STEP);
+    await waitForStepPresentation(page, "iframes");
+
+    const alignment = await page.evaluate(async () => {
+      const iframe = document.querySelector<HTMLIFrameElement>("#iframe-demo");
+      const button = iframe?.contentDocument?.querySelector<HTMLElement>("#iframe-demo-button");
+      const blockers = Array.from(
+        document.querySelectorAll<HTMLElement>(".enjoyhint_disable_events"),
+      );
+      if (!iframe || !button || blockers.length < 4) {
+        return null;
+      }
+
+      const buttonRect = button.getBoundingClientRect();
+      const iframeRect = iframe.getBoundingClientRect();
+      const expectedCenterX = iframeRect.left + buttonRect.left + buttonRect.width / 2;
+      const expectedCenterY = iframeRect.top + buttonRect.top + buttonRect.height / 2;
+      const hole = {
+        top: Number.parseInt(blockers[0]?.style.height ?? "0", 10),
+        bottom: Number.parseInt(blockers[1]?.style.top ?? "0", 10),
+        left: Number.parseInt(blockers[2]?.style.width ?? "0", 10),
+        right: Number.parseInt(blockers[3]?.style.left ?? "0", 10),
+      };
+      const label = document.querySelector<HTMLElement>(".enjoy_hint_label");
+
+      return {
+        deltaX: Math.abs((hole.left + hole.right) / 2 - expectedCenterX),
+        deltaY: Math.abs((hole.top + hole.bottom) / 2 - expectedCenterY),
+        labelTop: label?.offsetTop ?? -1,
+        labelBottom: (label?.offsetTop ?? 0) + (label?.offsetHeight ?? 0),
+        viewportHeight: window.innerHeight,
+      };
+    });
+
+    expect(alignment).not.toBeNull();
+    expect(alignment!.deltaX).toBeLessThan(20);
+    expect(alignment!.deltaY).toBeLessThan(20);
+    expect(alignment!.labelTop).toBeGreaterThanOrEqual(0);
+    expect(alignment!.labelBottom).toBeLessThanOrEqual(alignment!.viewportHeight + 1);
   });
 
   test("allows advancing a click step through Next when showNext is true", async ({

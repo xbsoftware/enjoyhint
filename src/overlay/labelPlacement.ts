@@ -165,6 +165,10 @@ export function computeLabelPlacement(input: LabelPlacementInput): LabelPlacemen
       break;
   }
 
+  const clampedLabel = clampLabelToViewport(labelX, labelY, label.width, label.height, viewport);
+  labelX = clampedLabel.x;
+  labelY = clampedLabel.y;
+
   let xFrom = labelX + label.width / 2;
   let yFrom = shape.centerY > labelY + label.height / 2 ? labelY + label.height : labelY;
 
@@ -217,4 +221,21 @@ function getShapeHeight(shape: LabelPlacementInput["shape"]): number {
   }
 
   return shape.height ?? (shape.radius ?? 0) * 2;
+}
+
+function clampLabelToViewport(
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  viewport: LabelPlacementInput["viewport"],
+  padding = 20,
+): { x: number; y: number } {
+  const maxX = Math.max(padding, viewport.width - width - padding);
+  const maxY = Math.max(padding, viewport.height - height - padding);
+
+  return {
+    x: Math.min(Math.max(padding, x), maxX),
+    y: Math.min(Math.max(padding, y), maxY),
+  };
 }

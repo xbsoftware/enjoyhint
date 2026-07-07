@@ -18,8 +18,9 @@ export const EXAMPLE1_AUTO_STEP = 11;
 export const EXAMPLE1_CUSTOM_EVENT_STEP = 12;
 export const EXAMPLE1_TIMEOUT_STEP = 13;
 export const EXAMPLE1_EVENT_SELECTOR_STEP = 14;
-export const EXAMPLE1_SHOW_NEXT_STEP = 15;
-export const EXAMPLE1_TOTAL_STEPS = 16;
+export const EXAMPLE1_IFRAME_STEP = 15;
+export const EXAMPLE1_SHOW_NEXT_STEP = 16;
+export const EXAMPLE1_TOTAL_STEPS = 17;
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 export const rootDir = join(__dirname, "../..");

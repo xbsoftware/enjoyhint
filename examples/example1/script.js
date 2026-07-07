@@ -112,6 +112,11 @@ var enjoyhint_script_steps = [
         showSkip: false
     },
     {
+        "next #iframe-demo-button" : "Elements inside iframes are highlighted using coordinates translated to the parent page.<br>" +
+            "Without this, the hint would appear too high when the target lives in an embedded frame.",
+        showNext: true
+    },
+    {
         "click .alert-success strong" : "Set <text style='color: #00ebe7'>showNext: true</text> on click steps so users can click Next instead of the target.<br>" +
             "Click the alert text or Next to finish.",
         showNext: true,

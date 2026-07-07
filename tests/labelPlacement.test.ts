@@ -88,13 +88,24 @@ describe("computeLabelPlacement", () => {
     });
 
     expect(placement.side).toBe("oversized");
-    expect(placement.label).toEqual({ x: -50, y: 5 });
+    expect(placement.label).toEqual({ x: 20, y: 20 });
     expect(placement.arrow).toEqual({
-      xFrom: 550,
+      xFrom: 620,
       yFrom: 250,
       xTo: 0,
       yTo: 0,
       byTopSide: "hor",
     });
+  });
+
+  it("keeps labels inside the viewport when the preferred side would overflow", () => {
+    const placement = computeLabelPlacement({
+      viewport: { width: 1000, height: 800 },
+      label: { width: 200, height: 80 },
+      shape: { ...baseShape, centerX: 500, centerY: 760 },
+    });
+
+    expect(placement.label.y).toBeLessThanOrEqual(800 - 80 - 20);
+    expect(placement.label.y).toBeGreaterThanOrEqual(20);
   });
 });

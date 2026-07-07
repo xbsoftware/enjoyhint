@@ -1,6 +1,7 @@
 import { DomAdapter } from "./DomAdapter";
 import { EventBus } from "./EventBus";
-import { scrollToElement } from "./ScrollHelper";
+import { getElementViewportRect, getElementWindow } from "./elementViewport";
+import { isRectOutsideViewport, scrollToElement } from "./ScrollHelper";
 import { OverlayRenderer } from "./overlay/OverlayRenderer";
 import { computeLabelPlacement } from "./overlay/labelPlacement";
 import {
@@ -142,7 +143,14 @@ export class StepController {
         return;
       }
 
-      const needsScroll = this.needsScroll(this.dom.getBoundingClientRect(target));
+      const elementWindow = getElementWindow(target);
+      const localRect = target.getBoundingClientRect();
+      const viewportRect =
+        elementWindow === window ? localRect : getElementViewportRect(target);
+      const needsParentScroll = isRectOutsideViewport(viewportRect, window);
+      const needsIframeScroll =
+        elementWindow !== window && isRectOutsideViewport(localRect, elementWindow);
+      const needsScroll = needsParentScroll || needsIframeScroll;
       const scrollSpeed = needsScroll
         ? step.scrollAnimationSpeed ?? LEGACY_DEFAULT_SCROLL_SPEED_MS
         : LEGACY_DEFAULT_SCROLL_SPEED_MS;
@@ -466,11 +474,6 @@ export class StepController {
     if (target) {
       this.renderOverlay(step, target, undefined, { immediate: true });
     }
-  }
-
-  private needsScroll(rect: DOMRect): boolean {
-    const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
-    return rect.top < 0 || rect.bottom > viewportHeight;
   }
 
   private getEventKeyCode(event: Event): number | undefined {
