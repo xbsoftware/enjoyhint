@@ -1,6 +1,16 @@
+var tourWasSkipped = false;
 
 //initialize instance
-var enjoyhint_instance = new EnjoyHint({});
+var enjoyhint_instance = new EnjoyHint({
+    onSkip: function () {
+        tourWasSkipped = true;
+        updateTourControls();
+    },
+    onEnd: function () {
+        tourWasSkipped = false;
+        updateTourControls();
+    }
+});
 
 //simple config.
 //Only one step - highlighting(with description) "New" button
@@ -134,9 +144,42 @@ document.getElementById("def_but")?.addEventListener("click", function () {
 //set script config
 enjoyhint_instance.set(enjoyhint_script_steps);
 
+function canResumeTour() {
+    return tourWasSkipped && enjoyhint_instance.getCurrentStep() < enjoyhint_script_steps.length;
+}
+
+function updateTourControls() {
+    var resumeBtn = document.getElementById("tour-resume-btn");
+    if (resumeBtn) {
+        resumeBtn.disabled = !canResumeTour();
+    }
+}
+
+document.getElementById("tour-resume-btn")?.addEventListener("click", function () {
+    if (!canResumeTour()) {
+        return;
+    }
+
+    tourWasSkipped = false;
+    enjoyhint_instance.resume();
+    updateTourControls();
+});
+
+document.getElementById("tour-restart-btn")?.addEventListener("click", function () {
+    tourWasSkipped = false;
+    enjoyhint_instance.run();
+    updateTourControls();
+});
+
 window.__example1Test = {
   hint: enjoyhint_instance,
   start: function () {
+    enjoyhint_instance.run();
+  },
+  resume: function () {
+    enjoyhint_instance.resume();
+  },
+  restart: function () {
     enjoyhint_instance.run();
   },
   goToStep: function (step) {
@@ -148,7 +191,13 @@ window.__example1Test = {
   trigger: function (eventName) {
     enjoyhint_instance.trigger(eventName);
   },
+  setTourWasSkipped: function (skipped) {
+    tourWasSkipped = skipped;
+    updateTourControls();
+  },
 };
+
+updateTourControls();
 
 if (!/[\?&]e2e(?:=1)?(?:&|$)/.test(location.search)) {
   enjoyhint_instance.run();
