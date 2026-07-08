@@ -291,6 +291,73 @@ describe("OverlayRenderer", () => {
     renderer.destroy();
   });
 
+  it("ignores hidden buttons when computing legacy button layout", () => {
+    const renderer = new OverlayRenderer();
+
+    renderer.mount();
+    renderer.showNext();
+    renderer.hidePrev();
+    renderer.showSkip();
+    renderer.positionButtons({
+      labelX: 200,
+      labelY: 300,
+      labelWidth: 250,
+      labelHeight: 100,
+      xFrom: 180,
+      yFrom: 250,
+      xTo: 450,
+      yTo: 350,
+      viewportWidth: 1280,
+    });
+
+    const nextButton = document.querySelector<HTMLElement>(".enjoyhint_next_btn");
+    const skipButton = document.querySelector<HTMLElement>(".enjoyhint_skip_btn");
+    const nextLeft = Number.parseFloat(nextButton?.style.left ?? "0");
+    const skipLeft = Number.parseFloat(skipButton?.style.left ?? "0");
+
+    expect(nextLeft).toBe(100);
+    expect(nextButton?.style.top).toBe("440px");
+    expect(skipLeft).toBeGreaterThan(nextLeft);
+    expect(skipButton?.style.top).toBe("440px");
+
+    renderer.destroy();
+  });
+
+  it("keeps navigation buttons hidden until they are positioned", () => {
+    const renderer = new OverlayRenderer();
+
+    renderer.mount();
+    renderer.showNext();
+    renderer.showSkip();
+
+    const nextButton = document.querySelector<HTMLElement>(".enjoyhint_next_btn");
+    const skipButton = document.querySelector<HTMLElement>(".enjoyhint_skip_btn");
+
+    expect(nextButton?.style.visibility).toBe("hidden");
+    expect(skipButton?.style.visibility).toBe("hidden");
+    expect(nextButton?.style.left).toBe("");
+    expect(nextButton?.style.top).toBe("");
+
+    renderer.positionButtons({
+      labelX: 200,
+      labelY: 300,
+      labelWidth: 250,
+      labelHeight: 100,
+      xFrom: 180,
+      yFrom: 250,
+      xTo: 220,
+      yTo: 350,
+      viewportWidth: 1280,
+    });
+
+    expect(nextButton?.style.visibility).toBe("visible");
+    expect(skipButton?.style.visibility).toBe("visible");
+    expect(nextButton?.style.left).not.toBe("");
+    expect(nextButton?.style.top).not.toBe("");
+
+    renderer.destroy();
+  });
+
   it("pins prev/next buttons to the top-left corner with chevrons on mobile", () => {
     const renderer = new OverlayRenderer();
 

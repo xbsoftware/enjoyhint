@@ -403,8 +403,8 @@ export class OverlayRenderer {
 
     const mobilePrevWidth = this.getButtonContentWidth(this.prevButton);
     const mobileNextWidth = this.getButtonContentWidth(this.nextButton);
-    const resolvedPrevWidth = isMobileViewport ? mobilePrevWidth : prevWidth;
-    const resolvedNextWidth = isMobileViewport ? mobileNextWidth : nextWidth;
+    const resolvedPrevWidth = isMobileViewport ? mobilePrevWidth : this.getButtonContentWidth(this.prevButton);
+    const resolvedNextWidth = isMobileViewport ? mobileNextWidth : this.getButtonContentWidth(this.nextButton);
 
     this.setButtonPosition(this.prevButton, distance, verticalPosition);
 
@@ -422,6 +422,7 @@ export class OverlayRenderer {
 
     this.setButtonPosition(this.nextButton, nextLeft, verticalPosition);
     this.setButtonPosition(this.skipButton, skipLeft, verticalPosition);
+    this.revealPositionedButtons();
   }
 
   setStepClass(stepNumber: number): void {
@@ -577,6 +578,9 @@ export class OverlayRenderer {
     if (button) {
       button.classList.toggle("enjoyhint_hide", !visible);
       button.style.display = "";
+      if (button === this.nextButton || button === this.prevButton || button === this.skipButton) {
+        button.style.visibility = visible ? "hidden" : "";
+      }
     }
 
     if (button === this.nextButton) this.nextVisible = visible;
@@ -592,12 +596,32 @@ export class OverlayRenderer {
     button.style.top = `${top}px`;
   }
 
+  private revealPositionedButtons(): void {
+    for (const button of [this.nextButton, this.prevButton, this.skipButton]) {
+      if (button && !button.classList.contains("enjoyhint_hide")) {
+        button.style.visibility = "visible";
+      }
+    }
+  }
+
   private getButtonContentWidth(button: HTMLElement | undefined): number {
-    if (!button) {
-      return 100;
+    if (!button || button.classList.contains("enjoyhint_hide")) {
+      return 0;
     }
 
-    return Number.parseFloat(window.getComputedStyle(button).width) || button.offsetWidth || 100;
+    const previousVisibility = button.style.visibility;
+    if (previousVisibility === "hidden") {
+      button.style.visibility = "visible";
+    }
+
+    const computedWidth = Number.parseFloat(window.getComputedStyle(button).width);
+    const width =
+      computedWidth > 0
+        ? computedWidth
+        : button.getBoundingClientRect().width || button.offsetWidth || 0;
+
+    button.style.visibility = previousVisibility;
+    return width;
   }
 
   private collapseSpotlight(): void {
