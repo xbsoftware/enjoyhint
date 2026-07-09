@@ -62,8 +62,17 @@ export class SvgArrow {
 }
 
 function buildArrowPath(input: Required<Omit<SvgArrowRenderInput, "arrowColor">>): string {
-  const xCenterArrow = input.byTopSide === "hor" ? input.xTo : input.xFrom;
-  const yCenterArrow = input.byTopSide === "hor" ? input.yFrom : input.yTo;
+  const xFrom = formatLegacyCoord(input.xFrom);
+  const yFrom = formatLegacyCoord(input.yFrom);
+  const xTo = formatLegacyCoord(input.xTo);
+  const yTo = formatLegacyCoord(input.yTo);
+  const xCenterArrow = formatLegacyCoord(input.byTopSide === "hor" ? input.xTo : input.xFrom);
+  const yCenterArrow = formatLegacyCoord(input.byTopSide === "hor" ? input.yFrom : input.yTo);
 
-  return `M${input.xFrom},${input.yFrom} Q${xCenterArrow},${yCenterArrow} ${input.xTo},${input.yTo}`;
+  return `M${xFrom},${yFrom} Q${xCenterArrow},${yCenterArrow} ${xTo},${yTo}`;
+}
+
+function formatLegacyCoord(value: number): string {
+  const rounded = Math.round(value * 1000) / 1000;
+  return String(rounded);
 }

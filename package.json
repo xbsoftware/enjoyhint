@@ -23,7 +23,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:e2e": "npm run build && playwright test tests/e2e",
-    "test:parity": "npm run build && playwright test tests/parity/parity.test.ts",
+    "test:parity": "npm run build && playwright test tests/parity",
     "test:watch": "vitest"
   },
   "repository": {

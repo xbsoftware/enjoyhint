@@ -207,37 +207,54 @@ export class StepController {
   }
 
   private renderLabel(step: NormalizedStep, spotlight: SpotlightRect): void {
-    const { width: labelWidth, height: labelHeight } = this.renderer.measureLabel(step.description);
+    const viewport = {
+      width: window.innerWidth || document.documentElement.clientWidth,
+      height: window.innerHeight || document.documentElement.clientHeight,
+    };
     const spotlightWidth = spotlight.right - spotlight.left;
     const spotlightHeight = spotlight.bottom - spotlight.top;
-    const placement = computeLabelPlacement({
-      viewport: {
-        width: window.innerWidth || document.documentElement.clientWidth,
-        height: window.innerHeight || document.documentElement.clientHeight,
-      },
-      label: {
-        width: labelWidth,
-        height: labelHeight,
-      },
-      shape: {
-        type: step.shape ?? "rect",
-        centerX: spotlight.centerX,
-        centerY: spotlight.centerY,
-        width: spotlightWidth,
-        height: spotlightHeight,
-        radius: step.shape === "circle" ? spotlightWidth / 2 : step.radius,
-      },
+    const shape = {
+      type: step.shape ?? "rect",
+      centerX: spotlight.centerX,
+      centerY: spotlight.centerY,
+      width: spotlightWidth,
+      height: spotlightHeight,
+      radius: step.shape === "circle" ? spotlightWidth / 2 : step.radius,
+    } as const;
+
+    let { width: labelWidth, height: labelHeight } = this.renderer.measureLabel(step.description);
+    let placement = computeLabelPlacement({ viewport, label: { width: labelWidth, height: labelHeight }, shape });
+
+    // A side placement may have capped the label narrower than it naturally
+    // measured, to keep the arrow's target-facing endpoint from being
+    // swallowed by the label once it's clamped on-screen (see
+    // labelPlacement.ts). Re-measure at that narrower width - this reflows
+    // the text taller, exactly like a real browser reflowing an
+    // absolutely-positioned label - and recompute the placement so the
+    // arrow/buttons agree with what will actually be rendered.
+    if (placement.label.width < labelWidth) {
+      const reflowed = this.renderer.measureLabel(step.description, placement.label.width);
+      labelWidth = reflowed.width;
+      labelHeight = reflowed.height;
+      placement = computeLabelPlacement({ viewport, label: { width: labelWidth, height: labelHeight }, shape });
+    }
+
+    const isOversized = placement.side === "oversized";
+    this.renderer.scheduleLabelPresentation(step.description, placement.label, {
+      oversized: isOversized,
+      maxWidthPx: isOversized ? undefined : placement.label.width,
     });
 
-    this.renderer.scheduleLabelPresentation(step.description, placement.label);
-    this.renderer.scheduleArrowPresentation({
-      xFrom: placement.arrow.xFrom,
-      yFrom: placement.arrow.yFrom,
-      xTo: placement.arrow.xTo,
-      yTo: placement.arrow.yTo,
-      byTopSide: placement.arrow.byTopSide,
-      arrowColor: step.arrowColor,
-    });
+    if (!isOversized) {
+      this.renderer.scheduleArrowPresentation({
+        xFrom: placement.arrow.xFrom,
+        yFrom: placement.arrow.yFrom,
+        xTo: placement.arrow.xTo,
+        yTo: placement.arrow.yTo,
+        byTopSide: placement.arrow.byTopSide,
+        arrowColor: step.arrowColor,
+      });
+    }
 
     this.scheduleStepTimeout(() => {
       this.renderer.positionButtons({
@@ -249,7 +266,12 @@ export class StepController {
         yFrom: placement.arrow.yFrom,
         xTo: placement.arrow.xTo,
         yTo: placement.arrow.yTo,
-        viewportWidth: window.innerWidth || document.documentElement.clientWidth,
+        viewportWidth: viewport.width,
+        viewportHeight: viewport.height,
+        spotlightTop: spotlight.top,
+        spotlightBottom: spotlight.bottom,
+        arrowTop: isOversized ? undefined : Math.min(placement.arrow.yFrom, placement.arrow.yTo),
+        arrowBottom: isOversized ? undefined : Math.max(placement.arrow.yFrom, placement.arrow.yTo),
       });
     }, 0);
   }

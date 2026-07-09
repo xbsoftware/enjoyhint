@@ -2,7 +2,11 @@ import { defineConfig } from "@playwright/test";
 
 export default defineConfig({
   testDir: "./tests",
-  testMatch: ["e2e/**/*.test.ts", "parity/parity.test.ts"],
+  testMatch: [
+    "e2e/**/*.test.ts",
+    "parity/parity.test.ts",
+    "parity/placementParity.test.ts",
+  ],
   timeout: 60_000,
   expect: {
     timeout: 10_000,
