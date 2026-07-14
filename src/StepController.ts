@@ -5,6 +5,11 @@ import { isRectOutsideViewport, scrollToElement } from "./ScrollHelper";
 import { OverlayRenderer } from "./overlay/OverlayRenderer";
 import { computeLabelPlacement } from "./overlay/labelPlacement";
 import {
+  computeToggleButtonPosition,
+  doesLabelOverlapSpotlight,
+  LABEL_TOGGLE_BUTTON_SIZE_PX,
+} from "./overlay/labelOverlapToggle";
+import {
   LEGACY_DEFAULT_SCROLL_SPEED_MS,
   getLegacyStepRenderDelay,
 } from "./stepTiming";
@@ -203,10 +208,14 @@ export class StepController {
       options,
     );
     this.renderButtons(step);
-    this.renderLabel(step, spotlight);
+    this.renderLabel(step, spotlight, options);
   }
 
-  private renderLabel(step: NormalizedStep, spotlight: SpotlightRect): void {
+  private renderLabel(
+    step: NormalizedStep,
+    spotlight: SpotlightRect,
+    options: { immediate?: boolean } = {},
+  ): void {
     const viewport = {
       width: window.innerWidth || document.documentElement.clientWidth,
       height: window.innerHeight || document.documentElement.clientHeight,
@@ -272,6 +281,54 @@ export class StepController {
         spotlightBottom: spotlight.bottom,
         arrowTop: isOversized ? undefined : Math.min(placement.arrow.yFrom, placement.arrow.yTo),
         arrowBottom: isOversized ? undefined : Math.max(placement.arrow.yFrom, placement.arrow.yTo),
+      });
+
+      // The overlap toggle only ever applies to oversized, centered,
+      // dark-background labels - a normal arrow-pointed label never covers
+      // the spotlight or the target, so it never needs to hide.
+      if (!isOversized) {
+        this.renderer.configureLabelOverlapToggle({
+          overlaps: false,
+          anchorX: 0,
+          anchorY: 0,
+          labelLeft: 0,
+          labelWidth: 0,
+          resetHidden: !options.immediate,
+        });
+        return;
+      }
+
+      const labelRect = {
+        top: placement.label.y,
+        left: placement.label.x,
+        right: placement.label.x + placement.label.width,
+        bottom: placement.label.y + labelHeight,
+      };
+      const overlapsSpotlight = doesLabelOverlapSpotlight(labelRect, spotlight);
+      const buttonRowRect = this.renderer.getButtonRowRect();
+      // Keep clear of the close button's fixed top-right home.
+      const closeButtonRect = {
+        top: 0,
+        right: viewport.width,
+        bottom: 60,
+        left: viewport.width - 60,
+      };
+      const avoidRects = [closeButtonRect, ...(buttonRowRect ? [buttonRowRect] : [])];
+      const togglePosition = computeToggleButtonPosition({
+        labelRect,
+        spotlight,
+        avoidRects,
+        buttonSize: LABEL_TOGGLE_BUTTON_SIZE_PX,
+        viewport,
+      });
+
+      this.renderer.configureLabelOverlapToggle({
+        overlaps: overlapsSpotlight,
+        anchorX: togglePosition.x,
+        anchorY: togglePosition.y,
+        labelLeft: labelRect.left,
+        labelWidth: placement.label.width,
+        resetHidden: !options.immediate,
       });
     }, 0);
   }

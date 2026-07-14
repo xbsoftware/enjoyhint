@@ -277,6 +277,41 @@
   transition: none;
 }
 
+.enjoyhint_label_toggle_btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  z-index: 1012;
+  pointer-events: all;
+  box-sizing: content-box;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid rgb(30, 205, 151);
+  background: rgba(0, 0, 0, 0);
+  color: rgb(30, 205, 151);
+  cursor: pointer;
+  transition: background-color 0.3s cubic-bezier(0, 0, 0, 0), color 0.3s cubic-bezier(0, 0, 0, 0);
+}
+
+/* Must beat `.enjoyhint_label_toggle_btn { display: inline-flex }` — equal
+   specificity alone lets the later flex rule override `.enjoyhint_hide`,
+   which left the eye painted on arrow / transparent-label steps. */
+.enjoyhint_label_toggle_btn.enjoyhint_hide {
+  display: none;
+}
+
+.enjoyhint_label_toggle_btn svg {
+  display: block;
+  pointer-events: none;
+}
+
+.enjoyhint_label_toggle_btn:hover {
+  background: rgb(30, 205, 151);
+  color: rgba(255, 255, 255, 1);
+}
+
 .enjoyhint_btn {
   -webkit-box-sizing: content-box;
   -moz-box-sizing: content-box;
@@ -404,9 +439,12 @@
   font-size: 22px;
   font-family: "casino_handregular", "Arial";
   pointer-events: none;
-  -webkit-transition: opacity 400ms cubic-bezier(0.42, 0, 0.58, 1);
-  -moz-transition: opacity 400ms cubic-bezier(0.42, 0, 0.58, 1);
-  transition: opacity 400ms cubic-bezier(0.42, 0, 0.58, 1);
+  -webkit-transition: opacity 400ms cubic-bezier(0.42, 0, 0.58, 1),
+    -webkit-transform 400ms cubic-bezier(0.42, 0, 0.58, 1);
+  -moz-transition: opacity 400ms cubic-bezier(0.42, 0, 0.58, 1),
+    -moz-transform 400ms cubic-bezier(0.42, 0, 0.58, 1);
+  transition: opacity 400ms cubic-bezier(0.42, 0, 0.58, 1),
+    transform 400ms cubic-bezier(0.42, 0, 0.58, 1);
 }
 
 @media (max-width : 640px){

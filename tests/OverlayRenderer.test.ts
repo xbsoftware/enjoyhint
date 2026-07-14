@@ -633,4 +633,264 @@ describe("OverlayRenderer", () => {
 
     renderer.destroy();
   });
+
+  it("exposes the button row's bounding box after positioning", () => {
+    const renderer = new OverlayRenderer();
+    renderer.mount();
+    renderer.showNext();
+
+    expect(renderer.getButtonRowRect()).toBeUndefined();
+
+    renderer.positionButtons({
+      labelX: 200,
+      labelY: 300,
+      labelWidth: 250,
+      labelHeight: 100,
+      xFrom: 180,
+      yFrom: 250,
+      xTo: 220,
+      yTo: 350,
+      viewportWidth: 1280,
+    });
+
+    const prevButton = document.querySelector<HTMLElement>(".enjoyhint_prev_btn");
+    const skipButton = document.querySelector<HTMLElement>(".enjoyhint_skip_btn");
+    const rowRect = renderer.getButtonRowRect();
+
+    expect(rowRect).toBeDefined();
+    expect(rowRect?.left).toBe(Number.parseFloat(prevButton?.style.left ?? "NaN"));
+    expect(rowRect?.top).toBe(Number.parseFloat(prevButton?.style.top ?? "NaN"));
+    expect(rowRect?.bottom).toBe(rowRect!.top + 40);
+    expect(rowRect?.right).toBeGreaterThan(Number.parseFloat(skipButton?.style.left ?? "0"));
+
+    renderer.destroy();
+  });
+
+  describe("label overlap toggle", () => {
+    it("stays hidden until configured to overlap", () => {
+      const renderer = new OverlayRenderer();
+      renderer.mount();
+
+      const button = document.querySelector<HTMLElement>(".enjoyhint_label_toggle_btn");
+      expect(button?.classList.contains("enjoyhint_hide")).toBe(true);
+
+      renderer.destroy();
+    });
+
+    it("shows and positions the button when overlapping", () => {
+      const renderer = new OverlayRenderer();
+      renderer.mount();
+
+      renderer.configureLabelOverlapToggle({
+        overlaps: true,
+        anchorX: 100,
+        anchorY: 200,
+        labelLeft: 10,
+        labelWidth: 50,
+        resetHidden: true,
+      });
+
+      const button = document.querySelector<HTMLElement>(".enjoyhint_label_toggle_btn");
+      expect(button?.classList.contains("enjoyhint_hide")).toBe(false);
+      expect(button?.style.left).toBe("82px");
+      expect(button?.style.top).toBe("182px");
+
+      renderer.destroy();
+    });
+
+    it("swaps the icon between an open eye and a slashed eye when toggled", () => {
+      const renderer = new OverlayRenderer();
+      renderer.mount();
+
+      const button = document.querySelector<HTMLElement>(".enjoyhint_label_toggle_btn")!;
+      const openIcon = button.innerHTML;
+      expect(openIcon).toContain("<svg");
+      expect(openIcon).not.toContain("<line");
+
+      renderer.configureLabelOverlapToggle({
+        overlaps: true,
+        anchorX: 100,
+        anchorY: 200,
+        labelLeft: 10,
+        labelWidth: 50,
+        resetHidden: true,
+      });
+      button.click();
+
+      expect(button.innerHTML).not.toBe(openIcon);
+      expect(button.innerHTML).toContain("<line");
+
+      button.click();
+      expect(button.innerHTML).toBe(openIcon);
+
+      renderer.destroy();
+    });
+
+    it("hides the button when not overlapping", () => {
+      const renderer = new OverlayRenderer();
+      renderer.mount();
+
+      renderer.configureLabelOverlapToggle({
+        overlaps: true,
+        anchorX: 100,
+        anchorY: 200,
+        labelLeft: 10,
+        labelWidth: 50,
+        resetHidden: true,
+      });
+      renderer.configureLabelOverlapToggle({
+        overlaps: false,
+        anchorX: 100,
+        anchorY: 200,
+        labelLeft: 10,
+        labelWidth: 50,
+        resetHidden: false,
+      });
+
+      const button = document.querySelector<HTMLElement>(".enjoyhint_label_toggle_btn");
+      expect(button?.classList.contains("enjoyhint_hide")).toBe(true);
+
+      renderer.destroy();
+    });
+
+    it("slides the label off-screen on click and restores it on a second click", () => {
+      vi.useFakeTimers();
+      const renderer = new OverlayRenderer();
+      renderer.mount();
+      renderer.scheduleLabelPresentation("Click the target", { x: 40, y: 60 });
+      vi.advanceTimersByTime(400);
+
+      renderer.configureLabelOverlapToggle({
+        overlaps: true,
+        anchorX: 100,
+        anchorY: 200,
+        labelLeft: 40,
+        labelWidth: 120,
+        resetHidden: true,
+      });
+
+      const button = document.querySelector<HTMLElement>(".enjoyhint_label_toggle_btn")!;
+      const label = document.querySelector<HTMLElement>(".enjoy_hint_label")!;
+
+      button.click();
+      expect(label.style.transform).toBe(`translateX(-${40 + 120 + 24}px)`);
+      expect(label.style.opacity).toBe("0");
+      expect(button.classList.contains("enjoyhint_label_toggle_btn--hidden")).toBe(true);
+
+      button.click();
+      expect(label.style.transform).toBe("");
+      expect(label.style.opacity).toBe("");
+      expect(button.classList.contains("enjoyhint_label_toggle_btn--hidden")).toBe(false);
+
+      renderer.destroy();
+    });
+
+    it("keeps transform transition on oversized labels so hide can slide left", () => {
+      vi.useFakeTimers();
+      const renderer = new OverlayRenderer();
+      renderer.mount();
+      renderer.scheduleLabelPresentation("Click the target", { x: 40, y: 60 }, { oversized: true });
+      vi.advanceTimersByTime(450);
+
+      const label = document.querySelector<HTMLElement>(".enjoy_hint_label")!;
+      // Oversized styles used to set transition: background-color only, which
+      // overrode the stylesheet's transform transition and made hide snap.
+      expect(label.style.transition).toMatch(/transform/);
+
+      renderer.destroy();
+      vi.useRealTimers();
+    });
+
+    it("keeps a pending label hidden when it is presented after toggling", () => {
+      vi.useFakeTimers();
+      const renderer = new OverlayRenderer();
+      renderer.mount();
+      renderer.scheduleLabelPresentation("Click the target", { x: 40, y: 60 });
+
+      renderer.configureLabelOverlapToggle({
+        overlaps: true,
+        anchorX: 100,
+        anchorY: 200,
+        labelLeft: 40,
+        labelWidth: 120,
+        resetHidden: true,
+      });
+      document.querySelector<HTMLElement>(".enjoyhint_label_toggle_btn")!.click();
+
+      vi.advanceTimersByTime(400);
+
+      const label = document.querySelector<HTMLElement>(".enjoy_hint_label")!;
+      expect(label.style.transform).toBe(`translateX(-${40 + 120 + 24}px)`);
+      expect(label.style.opacity).toBe("0");
+
+      renderer.destroy();
+      vi.useRealTimers();
+    });
+
+    it("resets hidden state and forces the label visible when resetHidden is true", () => {
+      vi.useFakeTimers();
+      const renderer = new OverlayRenderer();
+      renderer.mount();
+      renderer.scheduleLabelPresentation("Click the target", { x: 40, y: 60 });
+      vi.advanceTimersByTime(400);
+
+      renderer.configureLabelOverlapToggle({
+        overlaps: true,
+        anchorX: 100,
+        anchorY: 200,
+        labelLeft: 40,
+        labelWidth: 120,
+        resetHidden: true,
+      });
+      document.querySelector<HTMLElement>(".enjoyhint_label_toggle_btn")!.click();
+
+      renderer.configureLabelOverlapToggle({
+        overlaps: true,
+        anchorX: 100,
+        anchorY: 200,
+        labelLeft: 40,
+        labelWidth: 120,
+        resetHidden: true,
+      });
+
+      const label = document.querySelector<HTMLElement>(".enjoy_hint_label")!;
+      expect(label.style.transform).toBe("");
+      expect(label.style.opacity).toBe("");
+
+      renderer.destroy();
+    });
+
+    it("keeps the label hidden across a resize recompute (resetHidden false)", () => {
+      vi.useFakeTimers();
+      const renderer = new OverlayRenderer();
+      renderer.mount();
+      renderer.scheduleLabelPresentation("Click the target", { x: 40, y: 60 });
+      vi.advanceTimersByTime(400);
+
+      renderer.configureLabelOverlapToggle({
+        overlaps: true,
+        anchorX: 100,
+        anchorY: 200,
+        labelLeft: 40,
+        labelWidth: 120,
+        resetHidden: true,
+      });
+      document.querySelector<HTMLElement>(".enjoyhint_label_toggle_btn")!.click();
+
+      renderer.configureLabelOverlapToggle({
+        overlaps: true,
+        anchorX: 110,
+        anchorY: 210,
+        labelLeft: 50,
+        labelWidth: 120,
+        resetHidden: false,
+      });
+
+      const label = document.querySelector<HTMLElement>(".enjoy_hint_label")!;
+      expect(label.style.transform).toBe(`translateX(-${50 + 120 + 24}px)`);
+      expect(label.style.opacity).toBe("0");
+
+      renderer.destroy();
+    });
+  });
 });

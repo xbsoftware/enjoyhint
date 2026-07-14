@@ -15,6 +15,7 @@ import {
   LEGACY_LABEL_ARROW_DELAY_MS,
   LEGACY_OVERSIZED_LABEL_DELAY_MS,
 } from "../stepTiming";
+import { computeLabelHideOffsetPx, LABEL_TOGGLE_BUTTON_SIZE_PX } from "./labelOverlapToggle";
 import { VIEWPORT_EDGE_MARGIN_PX } from "./viewportClamp";
 
 export interface LabelPresentationOptions {
@@ -34,6 +35,16 @@ const LEGACY_BUTTON_MIN_WIDTH_PX = 100;
 const LEGACY_BUTTON_HEIGHT_PX = 40;
 const LABEL_MAX_WIDTH_RATIO = 0.8;
 
+const EYE_OPEN_ICON_SVG =
+  '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" ' +
+  'stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>' +
+  '<circle cx="12" cy="12" r="3"/></svg>';
+const EYE_CLOSED_ICON_SVG =
+  '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" ' +
+  'stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 ' +
+  '18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>' +
+  '<line x1="1" y1="1" x2="23" y2="23"/></svg>';
+
 export interface SpotlightRenderOptions {
   immediate?: boolean;
   duration?: number;
@@ -52,6 +63,10 @@ export class OverlayRenderer {
   private prevButton?: HTMLDivElement;
   private skipButton?: HTMLDivElement;
   private closeButton?: HTMLDivElement;
+  private labelToggleButton?: HTMLDivElement;
+  private labelHidden = false;
+  private labelHideOffsetPx = 0;
+  private buttonRowRect?: { top: number; right: number; bottom: number; left: number };
   private eventBlockers?: EventBlockers;
   private spotlightAnimationFrame?: number;
   private nextClick: ClickCallback = () => {};
@@ -130,8 +145,12 @@ export class OverlayRenderer {
     this.prevButton = this.createButton("enjoyhint_prev_btn", "Previous", () => {
       this.prevClick();
     });
+    this.labelToggleButton = this.createLabelToggleButton(() => {
+      this.setLabelHidden(!this.labelHidden);
+    });
+    this.labelToggleButton.classList.add("enjoyhint_hide");
 
-    root.append(this.skipButton, this.nextButton, this.closeButton, this.prevButton);
+    root.append(this.skipButton, this.nextButton, this.closeButton, this.prevButton, this.labelToggleButton);
     this.container.append(root);
     this.root = root;
   }
@@ -165,6 +184,8 @@ export class OverlayRenderer {
     this.hideNext();
     this.hidePrev();
     this.hideSkip();
+    this.setButtonVisible(this.labelToggleButton, false);
+    this.setLabelHidden(false);
   }
 
   measureLabel(html: string, maxWidthPx?: number): { width: number; height: number } {
@@ -238,6 +259,10 @@ export class OverlayRenderer {
         this.svg?.querySelectorAll("#enjoyhint_arrpw_line").forEach((arrow) => arrow.remove());
         this.root?.classList.remove("enjoyhint_svg_transparent");
       }
+
+      if (this.labelHidden) {
+        this.applyLabelHiddenTransform();
+      }
     }, delay);
   }
 
@@ -259,7 +284,10 @@ export class OverlayRenderer {
   private applyOversizedLabelStyles(label: HTMLDivElement): void {
     label.style.borderRadius = "20px";
     label.style.backgroundColor = LEGACY_OVERSIZED_LABEL_BACKGROUND;
-    label.style.transition = "background-color ease-out 0.5s";
+    // Keep transform/opacity in the transition — a background-only value
+    // would override the stylesheet and make the hide slide snap instantly.
+    label.style.transition =
+      "background-color ease-out 0.5s, opacity 400ms cubic-bezier(0.42, 0, 0.58, 1), transform 400ms cubic-bezier(0.42, 0, 0.58, 1)";
   }
 
   cancelLabelArrowTransition(): void {
@@ -293,6 +321,10 @@ export class OverlayRenderer {
     this.prevButton = undefined;
     this.skipButton = undefined;
     this.closeButton = undefined;
+    this.labelToggleButton = undefined;
+    this.labelHidden = false;
+    this.labelHideOffsetPx = 0;
+    this.buttonRowRect = undefined;
     this.eventBlockers = undefined;
   }
 
@@ -476,12 +508,13 @@ export class OverlayRenderer {
     const viewportHeight =
       input.viewportHeight ??
       (window.innerHeight || document.documentElement.clientHeight);
+    const rowSkipWidth = this.getLayoutButtonWidth(this.skipButton, 0, isMobileViewport);
     const clampedRow = this.clampButtonRowToViewport({
       distance,
       verticalPosition,
       nextLeft,
       skipLeft,
-      skipWidth: this.getLayoutButtonWidth(this.skipButton, 0, isMobileViewport),
+      skipWidth: rowSkipWidth,
       viewportWidth: input.viewportWidth,
       viewportHeight,
       labelY: input.labelY,
@@ -496,6 +529,59 @@ export class OverlayRenderer {
     this.setButtonPosition(this.nextButton, clampedRow.nextLeft, clampedRow.verticalPosition);
     this.setButtonPosition(this.skipButton, clampedRow.skipLeft, clampedRow.verticalPosition);
     this.revealPositionedButtons();
+
+    this.buttonRowRect = {
+      top: clampedRow.verticalPosition,
+      bottom: clampedRow.verticalPosition + LEGACY_BUTTON_HEIGHT_PX,
+      left: clampedRow.distance,
+      right: clampedRow.skipLeft + rowSkipWidth,
+    };
+  }
+
+  /**
+   * Bounding box of the last-positioned next/prev/skip button row, in
+   * viewport coordinates. Used by the label overlap toggle to steer clear
+   * of the buttons in addition to the label and the spotlight.
+   */
+  getButtonRowRect(): { top: number; right: number; bottom: number; left: number } | undefined {
+    return this.buttonRowRect;
+  }
+
+  configureLabelOverlapToggle(input: {
+    overlaps: boolean;
+    anchorX: number;
+    anchorY: number;
+    labelLeft: number;
+    labelWidth: number;
+    resetHidden: boolean;
+  }): void {
+    if (!this.labelToggleButton) {
+      return;
+    }
+
+    if (input.resetHidden) {
+      this.setLabelHidden(false);
+    }
+
+    this.labelHideOffsetPx = computeLabelHideOffsetPx({ left: input.labelLeft, width: input.labelWidth });
+
+    if (!input.overlaps) {
+      this.setButtonVisible(this.labelToggleButton, false);
+      this.labelToggleButton.style.left = "";
+      this.labelToggleButton.style.top = "";
+      if (this.labelHidden) {
+        this.setLabelHidden(false);
+      }
+      return;
+    }
+
+    this.labelToggleButton.style.left = `${input.anchorX - LABEL_TOGGLE_BUTTON_SIZE_PX / 2}px`;
+    this.labelToggleButton.style.top = `${input.anchorY - LABEL_TOGGLE_BUTTON_SIZE_PX / 2}px`;
+    this.setButtonVisible(this.labelToggleButton, true);
+
+    if (this.labelHidden) {
+      this.applyLabelHiddenTransform();
+    }
   }
 
   private clampButtonRowToViewport(input: {
@@ -724,6 +810,49 @@ export class OverlayRenderer {
     button.textContent = text;
     button.addEventListener("click", onClick);
     return button;
+  }
+
+  private createLabelToggleButton(onClick: () => void): HTMLDivElement {
+    const button = document.createElement("div");
+    button.className = "enjoyhint_label_toggle_btn";
+    button.setAttribute("role", "button");
+    button.setAttribute("aria-label", "Hide hint text");
+    button.innerHTML = EYE_OPEN_ICON_SVG;
+    button.addEventListener("click", onClick);
+    return button;
+  }
+
+  private setLabelHidden(hidden: boolean): void {
+    this.labelHidden = hidden;
+    this.labelToggleButton?.classList.toggle("enjoyhint_label_toggle_btn--hidden", hidden);
+    this.labelToggleButton?.setAttribute("aria-label", hidden ? "Show hint text" : "Hide hint text");
+    if (this.labelToggleButton) {
+      this.labelToggleButton.innerHTML = hidden ? EYE_CLOSED_ICON_SVG : EYE_OPEN_ICON_SVG;
+    }
+
+    if (hidden) {
+      this.applyLabelHiddenTransform();
+    } else {
+      this.clearLabelHiddenTransform();
+    }
+  }
+
+  private applyLabelHiddenTransform(): void {
+    if (!this.labelContainer) {
+      return;
+    }
+
+    this.labelContainer.style.transform = `translateX(-${this.labelHideOffsetPx}px)`;
+    this.labelContainer.style.opacity = "0";
+  }
+
+  private clearLabelHiddenTransform(): void {
+    if (!this.labelContainer) {
+      return;
+    }
+
+    this.labelContainer.style.transform = "";
+    this.labelContainer.style.opacity = "";
   }
 
   private createMarkerDefs(): SVGDefsElement {

@@ -1,6 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { StepController } from "../src/StepController";
-import { getLegacyStepRenderDelay, LEGACY_LABEL_ARROW_DELAY_MS } from "../src/stepTiming";
+import { OverlayRenderer } from "../src/overlay/OverlayRenderer";
+import { LABEL_TOGGLE_BUTTON_SIZE_PX } from "../src/overlay/labelOverlapToggle";
+import {
+  getLegacyStepRenderDelay,
+  LEGACY_LABEL_ARROW_DELAY_MS,
+  LEGACY_OVERSIZED_LABEL_DELAY_MS,
+} from "../src/stepTiming";
 import type { NormalizedStep } from "../src/types";
 
 function makeStep(overrides: Partial<NormalizedStep> = {}): NormalizedStep {
@@ -435,5 +441,118 @@ describe("StepController", () => {
     expect(holeRight - holeLeft).toBe(160);
     expect(holeBottom - holeTop).toBe(160);
     expect(document.querySelector("canvas")).toBeNull();
+  });
+
+  describe("label overlap toggle", () => {
+    // jsdom defaults to a 1024x768 window; restore that after each test so
+    // viewport overrides below don't leak into other tests in this file.
+    afterEach(() => {
+      window.innerWidth = 1024;
+      window.innerHeight = 768;
+    });
+
+    it("shows the toggle button when the label overlaps the spotlight", () => {
+      // A tiny viewport plus a small margin forces the "oversized" centered
+      // label path, which sits directly on top of the spotlight/target.
+      window.innerWidth = 300;
+      window.innerHeight = 300;
+      addTarget();
+      const controller = new StepController([makeStep({ margin: 4 })]);
+
+      controller.run();
+      advanceStepRender();
+      // The toggle is configured together with the next/prev/skip buttons,
+      // in the same zero-delay timeout that runs right after the label
+      // itself starts presenting - flush that tick before asserting.
+      vi.advanceTimersByTime(1);
+
+      const button = document.querySelector<HTMLElement>(".enjoyhint_label_toggle_btn");
+      expect(button?.classList.contains("enjoyhint_hide")).toBe(false);
+
+      controller.destroy();
+    });
+
+    it("does not show the toggle button when the label does not overlap the spotlight", () => {
+      window.innerWidth = 1280;
+      window.innerHeight = 800;
+      addTarget();
+      const controller = new StepController([makeStep()]);
+
+      controller.run();
+      advanceStepRender();
+      vi.advanceTimersByTime(1);
+
+      const button = document.querySelector<HTMLElement>(".enjoyhint_label_toggle_btn");
+      expect(button?.classList.contains("enjoyhint_hide")).toBe(true);
+
+      controller.destroy();
+    });
+
+    it("keeps the toggle button clear of the positioned next/prev/skip button row", () => {
+      window.innerWidth = 300;
+      window.innerHeight = 300;
+      addTarget();
+      const renderer = new OverlayRenderer();
+      const configureSpy = vi.spyOn(renderer, "configureLabelOverlapToggle");
+      const controller = new StepController([makeStep({ margin: 4 })], {}, undefined, undefined, renderer);
+
+      controller.run();
+      advanceStepRender();
+      vi.advanceTimersByTime(1);
+
+      const rowRect = renderer.getButtonRowRect();
+      expect(rowRect).toBeDefined();
+
+      const lastCall = configureSpy.mock.calls.at(-1)?.[0];
+      expect(lastCall?.overlaps).toBe(true);
+
+      const half = LABEL_TOGGLE_BUTTON_SIZE_PX / 2;
+      const toggleRect = {
+        top: lastCall!.anchorY - half,
+        bottom: lastCall!.anchorY + half,
+        left: lastCall!.anchorX - half,
+        right: lastCall!.anchorX + half,
+      };
+      const overlapsRow =
+        toggleRect.left < rowRect!.right &&
+        toggleRect.right > rowRect!.left &&
+        toggleRect.top < rowRect!.bottom &&
+        toggleRect.bottom > rowRect!.top;
+
+      expect(overlapsRow).toBe(false);
+
+      controller.destroy();
+    });
+
+    it("resets the label to visible when moving to the next step", () => {
+      window.innerWidth = 300;
+      window.innerHeight = 300;
+      addTarget();
+      const controller = new StepController([
+        makeStep({ margin: 4, event: "next", eventType: "next" }),
+        makeStep({ margin: 4, selector: ".target" }),
+      ]);
+
+      controller.run();
+      advanceStepRender();
+      // Both steps use the same tiny-viewport/small-margin setup, so both
+      // take the "oversized" label path (450ms presentation delay instead
+      // of the usual 400ms) - wait for the real label element to replace
+      // the in-flight measurement placeholder before interacting with it.
+      vi.advanceTimersByTime(LEGACY_OVERSIZED_LABEL_DELAY_MS);
+
+      document.querySelector<HTMLElement>(".enjoyhint_label_toggle_btn")!.click();
+      let label = document.querySelector<HTMLElement>(".enjoy_hint_label")!;
+      expect(label.style.opacity).toBe("0");
+
+      controller.trigger("next");
+      advanceStepRender();
+      vi.advanceTimersByTime(LEGACY_OVERSIZED_LABEL_DELAY_MS);
+
+      label = document.querySelector<HTMLElement>(".enjoy_hint_label")!;
+      expect(label.style.opacity).toBe("");
+
+      controller.destroy();
+    });
   });
 });
