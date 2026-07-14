@@ -29,6 +29,34 @@ Alternative way:
   <script src="<pathontheserver>/enjoyhint/dist/enjoyhint.min.js"></script>
 ```
 
+#### Using with Angular
+v5 is a dependency-free ESM/CJS build, so Angular can import EnjoyHint like any other library. Start the tour after the view (and step targets) exist, and destroy it when the host component is destroyed. If the tour would outlive the component (for example across a route change), stop or destroy it when leaving that view.
+
+```typescript
+import { AfterViewInit, OnDestroy, Component } from '@angular/core';
+import EnjoyHint from 'xbs-enjoyhint';
+import 'xbs-enjoyhint/dist/enjoyhint.css';
+
+@Component({ /* ... */ })
+export class TourHostComponent implements AfterViewInit, OnDestroy {
+  private tour?: EnjoyHint;
+
+  ngAfterViewInit(): void {
+    this.tour = new EnjoyHint({});
+    this.tour.set([
+      { 'click .new_btn': 'Click the "New" button' },
+    ]);
+    this.tour.run();
+  }
+
+  ngOnDestroy(): void {
+    this.tour?.destroy();
+  }
+}
+```
+
+Highlighting targets inside Angular Material dialogs (`MD-DIALOG` / `dialogClosing`) is supported. The pre-v5 bundler errors (`Can't resolve './jquery.enjoyhint.js'`, `global is not defined`) do not apply to v5.
+
 #### Initialization and configuration:
 ```javascript
 //initialize instance
