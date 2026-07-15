@@ -1,4 +1,4 @@
-import type { SpotlightRect } from "../types";
+import type { SpotlightRect, TextDirection } from "../types";
 
 export interface OverlapRect {
   top: number;
@@ -41,7 +41,7 @@ export function doesLabelOverlapSpotlight(
 }
 
 type EdgeDirection = "right" | "left" | "bottom" | "top";
-type CornerName = "bottom-right" | "bottom-left" | "top-left";
+type CornerName = "bottom-right" | "bottom-left" | "top-left" | "top-right";
 
 function rectFromCenter(x: number, y: number, size: number): OverlapRect {
   const half = size / 2;
@@ -75,6 +75,7 @@ export interface ToggleButtonPositionInput {
   buttonSize?: number;
   viewport: { width: number; height: number };
   offsetPx?: number;
+  dir?: TextDirection;
 }
 
 /**
@@ -87,7 +88,7 @@ export interface ToggleButtonPositionInput {
  * 3. Just outside the label's own edges (needed when an oversized
  *    dark-background label covers the spotlight entirely — spotlight-edge
  *    anchors then sit *inside* the label)
- * 4. Viewport corners (top-right skipped — reserved for the close button)
+ * 4. Viewport corners (close corner skipped — top-right in LTR, top-left in RTL)
  *
  * Among candidates, whichever has the least (ideally zero) overlap wins.
  */
@@ -136,8 +137,10 @@ export function computeToggleButtonPosition(input: ToggleButtonPositionInput): {
     (direction) => direction !== preferredDirection,
   );
 
-  // The top-right corner is deliberately excluded here - it's reserved for
-  // the tutorial's close button.
+  const dir: TextDirection = input.dir ?? "ltr";
+
+  // The close-button corner is deliberately excluded — top-right in LTR,
+  // top-left in RTL.
   const cornerAnchor = (corner: CornerName): { x: number; y: number } => {
     switch (corner) {
       case "bottom-right":
@@ -152,17 +155,25 @@ export function computeToggleButtonPosition(input: ToggleButtonPositionInput): {
         };
       case "top-left":
         return { x: VIEWPORT_CLAMP_MARGIN_PX + half, y: VIEWPORT_CLAMP_MARGIN_PX + half };
+      case "top-right":
+        return {
+          x: input.viewport.width - VIEWPORT_CLAMP_MARGIN_PX - half,
+          y: VIEWPORT_CLAMP_MARGIN_PX + half,
+        };
     }
   };
+
+  const cornerCandidates: CornerName[] =
+    dir === "rtl"
+      ? ["bottom-right", "bottom-left", "top-right"]
+      : ["bottom-right", "bottom-left", "top-left"];
 
   const candidates: Array<{ x: number; y: number }> = [
     spotlightEdgeAnchor(preferredDirection),
     ...remainingDirections.map(spotlightEdgeAnchor),
     labelEdgeAnchor(preferredDirection),
     ...remainingDirections.map(labelEdgeAnchor),
-    cornerAnchor("bottom-right"),
-    cornerAnchor("bottom-left"),
-    cornerAnchor("top-left"),
+    ...cornerCandidates.map(cornerAnchor),
   ];
 
   const evaluate = (anchor: { x: number; y: number }) => {
@@ -191,12 +202,22 @@ export function computeToggleButtonPosition(input: ToggleButtonPositionInput): {
 }
 
 /**
- * Distance (px) to translateX(-N) a label so it clears the left viewport
- * edge entirely, given its own current left position and width.
+ * Distance (px) to translate a label off-screen so it clears the viewport
+ * edge, given its current left position and width.
  */
 export function computeLabelHideOffsetPx(
   label: { left: number; width: number },
-  marginPx = LABEL_HIDE_MARGIN_PX,
+  options: {
+    marginPx?: number;
+    dir?: TextDirection;
+    viewportWidth?: number;
+  } = {},
 ): number {
+  const marginPx = options.marginPx ?? LABEL_HIDE_MARGIN_PX;
+  const dir = options.dir ?? "ltr";
+  if (dir === "rtl") {
+    const viewportWidth = options.viewportWidth ?? 0;
+    return viewportWidth - label.left + marginPx;
+  }
   return label.left + label.width + marginPx;
 }

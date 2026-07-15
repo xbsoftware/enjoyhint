@@ -13,7 +13,7 @@ import {
   LEGACY_DEFAULT_SCROLL_SPEED_MS,
   getLegacyStepRenderDelay,
 } from "./stepTiming";
-import type { SpotlightRect } from "./types";
+import type { SpotlightRect, TextDirection } from "./types";
 import type { EnjoyHintOptions, NormalizedStep } from "./types";
 
 type Disposer = () => void;
@@ -27,6 +27,7 @@ export class StepController {
   private readonly dom: DomAdapter;
   private readonly eventBus: EventBus;
   private readonly renderer: OverlayRenderer;
+  private readonly dir: TextDirection;
   private currentStep = 0;
   private previousBodyOverflow = "";
   private locked = false;
@@ -40,7 +41,11 @@ export class StepController {
     options: EnjoyHintOptions = {},
     dom: DomAdapter = new DomAdapter(),
     eventBus: EventBus = new EventBus(),
-    renderer: OverlayRenderer = new OverlayRenderer(document.body, options.backgroundColor),
+    renderer: OverlayRenderer = new OverlayRenderer(
+      document.body,
+      options.backgroundColor,
+      options.dir ?? "ltr",
+    ),
   ) {
     this.callbacks = {
       onStart: options.onStart ?? (() => {}),
@@ -52,6 +57,7 @@ export class StepController {
     this.dom = dom;
     this.eventBus = eventBus;
     this.renderer = renderer;
+    this.dir = options.dir ?? "ltr";
     this.renderer.onNextClick(() => this.next());
     this.renderer.onPrevClick(() => this.previous());
     this.renderer.onSkipClick(() => this.stop());
@@ -306,13 +312,12 @@ export class StepController {
       };
       const overlapsSpotlight = doesLabelOverlapSpotlight(labelRect, spotlight);
       const buttonRowRect = this.renderer.getButtonRowRect();
-      // Keep clear of the close button's fixed top-right home.
-      const closeButtonRect = {
-        top: 0,
-        right: viewport.width,
-        bottom: 60,
-        left: viewport.width - 60,
-      };
+      // Keep clear of the close button's fixed home - top-right in LTR,
+      // mirrored to top-left in RTL.
+      const closeButtonRect =
+        this.dir === "rtl"
+          ? { top: 0, right: 60, bottom: 60, left: 0 }
+          : { top: 0, right: viewport.width, bottom: 60, left: viewport.width - 60 };
       const avoidRects = [closeButtonRect, ...(buttonRowRect ? [buttonRowRect] : [])];
       const togglePosition = computeToggleButtonPosition({
         labelRect,
@@ -320,6 +325,7 @@ export class StepController {
         avoidRects,
         buttonSize: LABEL_TOGGLE_BUTTON_SIZE_PX,
         viewport,
+        dir: this.dir,
       });
 
       this.renderer.configureLabelOverlapToggle({
@@ -328,6 +334,7 @@ export class StepController {
         anchorY: togglePosition.y,
         labelLeft: labelRect.left,
         labelWidth: placement.label.width,
+        viewportWidth: viewport.width,
         resetHidden: !options.immediate,
       });
     }, 0);

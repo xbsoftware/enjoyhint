@@ -386,6 +386,50 @@ describe("OverlayRenderer", () => {
     renderer.destroy();
   });
 
+  it("pins nav buttons to the top-right corner on mobile when dir is rtl", () => {
+    const viewportWidth = 375;
+    const renderer = new OverlayRenderer(document.body, "rgba(0,0,0,0.6)", "rtl");
+
+    renderer.mount();
+    renderer.configureNextButton(undefined, "Next");
+    renderer.configurePrevButton(undefined, "Previous");
+    renderer.showNext();
+    renderer.showPrev();
+    renderer.showSkip();
+    renderer.positionButtons({
+      labelX: 200,
+      labelY: 300,
+      labelWidth: 250,
+      labelHeight: 100,
+      xFrom: 180,
+      yFrom: 250,
+      xTo: 220,
+      yTo: 350,
+      viewportWidth,
+    });
+
+    const nextButton = document.querySelector<HTMLElement>(".enjoyhint_next_btn")!;
+    const prevButton = document.querySelector<HTMLElement>(".enjoyhint_prev_btn")!;
+    const skipButton = document.querySelector<HTMLElement>(".enjoyhint_skip_btn")!;
+    const prevLeft = Number.parseFloat(prevButton.style.left);
+    const nextLeft = Number.parseFloat(nextButton.style.left);
+    const skipLeft = Number.parseFloat(skipButton.style.left);
+    const rowRight = Math.max(
+      skipLeft + skipButton.offsetWidth,
+      nextLeft + nextButton.offsetWidth,
+      prevLeft + prevButton.offsetWidth,
+    );
+
+    expect(prevButton.style.top).toBe("10px");
+    expect(nextButton.style.top).toBe("10px");
+    expect(skipLeft).toBeLessThan(nextLeft);
+    expect(nextLeft).toBeLessThan(prevLeft);
+    expect(rowRight).toBe(viewportWidth - 10);
+    expect(prevLeft).toBeGreaterThan(viewportWidth / 2);
+
+    renderer.destroy();
+  });
+
   it("always pins mobile buttons to the top-left corner even when the label occupies that corner", () => {
     const renderer = new OverlayRenderer();
 
@@ -664,6 +708,140 @@ describe("OverlayRenderer", () => {
     expect(rowRect?.right).toBeGreaterThan(Number.parseFloat(skipButton?.style.left ?? "0"));
 
     renderer.destroy();
+  });
+
+  it("sets root dir to ltr by default and pins the close button top-right", () => {
+    const renderer = new OverlayRenderer();
+    renderer.mount();
+    const root = document.querySelector(".enjoyhint");
+    expect(root?.getAttribute("dir")).toBe("ltr");
+    const closeButton = root?.querySelector<HTMLElement>(".enjoyhint_close_btn");
+    expect(closeButton?.style.right).toBe("10px");
+    expect(closeButton?.style.left).toBe("");
+    renderer.destroy();
+  });
+
+  it("sets root dir to rtl and pins the close button top-left", () => {
+    const renderer = new OverlayRenderer(document.body, "rgba(0,0,0,0.6)", "rtl");
+    renderer.mount();
+    const root = document.querySelector(".enjoyhint");
+    expect(root?.getAttribute("dir")).toBe("rtl");
+    const closeButton = root?.querySelector<HTMLElement>(".enjoyhint_close_btn");
+    expect(closeButton?.style.left).toBe("10px");
+    expect(closeButton?.style.right).toBe("");
+    renderer.destroy();
+  });
+
+  it("mirrors nav button order for rtl (skip, next, prev left-to-right)", () => {
+    const renderer = new OverlayRenderer(document.body, "rgba(0,0,0,0.6)", "rtl");
+    renderer.mount();
+    renderer.show();
+    renderer.showNext();
+    renderer.showPrev();
+    renderer.showSkip();
+    renderer.positionButtons({
+      labelX: 100,
+      labelY: 80,
+      labelWidth: 120,
+      labelHeight: 30,
+      xFrom: 160,
+      yFrom: 100,
+      xTo: 200,
+      yTo: 200,
+      viewportWidth: 800,
+      viewportHeight: 600,
+    });
+    const prev = document.querySelector<HTMLElement>(".enjoyhint_prev_btn")!;
+    const next = document.querySelector<HTMLElement>(".enjoyhint_next_btn")!;
+    const skip = document.querySelector<HTMLElement>(".enjoyhint_skip_btn")!;
+    const prevLeft = Number.parseFloat(prev.style.left);
+    const nextLeft = Number.parseFloat(next.style.left);
+    const skipLeft = Number.parseFloat(skip.style.left);
+    expect(skipLeft).toBeLessThan(nextLeft);
+    expect(nextLeft).toBeLessThan(prevLeft);
+    renderer.destroy();
+  });
+
+  it("lays out skip then next in rtl when prev is hidden", () => {
+    const renderer = new OverlayRenderer(document.body, "rgba(0,0,0,0.6)", "rtl");
+    renderer.mount();
+    renderer.showNext();
+    renderer.showSkip();
+    renderer.hidePrev();
+    renderer.positionButtons({
+      labelX: 100,
+      labelY: 80,
+      labelWidth: 120,
+      labelHeight: 30,
+      xFrom: 160,
+      yFrom: 100,
+      xTo: 200,
+      yTo: 200,
+      viewportWidth: 800,
+      viewportHeight: 600,
+    });
+
+    const next = document.querySelector<HTMLElement>(".enjoyhint_next_btn")!;
+    const skip = document.querySelector<HTMLElement>(".enjoyhint_skip_btn")!;
+    const skipLeft = Number.parseFloat(skip.style.left);
+    const nextLeft = Number.parseFloat(next.style.left);
+
+    expect(skipLeft).toBeLessThan(nextLeft);
+    expect(nextLeft - skipLeft).toBeGreaterThan(0);
+
+    renderer.destroy();
+  });
+
+  it("slides the label to the right when hidden in rtl", () => {
+    vi.useFakeTimers();
+    const renderer = new OverlayRenderer(document.body, "rgba(0,0,0,0.6)", "rtl");
+    renderer.mount();
+    renderer.scheduleLabelPresentation("Click the target", { x: 40, y: 60 }, { oversized: true });
+    vi.advanceTimersByTime(450);
+    renderer.configureLabelOverlapToggle({
+      overlaps: true,
+      anchorX: 100,
+      anchorY: 200,
+      labelLeft: 40,
+      labelWidth: 120,
+      viewportWidth: 800,
+      resetHidden: true,
+    });
+    document.querySelector<HTMLElement>(".enjoyhint_label_toggle_btn")!.click();
+    const label = document.querySelector<HTMLElement>(".enjoy_hint_label")!;
+    expect(label.style.transform).toBe(`translateX(${800 - 40 + 24}px)`);
+    renderer.destroy();
+    vi.useRealTimers();
+  });
+
+  it("keeps spotlight blockers identical for ltr and rtl dir", () => {
+    document.documentElement.style.direction = "rtl";
+
+    const measure = (dir: "ltr" | "rtl") => {
+      const renderer =
+        dir === "rtl"
+          ? new OverlayRenderer(document.body, "rgba(0,0,0,0.6)", "rtl")
+          : new OverlayRenderer();
+      renderer.mount();
+      expect(document.querySelector(".enjoyhint")?.getAttribute("dir")).toBe(dir);
+      renderer.renderSpotlight(
+        { shape: "rect", x: 100, y: 120, width: 80, height: 40 },
+        { immediate: true },
+      );
+      const styles = [...document.querySelectorAll<HTMLElement>(".enjoyhint_disable_events")].map(
+        (el) => ({
+          top: el.style.top,
+          left: el.style.left,
+          width: el.style.width,
+          height: el.style.height,
+        }),
+      );
+      renderer.destroy();
+      return styles;
+    };
+
+    expect(measure("rtl")).toEqual(measure("ltr"));
+    document.documentElement.style.direction = "";
   });
 
   describe("label overlap toggle", () => {

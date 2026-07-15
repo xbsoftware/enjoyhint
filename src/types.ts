@@ -3,6 +3,8 @@ export interface ButtonConfig {
   text?: string;
 }
 
+export type TextDirection = "ltr" | "rtl";
+
 export interface EnjoyHintOptions {
   onStart?: () => void;
   onEnd?: () => void;
@@ -11,6 +13,8 @@ export interface EnjoyHintOptions {
   btnNextText?: string;
   btnSkipText?: string;
   backgroundColor?: string;
+  /** Tour chrome direction. Independent of the host page. Default `"ltr"`. */
+  dir?: TextDirection;
 }
 
 export interface NormalizedStep {

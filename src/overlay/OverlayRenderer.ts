@@ -10,7 +10,7 @@ import {
   type SvgMaskSpotlightUpdate,
 } from "./SvgMaskSpotlight";
 import type { BlockerRect } from "./geometry";
-import type { ButtonConfig } from "../types";
+import type { ButtonConfig, TextDirection } from "../types";
 import {
   LEGACY_LABEL_ARROW_DELAY_MS,
   LEGACY_OVERSIZED_LABEL_DELAY_MS,
@@ -85,7 +85,11 @@ export class OverlayRenderer {
   private labelPresentationTimeoutId?: number;
   private arrowPresentationTimeoutId?: number;
 
-  constructor(container: HTMLElement = document.body, spotlightFill = "rgba(0,0,0,0.6)") {
+  constructor(
+    container: HTMLElement = document.body,
+    spotlightFill = "rgba(0,0,0,0.6)",
+    private readonly dir: TextDirection = "ltr",
+  ) {
     this.container = container;
     this.spotlightFill = spotlightFill;
   }
@@ -97,6 +101,7 @@ export class OverlayRenderer {
 
     const root = document.createElement("div");
     root.className = "enjoyhint enjoyhint_hide enjoyhint_svg_transparent";
+    root.setAttribute("dir", this.dir);
 
     const svgWrapper = document.createElement("div");
     svgWrapper.className = "enjoyhint_svg_wrapper enjoyhint_svg_transparent";
@@ -141,7 +146,11 @@ export class OverlayRenderer {
       this.skipClick();
     });
     this.closeButton.style.top = "10px";
-    this.closeButton.style.right = "10px";
+    if (this.dir === "rtl") {
+      this.closeButton.style.left = "10px";
+    } else {
+      this.closeButton.style.right = "10px";
+    }
     this.prevButton = this.createButton("enjoyhint_prev_btn", "Previous", () => {
       this.prevClick();
     });
@@ -525,17 +534,74 @@ export class OverlayRenderer {
       arrowBottom: input.arrowBottom,
       isMobileViewport,
     });
-    this.setButtonPosition(this.prevButton, clampedRow.distance, clampedRow.verticalPosition);
-    this.setButtonPosition(this.nextButton, clampedRow.nextLeft, clampedRow.verticalPosition);
-    this.setButtonPosition(this.skipButton, clampedRow.skipLeft, clampedRow.verticalPosition);
-    this.revealPositionedButtons();
+    if (this.dir === "rtl") {
+      const left = clampedRow.distance;
+      const skipW = rowSkipWidth;
+      const nextW = resolvedNextWidth;
+      const prevW = resolvedPrevWidth;
+      const skipL = left;
+      let nextL: number;
+      let prevL: number;
 
-    this.buttonRowRect = {
-      top: clampedRow.verticalPosition,
-      bottom: clampedRow.verticalPosition + LEGACY_BUTTON_HEIGHT_PX,
-      left: clampedRow.distance,
-      right: clampedRow.skipLeft + rowSkipWidth,
-    };
+      if (!this.prevVisible) {
+        // Skip → Next (no Prev) — mirrors LTR when prev is hidden.
+        nextL = left + skipW + 10;
+        prevL = nextL;
+      } else if (!this.nextVisible) {
+        // Skip → Prev (no Next) — mirrors LTR when next is hidden.
+        prevL = left + skipW + 10;
+        nextL = prevL;
+      } else {
+        // Skip → Next → Prev
+        nextL = left + skipW + 10;
+        prevL = left + skipW + nextW + 20;
+      }
+
+      const rtlRight = this.prevVisible
+        ? prevL + prevW
+        : this.nextVisible
+          ? nextL + nextW
+          : skipL + skipW;
+      const ltrRight = clampedRow.skipLeft + skipW;
+      // Desktop: row width is order-invariant, so unclamped shift is 0; shift
+      // re-anchors to the LTR-clamped right edge when clamp moved the row.
+      // Mobile: LTR pins the cluster to the top-left (margin 10); RTL pins it
+      // to the top-right instead.
+      const shift = isMobileViewport
+        ? input.viewportWidth - 10 - rtlRight
+        : ltrRight - rtlRight;
+      const positionedSkipL = skipL + shift;
+      const positionedNextL = nextL + shift;
+      const positionedPrevL = prevL + shift;
+
+      this.setButtonPosition(this.skipButton, positionedSkipL, clampedRow.verticalPosition);
+      this.setButtonPosition(this.nextButton, positionedNextL, clampedRow.verticalPosition);
+      this.setButtonPosition(this.prevButton, positionedPrevL, clampedRow.verticalPosition);
+      this.revealPositionedButtons();
+
+      this.buttonRowRect = {
+        top: clampedRow.verticalPosition,
+        bottom: clampedRow.verticalPosition + LEGACY_BUTTON_HEIGHT_PX,
+        left: Math.min(positionedSkipL, positionedNextL, positionedPrevL),
+        right: Math.max(
+          positionedSkipL + skipW,
+          positionedNextL + nextW,
+          positionedPrevL + prevW,
+        ),
+      };
+    } else {
+      this.setButtonPosition(this.prevButton, clampedRow.distance, clampedRow.verticalPosition);
+      this.setButtonPosition(this.nextButton, clampedRow.nextLeft, clampedRow.verticalPosition);
+      this.setButtonPosition(this.skipButton, clampedRow.skipLeft, clampedRow.verticalPosition);
+      this.revealPositionedButtons();
+
+      this.buttonRowRect = {
+        top: clampedRow.verticalPosition,
+        bottom: clampedRow.verticalPosition + LEGACY_BUTTON_HEIGHT_PX,
+        left: clampedRow.distance,
+        right: clampedRow.skipLeft + rowSkipWidth,
+      };
+    }
   }
 
   /**
@@ -553,6 +619,7 @@ export class OverlayRenderer {
     anchorY: number;
     labelLeft: number;
     labelWidth: number;
+    viewportWidth?: number;
     resetHidden: boolean;
   }): void {
     if (!this.labelToggleButton) {
@@ -563,7 +630,13 @@ export class OverlayRenderer {
       this.setLabelHidden(false);
     }
 
-    this.labelHideOffsetPx = computeLabelHideOffsetPx({ left: input.labelLeft, width: input.labelWidth });
+    this.labelHideOffsetPx = computeLabelHideOffsetPx(
+      { left: input.labelLeft, width: input.labelWidth },
+      {
+        dir: this.dir,
+        viewportWidth: input.viewportWidth ?? window.innerWidth,
+      },
+    );
 
     if (!input.overlaps) {
       this.setButtonVisible(this.labelToggleButton, false);
@@ -842,7 +915,10 @@ export class OverlayRenderer {
       return;
     }
 
-    this.labelContainer.style.transform = `translateX(-${this.labelHideOffsetPx}px)`;
+    this.labelContainer.style.transform =
+      this.dir === "rtl"
+        ? `translateX(${this.labelHideOffsetPx}px)`
+        : `translateX(-${this.labelHideOffsetPx}px)`;
     this.labelContainer.style.opacity = "0";
   }
 

@@ -524,6 +524,49 @@ describe("StepController", () => {
       controller.destroy();
     });
 
+    it("keeps the toggle button clear of the mirrored close button in RTL", () => {
+      window.innerWidth = 300;
+      window.innerHeight = 300;
+      addTarget();
+      const renderer = new OverlayRenderer(document.body, undefined, "rtl");
+      const configureSpy = vi.spyOn(renderer, "configureLabelOverlapToggle");
+      const controller = new StepController(
+        [makeStep({ margin: 4 })],
+        { dir: "rtl" },
+        undefined,
+        undefined,
+        renderer,
+      );
+
+      controller.run();
+      advanceStepRender();
+      vi.advanceTimersByTime(1);
+
+      const lastCall = configureSpy.mock.calls.at(-1)?.[0];
+      expect(lastCall?.overlaps).toBe(true);
+      expect(lastCall?.viewportWidth).toBe(300);
+
+      // The close button lives in the top-left corner in RTL - the toggle
+      // must not be positioned on top of it.
+      const closeButtonRect = { top: 0, right: 60, bottom: 60, left: 0 };
+      const half = LABEL_TOGGLE_BUTTON_SIZE_PX / 2;
+      const toggleRect = {
+        top: lastCall!.anchorY - half,
+        bottom: lastCall!.anchorY + half,
+        left: lastCall!.anchorX - half,
+        right: lastCall!.anchorX + half,
+      };
+      const overlapsCloseButton =
+        toggleRect.left < closeButtonRect.right &&
+        toggleRect.right > closeButtonRect.left &&
+        toggleRect.top < closeButtonRect.bottom &&
+        toggleRect.bottom > closeButtonRect.top;
+
+      expect(overlapsCloseButton).toBe(false);
+
+      controller.destroy();
+    });
+
     it("resets the label to visible when moving to the next step", () => {
       window.innerWidth = 300;
       window.innerHeight = 300;

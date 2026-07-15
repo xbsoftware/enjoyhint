@@ -19,6 +19,11 @@
   z-index: 1010;
   pointer-events: none;
   overflow: hidden;
+  direction: ltr;
+}
+
+.enjoyhint[dir="rtl"] {
+  direction: rtl;
 }
 
 .enjoyhint_hide {

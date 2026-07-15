@@ -2,6 +2,7 @@ var tourWasSkipped = false;
 
 //initialize instance
 var enjoyhint_instance = new EnjoyHint({
+    // dir: "rtl",
     onSkip: function () {
         tourWasSkipped = true;
         updateTourControls();

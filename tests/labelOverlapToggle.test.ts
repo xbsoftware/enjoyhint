@@ -132,7 +132,7 @@ describe("labelOverlapToggle", () => {
       expect(computeOverlapArea(buttonRect, labelRect)).toBe(0);
     });
 
-    it("never lands in the top-right corner, which is reserved for the close button", () => {
+    it("never lands in the top-right corner in ltr, which is reserved for the close button", () => {
       // Blocks all four spotlight edges but stops short of the extreme
       // top-left corner, and a bottom band blocks both bottom corners.
       // Label-edge candidates on the right remain clear. The top-right
@@ -140,11 +140,20 @@ describe("labelOverlapToggle", () => {
       const labelRect = { top: 40, right: 260, bottom: 260, left: 40 };
       const avoidRects = [{ top: 560, right: 800, bottom: 600, left: 0 }];
 
-      const position = computeToggleButtonPosition({ labelRect, spotlight, viewport, avoidRects });
+      const position = computeToggleButtonPosition({ labelRect, spotlight, viewport, avoidRects, dir: "ltr" });
 
       expect(position.x).toBeLessThan(viewport.width - 40);
       // Confirm we did not pick the reserved top-right corner.
       expect(!(position.x > viewport.width / 2 && position.y < viewport.height / 2)).toBe(true);
+    });
+
+    it("never lands in the top-left corner in rtl, which is reserved for the close button", () => {
+      const labelRect = { top: 40, right: 260, bottom: 260, left: 40 };
+      const avoidRects = [{ top: 560, right: 800, bottom: 600, left: 0 }];
+
+      const position = computeToggleButtonPosition({ labelRect, spotlight, viewport, avoidRects, dir: "rtl" });
+
+      expect(position.x).toBeGreaterThan(40);
     });
 
     it("avoids extra rects such as the next/prev/skip button row", () => {
@@ -243,7 +252,25 @@ describe("labelOverlapToggle", () => {
     });
 
     it("supports a custom margin", () => {
-      expect(computeLabelHideOffsetPx({ left: 50, width: 80 }, 10)).toBe(140);
+      expect(computeLabelHideOffsetPx({ left: 50, width: 80 }, { marginPx: 10 })).toBe(140);
+    });
+
+    it("clears the right viewport edge when dir is rtl", () => {
+      expect(
+        computeLabelHideOffsetPx(
+          { left: 100, width: 200 },
+          { dir: "rtl", viewportWidth: 800 },
+        ),
+      ).toBe(800 - 100 + LABEL_HIDE_MARGIN_PX);
+    });
+
+    it("uses custom margin for rtl", () => {
+      expect(
+        computeLabelHideOffsetPx(
+          { left: 50, width: 80 },
+          { dir: "rtl", viewportWidth: 500, marginPx: 10 },
+        ),
+      ).toBe(500 - 50 + 10);
     });
   });
 });
