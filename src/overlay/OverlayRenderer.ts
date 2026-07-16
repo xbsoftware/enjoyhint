@@ -262,6 +262,7 @@ export class OverlayRenderer {
       this.labelContainer = undefined;
       this.root?.append(detachedLabel);
       this.labelContainer = detachedLabel;
+      this.prepareLabelLinks(detachedLabel);
 
       if (oversized) {
         this.applyOversizedLabelStyles(detachedLabel);
@@ -297,6 +298,13 @@ export class OverlayRenderer {
     // would override the stylesheet and make the hide slide snap instantly.
     label.style.transition =
       "background-color ease-out 0.5s, opacity 400ms cubic-bezier(0.42, 0, 0.58, 1), transform 400ms cubic-bezier(0.42, 0, 0.58, 1)";
+  }
+
+  private prepareLabelLinks(label: ParentNode): void {
+    label.querySelectorAll("a[href]").forEach((anchor) => {
+      anchor.setAttribute("target", "_blank");
+      anchor.setAttribute("rel", "noopener noreferrer");
+    });
   }
 
   cancelLabelArrowTransition(): void {
@@ -414,6 +422,7 @@ export class OverlayRenderer {
     label.style.position = "absolute";
     label.style.left = `${position.x}px`;
     label.style.top = `${position.y}px`;
+    this.prepareLabelLinks(label);
     return label;
   }
 

@@ -440,7 +440,9 @@
   overflow: hidden;
   text-align: center;
   color: white;
-  z-index: 107;
+  /* Above .enjoyhint_disable_events (1011) so label links can receive clicks;
+     non-link pixels stay click-through via pointer-events: none. */
+  z-index: 1012;
   font-size: 22px;
   font-family: "casino_handregular", "Arial";
   pointer-events: none;
@@ -450,6 +452,11 @@
     -moz-transform 400ms cubic-bezier(0.42, 0, 0.58, 1);
   transition: opacity 400ms cubic-bezier(0.42, 0, 0.58, 1),
     transform 400ms cubic-bezier(0.42, 0, 0.58, 1);
+}
+
+.enjoy_hint_label a {
+  pointer-events: all;
+  cursor: pointer;
 }
 
 @media (max-width : 640px){

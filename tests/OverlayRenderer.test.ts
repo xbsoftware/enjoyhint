@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { OverlayRenderer } from "../src/overlay/OverlayRenderer";
 
@@ -1070,5 +1072,73 @@ describe("OverlayRenderer", () => {
 
       renderer.destroy();
     });
+  });
+
+  it("allows pointer events on label anchors while the label stays non-interactive", () => {
+    const css = readFileSync(resolve(__dirname, "../src/jquery.enjoyhint.css"), "utf8");
+
+    expect(css).toMatch(/\.enjoy_hint_label\s*\{[^}]*pointer-events:\s*none/s);
+    expect(css).toMatch(/\.enjoy_hint_label\s*\{[^}]*z-index:\s*1012/s);
+    expect(css).toMatch(/\.enjoy_hint_label\s+a\s*\{[^}]*pointer-events:\s*all/s);
+    expect(css).toMatch(/\.enjoy_hint_label\s+a\s*\{[^}]*cursor:\s*pointer/s);
+  });
+
+  it("makes description links open in a new tab via renderLabel", () => {
+    const renderer = new OverlayRenderer();
+    renderer.mount();
+
+    const label = renderer.renderLabel(
+      'See <a href="https://example.com/docs" target="_self" rel="nofollow">docs</a>',
+      { x: 10, y: 20 },
+    );
+    const anchor = label.querySelector("a");
+
+    expect(anchor?.getAttribute("href")).toBe("https://example.com/docs");
+    expect(anchor?.getAttribute("target")).toBe("_blank");
+    expect(anchor?.getAttribute("rel")).toBe("noopener noreferrer");
+
+    renderer.destroy();
+  });
+
+  it("prepares links when scheduleLabelPresentation mounts the label", () => {
+    vi.useFakeTimers();
+    const renderer = new OverlayRenderer();
+    renderer.mount();
+
+    renderer.scheduleLabelPresentation(
+      'Read <a href="https://example.com/help">help</a>',
+      { x: 10, y: 20 },
+    );
+
+    expect(document.querySelector(".enjoy_hint_label")).toBeNull();
+
+    vi.advanceTimersByTime(400);
+
+    const anchor = document.querySelector<HTMLAnchorElement>(".enjoy_hint_label a");
+    expect(anchor?.getAttribute("href")).toBe("https://example.com/help");
+    expect(anchor?.getAttribute("target")).toBe("_blank");
+    expect(anchor?.getAttribute("rel")).toBe("noopener noreferrer");
+
+    renderer.destroy();
+    vi.useRealTimers();
+  });
+
+  it("prepares every href anchor in the label", () => {
+    const renderer = new OverlayRenderer();
+    renderer.mount();
+
+    const label = renderer.renderLabel(
+      '<a href="https://a.example">A</a> and <a href="https://b.example">B</a>',
+      { x: 0, y: 0 },
+    );
+    const anchors = label.querySelectorAll("a");
+
+    expect(anchors).toHaveLength(2);
+    for (const anchor of anchors) {
+      expect(anchor.getAttribute("target")).toBe("_blank");
+      expect(anchor.getAttribute("rel")).toBe("noopener noreferrer");
+    }
+
+    renderer.destroy();
   });
 });

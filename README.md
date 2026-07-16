@@ -97,6 +97,7 @@ var enjoyhint_script_steps = [
 #### Properties of the step configuration
 * `"event selector" : "description"` - to describe a step you should set an event type, selecte element and add description for this element (hint)
 * `selector` / `event` / `description` - object-form fields for the same step data. Omit `selector` for a **targetless** step (see below).
+* `description` may include HTML. Links written as `<a href="...">...</a>` are clickable and always open in a new tab; the rest of the label still lets clicks pass through to the highlighted element.
 * `arrowColor` - the color of a marker that accepts all CSS colors.
 * `keyCode` - the code of a button, which triggers the next EnjoyHint step upon a click. Defined by the “key” event. (“key #block” : “hello”).
 * `event_selector` - if you need to attach an event (that was set in "event" property) to other selector, you can use this one  

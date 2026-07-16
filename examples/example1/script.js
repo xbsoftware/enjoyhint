@@ -101,6 +101,14 @@ var enjoyhint_script_steps = [
         arrowColor: "#e74c3c"
     },
     {
+        event: "next",
+        event_type: "next",
+        description:
+            "Descriptions can include clickable HTML links.<br>" +
+            'Try <a href="https://github.com/xbsoftware/enjoyhint">EnjoyHint on GitHub</a> — links open in a new tab.<br>' +
+            "Click Next to continue."
+    },
+    {
         "next #pr_btm" : "Use <text style='color: #00ebe7'>margin</text> to enlarge rectangular highlights around small targets.",
         margin: 30
     },
