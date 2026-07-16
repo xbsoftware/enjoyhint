@@ -142,6 +142,23 @@ var enjoyhint_script_steps = [
 
 You can also use `event_type: "custom"` with `trigger()`, or `event: "key"` with `keyCode` (listened on `document`). Shape / margin / arrow options are ignored on targetless steps. A non-empty `selector` whose element is missing still ends the tour.
 
+#### RTL support (`dir` option)
+Pass `dir: "rtl"` (or `"ltr"`, the default) when creating the EnjoyHint instance. This controls tour chrome direction independently of the host page, so RTL pages no longer break overlay layout, and RTL tours can mirror chrome without moving the spotlight off the real target.
+
+```javascript
+var enjoyhint_instance = new EnjoyHint({
+  dir: "rtl"
+});
+```
+
+With `dir: "rtl"`, EnjoyHint mirrors:
+* Close button — top-left instead of top-right
+* Nav button row — Skip → Next → Prev (horizontal mirror of Prev → Next → Skip)
+* Label hide slide — off the right edge instead of the left
+* Label text flow — right-to-left
+
+Spotlight shape/position, event blockers, arrow endpoints, and step shape offsets (`left` / `right` / `top` / `bottom` / `margin`) stay tied to physical element coordinates in both modes. `dir` is tour-wide and set only at construction; EnjoyHint does not auto-detect the page’s `dir` or `lang`.
+
 #### Non-standard events:
 * `auto` - for example, you need to click on the same button on the second step imediatelly after the first step and go to the next step after it. Then you can use "auto" in the "event_type" property and "click" in "event" property.
 * `custom` - this value is very usefull if you need to go to the next step by event in your app code. For example, you want to go to the next step only after some data have been loaded in your application. Then you should use the "custom" event_type and the "trigger" method of the EnjoyHint instance.  
