@@ -57,4 +57,27 @@ describe("normalizeStep", () => {
 
     expect(step.eventSelector).toBe("#y");
   });
+
+  it("keeps selector empty for object-form steps without selector", () => {
+    const step = normalizeStep({
+      event: "next",
+      description: "Welcome with no target",
+    });
+
+    expect(step.selector).toBe("");
+    expect(step.event).toBe("next");
+    expect(step.eventType).toBeUndefined();
+    expect(step.description).toBe("Welcome with no target");
+  });
+
+  it("sets eventType next when provided explicitly without selector", () => {
+    const step = normalizeStep({
+      event: "next",
+      event_type: "next",
+      description: "Welcome",
+    });
+
+    expect(step.selector).toBe("");
+    expect(step.eventType).toBe("next");
+  });
 });

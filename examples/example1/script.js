@@ -18,6 +18,13 @@ var enjoyhint_instance = new EnjoyHint({
 //hide EnjoyHint after a click on the button.
 var enjoyhint_script_steps = [
     {
+        event: "next",
+        event_type: "next",
+        description:
+            "A step can omit <text style='color: #00ebe7'>selector</text> to show centered text with no spotlight.<br>" +
+            "Click Next to begin the tour."
+    },
+    {
         "next #banner": 'Hello, I\'d like to tell you about EnjoyHint.<br> Click "Next" to proceed.'
     },
     {

@@ -96,6 +96,7 @@ var enjoyhint_script_steps = [
 
 #### Properties of the step configuration
 * `"event selector" : "description"` - to describe a step you should set an event type, selecte element and add description for this element (hint)
+* `selector` / `event` / `description` - object-form fields for the same step data. Omit `selector` for a **targetless** step (see below).
 * `arrowColor` - the color of a marker that accepts all CSS colors.
 * `keyCode` - the code of a button, which triggers the next EnjoyHint step upon a click. Defined by the “key” event. (“key #block” : “hello”).
 * `event_selector` - if you need to attach an event (that was set in "event" property) to other selector, you can use this one  
@@ -123,8 +124,23 @@ var enjoyhint_script_steps = [
 * `showNext` - shows or hides the Next button (true|false)
 * `showPrev` - shows or hides the Previous button (true|false)
 
+#### Targetless steps (no selector / no spotlight)
+Omit `selector` to show a full-screen dim with centered description text and the usual Next / Prev / Skip / Close buttons — no spotlight hole and no arrow. Use the object form (shorthand keys like `"next #banner"` always imply a selector):
 
+```javascript
+var enjoyhint_script_steps = [
+  {
+    event: "next",
+    event_type: "next",
+    description: "Welcome. Click Next to begin."
+  },
+  {
+    "click .new_btn": "Click the New button"
+  }
+];
+```
 
+You can also use `event_type: "custom"` with `trigger()`, or `event: "key"` with `keyCode` (listened on `document`). Shape / margin / arrow options are ignored on targetless steps. A non-empty `selector` whose element is missing still ends the tour.
 
 #### Non-standard events:
 * `auto` - for example, you need to click on the same button on the second step imediatelly after the first step and go to the next step after it. Then you can use "auto" in the "event_type" property and "click" in "event" property.

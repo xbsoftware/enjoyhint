@@ -34,24 +34,29 @@ test.describe("example1 browser e2e", () => {
     await openExample1(page);
     await startExample1Tour(page);
 
-    await waitForStepPresentation(page, "EnjoyHint");
+    await waitForStepPresentation(page, "omit");
     expect(await getExample1Step(page)).toBe(0);
+    expect(await readSpotlightHoleWidth(page)).toBe(0);
     await clickEnjoyHintNext(page);
 
-    await waitForStepPresentation(page, "select different blocks");
+    await waitForStepPresentation(page, "EnjoyHint");
     expect(await getExample1Step(page)).toBe(1);
     await clickEnjoyHintNext(page);
 
-    await waitForStepPresentation(page, "handler for a button click");
+    await waitForStepPresentation(page, "select different blocks");
     expect(await getExample1Step(page)).toBe(2);
+    await clickEnjoyHintNext(page);
+
+    await waitForStepPresentation(page, "handler for a button click");
+    expect(await getExample1Step(page)).toBe(3);
     await page.locator("#buttons_ex a.btn-success").first().click();
 
     await waitForStepPresentation(page, "highlight blocks");
-    expect(await getExample1Step(page)).toBe(3);
+    expect(await getExample1Step(page)).toBe(4);
     await clickEnjoyHintNext(page);
 
     await waitForStepPresentation(page, "fix radius");
-    expect(await getExample1Step(page)).toBe(4);
+    expect(await getExample1Step(page)).toBe(5);
     await clickEnjoyHintNext(page);
 
     await waitForStepPresentation(
@@ -59,48 +64,48 @@ test.describe("example1 browser e2e", () => {
       "scroll the page",
       getLegacyScrollStepLabelDelay() + 2000,
     );
-    expect(await getExample1Step(page)).toBe(5);
+    expect(await getExample1Step(page)).toBe(6);
     await clickEnjoyHintNext(page);
 
     await waitForStepPresentation(page, "keyboard events");
-    expect(await getExample1Step(page)).toBe(6);
+    expect(await getExample1Step(page)).toBe(7);
     await page.locator("#inputSuccess").press("Enter");
 
     await waitForStepPresentation(page, "Previous");
-    expect(await getExample1Step(page)).toBe(7);
-    await clickEnjoyHintNext(page);
-
-    await waitForStepPresentation(page, "customized per step");
     expect(await getExample1Step(page)).toBe(8);
     await clickEnjoyHintNext(page);
 
-    await waitForStepPresentation(page, "arrow color");
+    await waitForStepPresentation(page, "customized per step");
     expect(await getExample1Step(page)).toBe(9);
     await clickEnjoyHintNext(page);
 
-    await waitForStepPresentation(page, "margin");
+    await waitForStepPresentation(page, "arrow color");
     expect(await getExample1Step(page)).toBe(10);
+    await clickEnjoyHintNext(page);
+
+    await waitForStepPresentation(page, "margin");
+    expect(await getExample1Step(page)).toBe(11);
     await clickEnjoyHintNext(page);
 
     await expect(page.locator("#change_checkbox")).toBeChecked({ timeout: 3000 });
     await waitForStepPresentation(page, "custom", 2000);
-    expect(await getExample1Step(page)).toBe(12);
+    expect(await getExample1Step(page)).toBe(13);
     await page.locator("#def_but").click();
 
     await waitForStepPresentation(page, "wait before rendering", 2000);
-    expect(await getExample1Step(page)).toBe(13);
+    expect(await getExample1Step(page)).toBe(14);
     await clickEnjoyHintNext(page);
 
     await waitForStepPresentation(page, "event_selector");
-    expect(await getExample1Step(page)).toBe(14);
+    expect(await getExample1Step(page)).toBe(15);
     await page.locator("#buttons_ex a.btn-success").first().click();
 
     await waitForStepPresentation(page, "iframes");
-    expect(await getExample1Step(page)).toBe(15);
+    expect(await getExample1Step(page)).toBe(16);
     await clickEnjoyHintNext(page);
 
     await waitForStepPresentation(page, "showNext");
-    expect(await getExample1Step(page)).toBe(16);
+    expect(await getExample1Step(page)).toBe(17);
     await clickEnjoyHintNext(page);
 
     await expect(page.locator(".enjoyhint")).toHaveCount(0, { timeout: 5000 });

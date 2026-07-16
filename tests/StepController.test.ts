@@ -379,6 +379,26 @@ describe("StepController", () => {
     expect(document.querySelector("#enjoyhint_arrpw_line")).not.toBeNull();
   });
 
+  it("immediately clears the arrow and spotlight when advancing to a targetless step", () => {
+    addTarget("first");
+    const controller = new StepController([
+      makeStep({ selector: ".first", event: "next", eventType: "next" }),
+      makeStep({ selector: "", event: "next", eventType: "next" }),
+    ]);
+
+    controller.run();
+    advanceStepPresentation();
+    expect(document.querySelector("#enjoyhint_arrpw_line")).not.toBeNull();
+
+    controller.trigger("next");
+    advanceStepRender();
+
+    expect(document.querySelector("#enjoyhint_arrpw_line")).toBeNull();
+    const hole = document.querySelector<SVGRectElement>("rect[data-enjoyhint-spotlight-hole]");
+    expect(Number(hole?.getAttribute("width"))).toBe(0);
+    expect(Number(hole?.getAttribute("height"))).toBe(0);
+  });
+
   it("clears the previous step presentation and collapses spotlight before scrolling", () => {
     addTarget("first");
     const second = addTarget("second");
@@ -441,6 +461,145 @@ describe("StepController", () => {
     expect(holeRight - holeLeft).toBe(160);
     expect(holeBottom - holeTop).toBe(160);
     expect(document.querySelector("canvas")).toBeNull();
+  });
+
+  it("renders a targetless next step with no spotlight hole and centered label", () => {
+    const onEnd = vi.fn();
+    const controller = new StepController(
+      [
+        makeStep({
+          selector: "",
+          event: "next",
+          eventType: "next",
+          description: "Targetless welcome",
+        }),
+      ],
+      { onEnd },
+    );
+
+    controller.run();
+    advanceStepPresentation();
+
+    expect(onEnd).not.toHaveBeenCalled();
+    expect(controller.getCurrentStep()).toBe(0);
+
+    const label = document.querySelector<HTMLElement>("#enjoyhint_label");
+    expect(label).toBeTruthy();
+    expect(label?.textContent).toContain("Targetless welcome");
+    expect(label?.style.backgroundColor).not.toBe("rgb(39, 42, 38)");
+
+    const viewportW = window.innerWidth || document.documentElement.clientWidth;
+    const viewportH = window.innerHeight || document.documentElement.clientHeight;
+    const labelLeft = Number.parseFloat(label!.style.left);
+    const labelTop = Number.parseFloat(label!.style.top);
+    expect(labelLeft).toBeGreaterThan(viewportW * 0.1);
+    expect(labelLeft).toBeLessThan(viewportW * 0.9);
+    expect(labelTop).toBeGreaterThan(viewportH * 0.1);
+    expect(labelTop).toBeLessThan(viewportH * 0.9);
+
+    const hole = document.querySelector("rect[data-enjoyhint-spotlight-hole]");
+    const holeW = Number(hole?.getAttribute("width") ?? "-1");
+    const holeH = Number(hole?.getAttribute("height") ?? "-1");
+    expect(holeW).toBe(0);
+    expect(holeH).toBe(0);
+
+    expect(document.querySelector("#enjoyhint_arrpw_line")).toBeNull();
+    expect(document.querySelector(".enjoyhint_next_btn")).toBeTruthy();
+  });
+
+  it("advances a targetless next step via Next trigger", () => {
+    addTarget();
+    const controller = new StepController([
+      makeStep({
+        selector: "",
+        event: "next",
+        eventType: "next",
+        description: "Intro",
+      }),
+      makeStep({ event: "next", eventType: "next", description: "Click me" }),
+    ]);
+
+    controller.run();
+    advanceStepPresentation();
+    expect(controller.getCurrentStep()).toBe(0);
+
+    controller.trigger("next");
+    advanceStepPresentation();
+    expect(controller.getCurrentStep()).toBe(1);
+  });
+
+  it("advances a targetless custom step on matching trigger", () => {
+    const controller = new StepController([
+      makeStep({
+        selector: "",
+        event: "proceed",
+        eventType: "custom",
+        description: "Wait for trigger",
+      }),
+      makeStep({
+        selector: "",
+        event: "next",
+        eventType: "next",
+        description: "After",
+      }),
+    ]);
+
+    controller.run();
+    advanceStepPresentation();
+    controller.trigger("other");
+    expect(controller.getCurrentStep()).toBe(0);
+
+    controller.trigger("proceed");
+    advanceStepPresentation();
+    expect(controller.getCurrentStep()).toBe(1);
+  });
+
+  it("advances a targetless key step on document keydown", () => {
+    const controller = new StepController([
+      makeStep({
+        selector: "",
+        event: "key",
+        keyCode: 13,
+        description: "Press enter",
+      }),
+    ]);
+
+    controller.run();
+    advanceStepPresentation();
+
+    document.dispatchEvent(new KeyboardEvent("keydown", { keyCode: 27 }));
+    expect(controller.getCurrentStep()).toBe(0);
+
+    document.dispatchEvent(new KeyboardEvent("keydown", { keyCode: 13 }));
+    expect(controller.getCurrentStep()).toBe(1);
+  });
+
+  it("does not auto-advance a targetless auto step", () => {
+    const controller = new StepController([
+      makeStep({
+        selector: "",
+        event: "click",
+        eventType: "auto",
+        description: "Should stay",
+      }),
+    ]);
+
+    controller.run();
+    advanceStepPresentation();
+    expect(controller.getCurrentStep()).toBe(0);
+  });
+
+  it("still finishes when a non-empty selector is missing", () => {
+    const onEnd = vi.fn();
+    const controller = new StepController(
+      [makeStep({ selector: ".does-not-exist", event: "next", eventType: "next" })],
+      { onEnd },
+    );
+
+    controller.run();
+    advanceStepRender();
+
+    expect(onEnd).toHaveBeenCalled();
   });
 
   describe("label overlap toggle", () => {

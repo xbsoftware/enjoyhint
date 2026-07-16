@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { goToExample1Step, openExample1 } from "./example1.helpers";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const rootDir = join(__dirname, "../..");
@@ -62,9 +63,12 @@ test.describe("label overlap toggle e2e", () => {
     page,
   }) => {
     await page.setViewportSize({ width: 1280, height: 800 });
-    const url = pathToFileURL(join(rootDir, "examples/example1.html")).href;
-    await page.goto(url);
+    await openExample1(page);
+    await goToExample1Step(page, 1);
     await page.waitForSelector(".enjoy_hint_label", { timeout: 10000 });
+    await page.waitForFunction(() => !!document.querySelector("#enjoyhint_arrpw_line"), {
+      timeout: 10000,
+    });
     await page.waitForTimeout(600);
 
     const info = await page.evaluate(() => {

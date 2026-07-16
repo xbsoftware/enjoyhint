@@ -13,6 +13,7 @@ import {
   LEGACY_DEFAULT_SCROLL_SPEED_MS,
   getLegacyStepRenderDelay,
 } from "./stepTiming";
+import { LEGACY_COLLAPSED_SPOTLIGHT_STATE } from "./overlay/SvgMaskSpotlight";
 import type { SpotlightRect, TextDirection } from "./types";
 import type { EnjoyHintOptions, NormalizedStep } from "./types";
 
@@ -148,6 +149,18 @@ export class StepController {
         return;
       }
 
+      if (!step.selector) {
+        this.scheduleStepTimeout(() => {
+          if (!this.isCurrentStepToken(token)) {
+            return;
+          }
+
+          this.renderTargetlessOverlay(step);
+          this.bindStepEvents(step, null);
+        }, getLegacyStepRenderDelay(LEGACY_DEFAULT_SCROLL_SPEED_MS));
+        return;
+      }
+
       const target = this.dom.query(step.selector);
       if (!target) {
         this.finish();
@@ -215,6 +228,70 @@ export class StepController {
     );
     this.renderButtons(step);
     this.renderLabel(step, spotlight, options);
+  }
+
+  private renderTargetlessOverlay(
+    step: NormalizedStep,
+    options: { immediate?: boolean } = {},
+  ): void {
+    const viewport = {
+      width: window.innerWidth || document.documentElement.clientWidth,
+      height: window.innerHeight || document.documentElement.clientHeight,
+    };
+
+    this.renderer.mount();
+    this.renderer.setStepClass(this.currentStep + 1);
+    this.renderer.show();
+    this.renderer.clearStepPresentation();
+    this.renderer.renderSpotlight(
+      {
+        shape: "rect",
+        x: LEGACY_COLLAPSED_SPOTLIGHT_STATE.centerX,
+        y: LEGACY_COLLAPSED_SPOTLIGHT_STATE.centerY,
+        width: LEGACY_COLLAPSED_SPOTLIGHT_STATE.width,
+        height: LEGACY_COLLAPSED_SPOTLIGHT_STATE.height,
+        radius: LEGACY_COLLAPSED_SPOTLIGHT_STATE.radius,
+      },
+      { ...options, immediate: true },
+    );
+
+    this.renderButtons(step);
+
+    const { width: labelWidth, height: labelHeight } = this.renderer.measureLabel(
+      step.description,
+    );
+    const labelX = Math.round((viewport.width - labelWidth) / 2);
+    const labelY = Math.round((viewport.height - labelHeight) / 2);
+
+    this.renderer.scheduleLabelPresentation(
+      step.description,
+      { x: labelX, y: labelY },
+      { oversized: false },
+    );
+
+    this.scheduleStepTimeout(() => {
+      this.renderer.positionButtons({
+        labelX,
+        labelY,
+        labelWidth,
+        labelHeight,
+        xFrom: labelX + labelWidth / 2,
+        yFrom: labelY + labelHeight,
+        xTo: labelX + labelWidth / 2,
+        yTo: labelY + labelHeight,
+        viewportWidth: viewport.width,
+        viewportHeight: viewport.height,
+      });
+
+      this.renderer.configureLabelOverlapToggle({
+        overlaps: false,
+        anchorX: 0,
+        anchorY: 0,
+        labelLeft: 0,
+        labelWidth: 0,
+        resetHidden: !options.immediate,
+      });
+    }, 0);
   }
 
   private renderLabel(
@@ -410,7 +487,7 @@ export class StepController {
     this.renderer.configurePrevButton(step.prevButton, "Previous");
     this.renderer.configureSkipButton(step.skipButton, this.callbacks.btnSkipText ?? "Skip");
 
-    if (step.eventType === "next" || step.showNext === true) {
+    if (step.event === "next" || step.eventType === "next" || step.showNext === true) {
       this.renderer.showNext();
     } else {
       this.renderer.hideNext();
@@ -429,8 +506,12 @@ export class StepController {
     }
   }
 
-  private bindStepEvents(step: NormalizedStep, target: Element): void {
+  private bindStepEvents(step: NormalizedStep, target: Element | null): void {
     if (step.eventType === "auto") {
+      if (!target) {
+        return;
+      }
+
       if (step.event === "click" && target instanceof HTMLElement) {
         target.click();
       } else {
@@ -446,12 +527,7 @@ export class StepController {
       return;
     }
 
-    if (step.eventType === "next") {
-      return;
-    }
-
-    const eventTarget = step.eventSelector ? this.dom.query(step.eventSelector) : target;
-    if (!eventTarget) {
+    if (step.eventType === "next" || step.event === "next") {
       return;
     }
 
@@ -463,6 +539,16 @@ export class StepController {
 
       this.next();
     };
+
+    if (!target) {
+      this.stepDisposers.push(this.dom.addDocumentEvent(eventName, handler));
+      return;
+    }
+
+    const eventTarget = step.eventSelector ? this.dom.query(step.eventSelector) : target;
+    if (!eventTarget) {
+      return;
+    }
 
     this.stepDisposers.push(this.dom.addEvent(eventTarget, eventName, handler));
   }
@@ -553,6 +639,11 @@ export class StepController {
   private refreshCurrentStep(): void {
     const step = this.steps[this.currentStep];
     if (!step) {
+      return;
+    }
+
+    if (!step.selector) {
+      this.renderTargetlessOverlay(step, { immediate: true });
       return;
     }
 

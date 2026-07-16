@@ -8,19 +8,20 @@ import {
 import { LEGACY_SPOTLIGHT_ANIMATION_DURATION_MS } from "../../src/overlay/SvgMaskSpotlight";
 
 export const EXAMPLE1_SCROLL_STEP_SPEED_MS = 2500;
-export const EXAMPLE1_LARGE_CIRCLE_STEP = 4;
-export const EXAMPLE1_SCROLL_STEP = 5;
-export const EXAMPLE1_PREV_STEP = 7;
-export const EXAMPLE1_CUSTOM_BUTTONS_STEP = 8;
-export const EXAMPLE1_ARROW_COLOR_STEP = 9;
-export const EXAMPLE1_MARGIN_STEP = 10;
-export const EXAMPLE1_AUTO_STEP = 11;
-export const EXAMPLE1_CUSTOM_EVENT_STEP = 12;
-export const EXAMPLE1_TIMEOUT_STEP = 13;
-export const EXAMPLE1_EVENT_SELECTOR_STEP = 14;
-export const EXAMPLE1_IFRAME_STEP = 15;
-export const EXAMPLE1_SHOW_NEXT_STEP = 16;
-export const EXAMPLE1_TOTAL_STEPS = 17;
+export const EXAMPLE1_TARGETLESS_STEP = 0;
+export const EXAMPLE1_LARGE_CIRCLE_STEP = 5;
+export const EXAMPLE1_SCROLL_STEP = 6;
+export const EXAMPLE1_PREV_STEP = 8;
+export const EXAMPLE1_CUSTOM_BUTTONS_STEP = 9;
+export const EXAMPLE1_ARROW_COLOR_STEP = 10;
+export const EXAMPLE1_MARGIN_STEP = 11;
+export const EXAMPLE1_AUTO_STEP = 12;
+export const EXAMPLE1_CUSTOM_EVENT_STEP = 13;
+export const EXAMPLE1_TIMEOUT_STEP = 14;
+export const EXAMPLE1_EVENT_SELECTOR_STEP = 15;
+export const EXAMPLE1_IFRAME_STEP = 16;
+export const EXAMPLE1_SHOW_NEXT_STEP = 17;
+export const EXAMPLE1_TOTAL_STEPS = 18;
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 export const rootDir = join(__dirname, "../..");
