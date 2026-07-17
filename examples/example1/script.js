@@ -143,6 +143,26 @@ var enjoyhint_script_steps = [
         showNext: true
     },
     {
+        event: "next",
+        event_type: "next",
+        description:
+            "Return <text style='color: #00ebe7'>false</text> from <text style='color: #00ebe7'>onBeforeStart</text> to skip a step without rendering it.<br>" +
+            "The next step targets a hidden element and returns <text style='color: #00ebe7'>false</text> — you will never see it.<br>" +
+            "Click Next to continue."
+    },
+    {
+        selector: "#skip-demo-hidden",
+        event: "next",
+        event_type: "next",
+        description: "This step is skipped — you should not see this text.",
+        onBeforeStart: function () {
+            var target = document.querySelector("#skip-demo-hidden");
+            if (!target || target.hidden || target.getAttribute("aria-hidden") === "true") {
+                return false;
+            }
+        }
+    },
+    {
         "click .alert-success strong" : "Set <text style='color: #00ebe7'>showNext: true</text> on click steps so users can click Next instead of the target.<br>" +
             "Click the alert text or Next to finish.",
         showNext: true,

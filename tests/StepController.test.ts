@@ -169,6 +169,110 @@ describe("StepController", () => {
     expect(document.querySelector(".enjoyhint")).toBeInstanceOf(HTMLElement);
   });
 
+  it("skips a step when onBeforeStart returns false without rendering it", () => {
+    addTarget("first");
+    addTarget("second");
+    const onNext = vi.fn();
+    const controller = new StepController(
+      [
+        makeStep({
+          selector: ".first",
+          event: "next",
+          eventType: "next",
+          description: "Skip me",
+          onBeforeStart: () => false,
+        }),
+        makeStep({
+          selector: ".second",
+          event: "next",
+          eventType: "next",
+          description: "Keep me",
+        }),
+      ],
+      { onNext },
+    );
+
+    controller.run();
+    advanceStepPresentation();
+
+    expect(controller.getCurrentStep()).toBe(1);
+    expect(onNext).toHaveBeenCalledTimes(1);
+    expect(document.querySelector(".enjoy_hint_label")?.textContent).toBe("Keep me");
+  });
+
+  it("chain-skips consecutive steps that return false from onBeforeStart", () => {
+    addTarget("first");
+    addTarget("second");
+    addTarget("third");
+    const onNext = vi.fn();
+    const controller = new StepController(
+      [
+        makeStep({
+          selector: ".first",
+          event: "next",
+          eventType: "next",
+          onBeforeStart: () => false,
+        }),
+        makeStep({
+          selector: ".second",
+          event: "next",
+          eventType: "next",
+          onBeforeStart: () => false,
+        }),
+        makeStep({
+          selector: ".third",
+          event: "next",
+          eventType: "next",
+          description: "Land here",
+        }),
+      ],
+      { onNext },
+    );
+
+    controller.run();
+    advanceStepPresentation();
+
+    expect(controller.getCurrentStep()).toBe(2);
+    expect(onNext).toHaveBeenCalledTimes(1);
+    expect(document.querySelector(".enjoy_hint_label")?.textContent).toBe("Land here");
+  });
+
+  it("finishes the tour when onBeforeStart returns false on the last remaining step", () => {
+    addTarget();
+    const onNext = vi.fn();
+    const onEnd = vi.fn();
+    const controller = new StepController(
+      [
+        makeStep({
+          event: "next",
+          eventType: "next",
+          onBeforeStart: () => false,
+        }),
+      ],
+      { onNext, onEnd },
+    );
+
+    controller.run();
+
+    expect(onNext).not.toHaveBeenCalled();
+    expect(onEnd).toHaveBeenCalledTimes(1);
+    expect(document.querySelector(".enjoyhint")).toBeNull();
+  });
+
+  it("still renders the step when onBeforeStart returns undefined", () => {
+    addTarget();
+    const onBeforeStart = vi.fn(() => undefined);
+    const controller = new StepController([
+      makeStep({ event: "next", eventType: "next", onBeforeStart }),
+    ]);
+
+    controller.run();
+    advanceStepRender();
+
+    expect(onBeforeStart).toHaveBeenCalledTimes(1);
+    expect(document.querySelector(".enjoyhint")).toBeInstanceOf(HTMLElement);
+  });
+
   it("stops on skip, calls callbacks, removes overlay, and restores body overflow", () => {
     addTarget();
     document.body.style.overflow = "auto";

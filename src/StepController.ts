@@ -141,8 +141,13 @@ export class StepController {
       return;
     }
 
+    if (step.onBeforeStart?.() === false) {
+      this.currentStep += 1;
+      this.renderStep();
+      return;
+    }
+
     this.callbacks.onNext();
-    step.onBeforeStart?.();
 
     const scheduleStep = () => {
       if (!this.isCurrentStepToken(token)) {

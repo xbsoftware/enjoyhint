@@ -194,7 +194,7 @@ var enjoyhint_instance = new EnjoyHint({
 });
 ```
 **Step Events**:  
-* `onBeforeStart` - fires before the step is started.
+* `onBeforeStart` - fires before the step is started. Return `false` to skip the step without rendering and advance to the next one (consecutive skips chain). Tour `onNext` does not fire for skipped steps.
 ```javascript
 var enjoyhint_script_steps = [
   {
@@ -203,6 +203,7 @@ var enjoyhint_script_steps = [
     description:'Click on this btn',
     onBeforeStart:function(){
       //do something
+      // return false; // skip this step
     }
   }
 ];

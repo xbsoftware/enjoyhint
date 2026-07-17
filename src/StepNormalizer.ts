@@ -55,7 +55,7 @@ export function normalizeStep(raw: RawStep): NormalizedStep {
     step.skipButton = raw.skipButton as NormalizedStep["skipButton"];
   }
   if (typeof raw.onBeforeStart === "function") {
-    step.onBeforeStart = raw.onBeforeStart as () => void;
+    step.onBeforeStart = raw.onBeforeStart as () => void | false;
   }
 
   if (!step.selector) {

@@ -31,6 +31,15 @@ const example1ExtendedSteps = [
     showSkip: false,
   },
   {
+    selector: "#skip-demo-hidden",
+    event: "next",
+    event_type: "next",
+    description: "Skipped step",
+    onBeforeStart: function () {
+      return false;
+    },
+  },
+  {
     "click .alert-success strong": "Show next",
     showNext: true,
   },
@@ -40,7 +49,7 @@ describe("example1 extended steps", () => {
   it("normalizes the additional showcase step configs", () => {
     const steps = normalizeSteps(example1ExtendedSteps);
 
-    expect(steps).toHaveLength(9);
+    expect(steps).toHaveLength(10);
     expect(steps[0]?.eventType).toBe("next");
     expect(steps[1]?.nextButton?.text).toBe("Continue");
     expect(steps[2]?.arrowColor).toBe("#e74c3c");
@@ -55,6 +64,7 @@ describe("example1 extended steps", () => {
     expect(steps[6]?.timeout).toBe(500);
     expect(steps[7]?.eventSelector).toBe("#buttons_ex a.btn-success");
     expect(steps[7]?.showSkip).toBe(false);
-    expect(steps[8]?.showNext).toBe(true);
+    expect(steps[8]?.onBeforeStart?.()).toBe(false);
+    expect(steps[9]?.showNext).toBe(true);
   });
 });

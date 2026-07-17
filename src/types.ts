@@ -40,7 +40,7 @@ export interface NormalizedStep {
   nextButton?: ButtonConfig;
   prevButton?: ButtonConfig;
   skipButton?: ButtonConfig;
-  onBeforeStart?: () => void;
+  onBeforeStart?: () => void | false;
 }
 
 export interface SpotlightRect {
