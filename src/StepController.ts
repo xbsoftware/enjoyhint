@@ -16,6 +16,7 @@ import {
 import { LEGACY_COLLAPSED_SPOTLIGHT_STATE } from "./overlay/SvgMaskSpotlight";
 import type { SpotlightRect, TextDirection } from "./types";
 import type { EnjoyHintOptions, NormalizedStep } from "./types";
+import { mergeButtonConfig } from "./mergeButtonConfig";
 
 type Disposer = () => void;
 
@@ -488,9 +489,21 @@ export class StepController {
   }
 
   private renderButtons(step: NormalizedStep): void {
-    this.renderer.configureNextButton(step.nextButton, this.callbacks.btnNextText ?? "Next");
-    this.renderer.configurePrevButton(step.prevButton, "Previous");
-    this.renderer.configureSkipButton(step.skipButton, this.callbacks.btnSkipText ?? "Skip");
+    const next = mergeButtonConfig(
+      step.nextButton,
+      this.callbacks.nextButton,
+      this.callbacks.btnNextText,
+    );
+    const prev = mergeButtonConfig(step.prevButton, this.callbacks.prevButton);
+    const skip = mergeButtonConfig(
+      step.skipButton,
+      this.callbacks.skipButton,
+      this.callbacks.btnSkipText,
+    );
+
+    this.renderer.configureNextButton(next, "Next");
+    this.renderer.configurePrevButton(prev, "Previous");
+    this.renderer.configureSkipButton(skip, "Skip");
 
     if (step.event === "next" || step.eventType === "next" || step.showNext === true) {
       this.renderer.showNext();

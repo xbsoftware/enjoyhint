@@ -10,8 +10,13 @@ export interface EnjoyHintOptions {
   onEnd?: () => void;
   onSkip?: () => void;
   onNext?: () => void;
+  /** @deprecated Prefer `nextButton.text`. */
   btnNextText?: string;
+  /** @deprecated Prefer `skipButton.text`. */
   btnSkipText?: string;
+  nextButton?: ButtonConfig;
+  prevButton?: ButtonConfig;
+  skipButton?: ButtonConfig;
   backgroundColor?: string;
   /** Tour chrome direction. Independent of the host page. Default `"ltr"`. */
   dir?: TextDirection;

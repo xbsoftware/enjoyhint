@@ -611,6 +611,48 @@ describe("StepController", () => {
     expect(document.querySelector(".enjoyhint_next_btn")).toBeTruthy();
   });
 
+  it("applies init nextButton/skipButton/prevButton across steps and field-merges step overrides", () => {
+    addTarget();
+    const controller = new StepController(
+      [
+        makeStep({ event: "next", eventType: "next", description: "First" }),
+        makeStep({
+          event: "next",
+          eventType: "next",
+          description: "Second",
+          nextButton: { text: "OK" },
+        }),
+      ],
+      {
+        nextButton: { text: "Continue", className: "global-next" },
+        skipButton: { text: "Exit", className: "global-skip" },
+        prevButton: { text: "Back", className: "global-prev" },
+      },
+    );
+
+    controller.run();
+    advanceStepPresentation();
+
+    const next = document.querySelector<HTMLElement>(".enjoyhint_next_btn");
+    const skip = document.querySelector<HTMLElement>(".enjoyhint_skip_btn");
+    expect(next?.textContent).toBe("Continue");
+    expect(next?.classList.contains("global-next")).toBe(true);
+    expect(skip?.textContent).toBe("Exit");
+    expect(skip?.classList.contains("global-skip")).toBe(true);
+
+    controller.trigger("next");
+    advanceStepPresentation();
+
+    const next2 = document.querySelector<HTMLElement>(".enjoyhint_next_btn");
+    const prev = document.querySelector<HTMLElement>(".enjoyhint_prev_btn");
+    expect(next2?.textContent).toBe("OK");
+    expect(next2?.classList.contains("global-next")).toBe(true);
+    expect(prev?.textContent).toBe("Back");
+    expect(prev?.classList.contains("global-prev")).toBe(true);
+
+    controller.destroy();
+  });
+
   it("advances a targetless next step via Next trigger", () => {
     addTarget();
     const controller = new StepController([

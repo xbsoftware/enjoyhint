@@ -60,7 +60,12 @@ Highlighting targets inside Angular Material dialogs (`MD-DIALOG` / `dialogClosi
 #### Initialization and configuration:
 ```javascript
 //initialize instance
-var enjoyhint_instance = new EnjoyHint({});
+var enjoyhint_instance = new EnjoyHint({
+  // Optional global button defaults (applied to every step; per-step fields override)
+  nextButton: { text: "Continue", className: "my-next" },
+  skipButton: { text: "Exit", className: "my-skip" },
+  prevButton: { text: "Back", className: "my-prev" },
+});
 
 //simple config. 
 //Only one step - highlighting(with description) "New" button 
@@ -77,6 +82,12 @@ enjoyhint_instance.set(enjoyhint_script_steps);
 //run Enjoyhint script
 enjoyhint_instance.run();
 ```
+
+Initialization options also include:
+* `nextButton` / `prevButton` / `skipButton` — default `{ text, className }` for all steps. A step may override individual fields; missing fields fall through to these defaults.
+* `btnNextText` / `btnSkipText` — **deprecated.** Prefer `nextButton.text` / `skipButton.text`. Still honored when the corresponding button object does not set `text`.
+* `dir` — `"ltr"` (default) or `"rtl"` for tour chrome direction (see RTL support below).
+* `backgroundColor`, `onStart`, `onEnd`, `onSkip`, `onNext` — overlay color and tour lifecycle callbacks.
 
 #### Script Configuration
 The sequence of steps can be only linear for now. So, the script config is an array. Every element of this array is the config for some step.
@@ -110,9 +121,9 @@ var enjoyhint_script_steps = [
 * `bottom` - bottom margin for the shape of "rect" type  
 * `left` - left margin for the shape of "rect" type
 * `scrollAnimationSpeed` - sets the auto scroll speed (ms).
-* `nextButton` - allows applying its classes and names for the button Nеxt.
-* `skipButton` - allows applying its classes and names for the button Skip.
-* `prevButton` - allows applying its classes and names for the button Previous. For the example :
+* `nextButton` - allows applying its classes and names for the button Next (overrides init defaults field-by-field).
+* `skipButton` - allows applying its classes and names for the button Skip (overrides init defaults field-by-field).
+* `prevButton` - allows applying its classes and names for the button Previous (overrides init defaults field-by-field). For the example :
 ```javascript
 	var options = {
                     "next #block": 'Hello.',
