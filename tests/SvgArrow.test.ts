@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { SvgArrow } from "../src/overlay/SvgArrow";
+import { svgFragmentUrl } from "../src/overlay/svgFragmentUrl";
 
 function createSvg(): SVGSVGElement {
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -26,7 +27,7 @@ describe("SvgArrow", () => {
 
     const path = svg.querySelector<SVGPathElement>("#enjoyhint_arrpw_line");
     expect(path?.getAttribute("d")).toBe("M10,20 Q110,20 110,220");
-    expect(path?.getAttribute("marker-end")).toBe("url(#arrowMarker)");
+    expect(path?.getAttribute("marker-end")).toBe(svgFragmentUrl("arrowMarker"));
     expect(path?.getAttribute("style")).toBe("fill: none; stroke: rgb(255, 255, 255); stroke-width: 3;");
   });
 

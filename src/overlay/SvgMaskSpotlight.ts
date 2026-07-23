@@ -1,3 +1,5 @@
+import { svgFragmentUrl } from "./svgFragmentUrl";
+
 const SVG_NS = "http://www.w3.org/2000/svg";
 const MASK_ID_PREFIX = "enjoyhint-spotlight-mask";
 const SPOTLIGHT_HOLE_ATTR = "data-enjoyhint-spotlight-hole";
@@ -162,7 +164,7 @@ export class SvgMaskSpotlight {
     overlay.setAttribute("width", "100%");
     overlay.setAttribute("height", "100%");
     overlay.setAttribute("fill", this.fill);
-    overlay.setAttribute("mask", `url(#${this.maskId})`);
+    overlay.setAttribute("mask", svgFragmentUrl(this.maskId));
     overlay.setAttribute("pointer-events", "none");
 
     this.svg.append(overlay);

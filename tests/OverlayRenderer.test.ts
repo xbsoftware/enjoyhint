@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { OverlayRenderer } from "../src/overlay/OverlayRenderer";
+import { svgFragmentUrl } from "../src/overlay/svgFragmentUrl";
 
 describe("OverlayRenderer", () => {
   afterEach(() => {
@@ -119,7 +120,8 @@ describe("OverlayRenderer", () => {
     const mask = root?.querySelector("#kinetic_container svg mask[id^='enjoyhint-spotlight-mask-']");
     expect(mask).not.toBeNull();
     expect(root?.querySelector("svg mask rect[data-enjoyhint-spotlight-hole]")).not.toBeNull();
-    expect(root?.querySelector(`[mask="url(#${mask?.id})"]`)).not.toBeNull();
+    const overlay = root?.querySelector<SVGRectElement>("rect[mask]");
+    expect(overlay?.getAttribute("mask")).toBe(svgFragmentUrl(mask!.id));
 
     renderer.destroy();
   });
@@ -180,8 +182,10 @@ describe("OverlayRenderer", () => {
     const masks = document.querySelectorAll<SVGMaskElement>("#kinetic_container svg mask[id^='enjoyhint-spotlight-mask-']");
     expect(masks).toHaveLength(2);
     expect(masks[0]?.id).not.toBe(masks[1]?.id);
-    expect(firstContainer.querySelector(`[mask="url(#${masks[0]?.id})"]`)).not.toBeNull();
-    expect(secondContainer.querySelector(`[mask="url(#${masks[1]?.id})"]`)).not.toBeNull();
+    const firstOverlay = firstContainer.querySelector<SVGRectElement>("rect[mask]");
+    const secondOverlay = secondContainer.querySelector<SVGRectElement>("rect[mask]");
+    expect(firstOverlay?.getAttribute("mask")).toBe(svgFragmentUrl(masks[0]!.id));
+    expect(secondOverlay?.getAttribute("mask")).toBe(svgFragmentUrl(masks[1]!.id));
 
     firstRenderer.destroy();
     secondRenderer.destroy();
@@ -287,7 +291,9 @@ describe("OverlayRenderer", () => {
 
     const spotlightSvg = document.querySelector<SVGSVGElement>("#kinetic_container svg");
     const arrowSvg = document.querySelector<SVGSVGElement>(".enjoyhint_svg_wrapper svg.enjoyhint_svg");
-    const overlay = document.querySelector<SVGRectElement>("rect[mask^='url(#enjoyhint-spotlight-mask-']");
+    const overlay = [...document.querySelectorAll<SVGRectElement>("rect[mask]")].find((rect) =>
+      rect.getAttribute("mask")?.includes("enjoyhint-spotlight-mask-"),
+    );
 
     expect(spotlightSvg?.getAttribute("pointer-events")).toBe("none");
     expect(arrowSvg?.getAttribute("pointer-events")).toBe("none");

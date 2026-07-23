@@ -1,4 +1,5 @@
 import type { ArrowOrientation } from "./labelPlacement";
+import { svgFragmentUrl } from "./svgFragmentUrl";
 
 const SVG_NS = "http://www.w3.org/2000/svg";
 const ARROW_PATH_ID = "enjoyhint_arrpw_line";
@@ -32,7 +33,7 @@ export class SvgArrow {
 
     this.svg.querySelectorAll(`#${ARROW_PATH_ID}`).forEach((stalePath) => stalePath.remove());
     path.setAttribute("style", `fill: none; stroke: ${stroke}; stroke-width: 3;`);
-    path.setAttribute("marker-end", "url(#arrowMarker)");
+    path.setAttribute("marker-end", svgFragmentUrl("arrowMarker"));
     path.setAttribute("d", buildArrowPath({ xFrom, yFrom, xTo, yTo, byTopSide }));
     path.setAttribute("id", ARROW_PATH_ID);
     path.setAttribute("pointer-events", "none");

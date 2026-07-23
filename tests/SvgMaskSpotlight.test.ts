@@ -6,6 +6,7 @@ import {
   sampleSpotlightGeometry,
   toSpotlightHoleRect,
 } from "../src/overlay/SvgMaskSpotlight";
+import { svgFragmentUrl } from "../src/overlay/svgFragmentUrl";
 
 describe("SvgMaskSpotlight", () => {
   it("creates SVG mask with spotlight hole", () => {
@@ -17,7 +18,8 @@ describe("SvgMaskSpotlight", () => {
     const mask = svg.querySelector("mask[id^='enjoyhint-spotlight-mask-']");
     expect(mask).not.toBeNull();
     expect(svg.querySelector("mask rect[data-enjoyhint-spotlight-hole]")).not.toBeNull();
-    expect(svg.querySelector(`[mask="url(#${mask?.id})"]`)).not.toBeNull();
+    const overlay = svg.querySelector<SVGRectElement>("rect[mask]");
+    expect(overlay?.getAttribute("mask")).toBe(svgFragmentUrl(mask!.id));
   });
 
   it("updates a rounded rect spotlight hole", () => {
