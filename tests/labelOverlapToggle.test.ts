@@ -1,13 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
-  computeLabelHideOffsetPx,
-  computeOverlapArea,
-  computeToggleButtonPosition,
-  doesLabelOverlapSpotlight,
+  LabelOverlapToggleService,
   LABEL_HIDE_MARGIN_PX,
   LABEL_OVERLAP_AREA_THRESHOLD_PX2,
   LABEL_TOGGLE_BUTTON_SIZE_PX,
-} from "../src/overlay/labelOverlapToggle";
+} from "../src/overlay/LabelOverlapToggleService";
 
 describe("labelOverlapToggle", () => {
   describe("computeOverlapArea", () => {
@@ -15,21 +12,21 @@ describe("labelOverlapToggle", () => {
       const a = { top: 0, right: 10, bottom: 10, left: 0 };
       const b = { top: 20, right: 30, bottom: 30, left: 20 };
 
-      expect(computeOverlapArea(a, b)).toBe(0);
+      expect(LabelOverlapToggleService.computeOverlapArea(a, b)).toBe(0);
     });
 
     it("returns the intersection area for partially overlapping rects", () => {
       const a = { top: 0, right: 10, bottom: 10, left: 0 };
       const b = { top: 5, right: 15, bottom: 15, left: 5 };
 
-      expect(computeOverlapArea(a, b)).toBe(25);
+      expect(LabelOverlapToggleService.computeOverlapArea(a, b)).toBe(25);
     });
 
     it("returns the full area when one rect contains the other", () => {
       const outer = { top: 0, right: 100, bottom: 100, left: 0 };
       const inner = { top: 10, right: 20, bottom: 20, left: 10 };
 
-      expect(computeOverlapArea(outer, inner)).toBe(100);
+      expect(LabelOverlapToggleService.computeOverlapArea(outer, inner)).toBe(100);
     });
   });
 
@@ -38,7 +35,7 @@ describe("labelOverlapToggle", () => {
       const label = { top: 0, right: 10, bottom: 10, left: 0 };
       const spotlight = { top: 20, right: 30, bottom: 30, left: 20, centerX: 25, centerY: 25 };
 
-      expect(doesLabelOverlapSpotlight(label, spotlight)).toBe(false);
+      expect(LabelOverlapToggleService.doesLabelOverlapSpotlight(label, spotlight)).toBe(false);
     });
 
     it("returns false for an edge-touch overlap below the threshold", () => {
@@ -46,15 +43,15 @@ describe("labelOverlapToggle", () => {
       // Overlaps spotlight by a 1x1px sliver (area 1), far below the threshold.
       const spotlight = { top: 9, right: 20, bottom: 20, left: 9, centerX: 14, centerY: 14 };
 
-      expect(doesLabelOverlapSpotlight(label, spotlight)).toBe(false);
+      expect(LabelOverlapToggleService.doesLabelOverlapSpotlight(label, spotlight)).toBe(false);
     });
 
     it("returns true when overlap area exceeds the threshold", () => {
       const label = { top: 0, right: 100, bottom: 100, left: 0 };
       const spotlight = { top: 50, right: 150, bottom: 150, left: 50, centerX: 100, centerY: 100 };
 
-      expect(computeOverlapArea(label, spotlight)).toBeGreaterThan(LABEL_OVERLAP_AREA_THRESHOLD_PX2);
-      expect(doesLabelOverlapSpotlight(label, spotlight)).toBe(true);
+      expect(LabelOverlapToggleService.computeOverlapArea(label, spotlight)).toBeGreaterThan(LABEL_OVERLAP_AREA_THRESHOLD_PX2);
+      expect(LabelOverlapToggleService.doesLabelOverlapSpotlight(label, spotlight)).toBe(true);
     });
   });
 
@@ -68,7 +65,7 @@ describe("labelOverlapToggle", () => {
     it("anchors on the spotlight's right edge when the label is to the left", () => {
       const labelRect = { top: 100, right: 50, bottom: 200, left: 0 };
 
-      const position = computeToggleButtonPosition({ labelRect, spotlight, viewport });
+      const position = LabelOverlapToggleService.computeToggleButtonPosition({ labelRect, spotlight, viewport });
 
       expect(position).toEqual({ x: 230, y: 150 });
     });
@@ -76,7 +73,7 @@ describe("labelOverlapToggle", () => {
     it("anchors on the spotlight's left edge when the label is to the right", () => {
       const labelRect = { top: 100, right: 500, bottom: 200, left: 450 };
 
-      const position = computeToggleButtonPosition({ labelRect, spotlight, viewport });
+      const position = LabelOverlapToggleService.computeToggleButtonPosition({ labelRect, spotlight, viewport });
 
       expect(position).toEqual({ x: 70, y: 150 });
     });
@@ -84,7 +81,7 @@ describe("labelOverlapToggle", () => {
     it("anchors on the spotlight's bottom edge when the label is above", () => {
       const labelRect = { top: 0, right: 200, bottom: 50, left: 100 };
 
-      const position = computeToggleButtonPosition({ labelRect, spotlight, viewport });
+      const position = LabelOverlapToggleService.computeToggleButtonPosition({ labelRect, spotlight, viewport });
 
       expect(position).toEqual({ x: 150, y: 230 });
     });
@@ -92,7 +89,7 @@ describe("labelOverlapToggle", () => {
     it("anchors on the spotlight's top edge when the label is below", () => {
       const labelRect = { top: 350, right: 200, bottom: 400, left: 100 };
 
-      const position = computeToggleButtonPosition({ labelRect, spotlight, viewport });
+      const position = LabelOverlapToggleService.computeToggleButtonPosition({ labelRect, spotlight, viewport });
 
       expect(position).toEqual({ x: 150, y: 70 });
     });
@@ -100,7 +97,7 @@ describe("labelOverlapToggle", () => {
     it("supports a custom offset", () => {
       const labelRect = { top: 100, right: 50, bottom: 200, left: 0 };
 
-      const position = computeToggleButtonPosition({ labelRect, spotlight, viewport, offsetPx: 20 });
+      const position = LabelOverlapToggleService.computeToggleButtonPosition({ labelRect, spotlight, viewport, offsetPx: 20 });
 
       expect(position).toEqual({ x: 220, y: 150 });
     });
@@ -110,7 +107,7 @@ describe("labelOverlapToggle", () => {
       // but stops well above the spotlight's bottom edge.
       const labelRect = { top: 100, right: 260, bottom: 200, left: 0 };
 
-      const position = computeToggleButtonPosition({ labelRect, spotlight, viewport });
+      const position = LabelOverlapToggleService.computeToggleButtonPosition({ labelRect, spotlight, viewport });
 
       expect(position).toEqual({ x: 150, y: 230 });
     });
@@ -118,7 +115,7 @@ describe("labelOverlapToggle", () => {
     it("falls back to just outside the label when the label covers all four spotlight edges", () => {
       const labelRect = { top: 0, right: 260, bottom: 260, left: 0 };
 
-      const position = computeToggleButtonPosition({ labelRect, spotlight, viewport });
+      const position = LabelOverlapToggleService.computeToggleButtonPosition({ labelRect, spotlight, viewport });
 
       // Prefer the label's right edge (spotlight-right is covered by the label).
       expect(position).toEqual({ x: 290, y: 130 });
@@ -129,7 +126,7 @@ describe("labelOverlapToggle", () => {
         bottom: position.y + half,
         left: position.x - half,
       };
-      expect(computeOverlapArea(buttonRect, labelRect)).toBe(0);
+      expect(LabelOverlapToggleService.computeOverlapArea(buttonRect, labelRect)).toBe(0);
     });
 
     it("never lands in the top-right corner in ltr, which is reserved for the close button", () => {
@@ -140,7 +137,7 @@ describe("labelOverlapToggle", () => {
       const labelRect = { top: 40, right: 260, bottom: 260, left: 40 };
       const avoidRects = [{ top: 560, right: 800, bottom: 600, left: 0 }];
 
-      const position = computeToggleButtonPosition({ labelRect, spotlight, viewport, avoidRects, dir: "ltr" });
+      const position = LabelOverlapToggleService.computeToggleButtonPosition({ labelRect, spotlight, viewport, avoidRects, dir: "ltr" });
 
       expect(position.x).toBeLessThan(viewport.width - 40);
       // Confirm we did not pick the reserved top-right corner.
@@ -151,7 +148,7 @@ describe("labelOverlapToggle", () => {
       const labelRect = { top: 40, right: 260, bottom: 260, left: 40 };
       const avoidRects = [{ top: 560, right: 800, bottom: 600, left: 0 }];
 
-      const position = computeToggleButtonPosition({ labelRect, spotlight, viewport, avoidRects, dir: "rtl" });
+      const position = LabelOverlapToggleService.computeToggleButtonPosition({ labelRect, spotlight, viewport, avoidRects, dir: "rtl" });
 
       expect(position.x).toBeGreaterThan(40);
     });
@@ -159,13 +156,13 @@ describe("labelOverlapToggle", () => {
     it("avoids extra rects such as the next/prev/skip button row", () => {
       const avoidRects = [{ top: 130, right: 260, bottom: 170, left: 200 }];
 
-      const position = computeToggleButtonPosition({ labelRect: tinyLabel, spotlight, viewport, avoidRects });
+      const position = LabelOverlapToggleService.computeToggleButtonPosition({ labelRect: tinyLabel, spotlight, viewport, avoidRects });
 
       expect(position).toEqual({ x: 70, y: 150 });
     });
 
     it("supports a custom button size", () => {
-      const position = computeToggleButtonPosition({
+      const position = LabelOverlapToggleService.computeToggleButtonPosition({
         labelRect: tinyLabel,
         spotlight,
         viewport,
@@ -189,7 +186,7 @@ describe("labelOverlapToggle", () => {
       };
       const narrowViewport = { width: 320, height: 480 };
 
-      const position = computeToggleButtonPosition({
+      const position = LabelOverlapToggleService.computeToggleButtonPosition({
         labelRect: coveredLabel,
         spotlight: coveredSpotlight,
         viewport: narrowViewport,
@@ -202,8 +199,8 @@ describe("labelOverlapToggle", () => {
         left: position.x - half,
       };
 
-      expect(computeOverlapArea(buttonRect, coveredLabel)).toBe(0);
-      expect(computeOverlapArea(buttonRect, coveredSpotlight)).toBe(0);
+      expect(LabelOverlapToggleService.computeOverlapArea(buttonRect, coveredLabel)).toBe(0);
+      expect(LabelOverlapToggleService.computeOverlapArea(buttonRect, coveredSpotlight)).toBe(0);
     });
 
     it("clears the label even when viewport corners are occupied by other buttons", () => {
@@ -225,7 +222,7 @@ describe("labelOverlapToggle", () => {
         { top: 340, right: 320, bottom: 400, left: 260 },
       ];
 
-      const position = computeToggleButtonPosition({
+      const position = LabelOverlapToggleService.computeToggleButtonPosition({
         labelRect: coveredLabel,
         spotlight: coveredSpotlight,
         viewport: narrowViewport,
@@ -239,25 +236,25 @@ describe("labelOverlapToggle", () => {
         left: position.x - half,
       };
 
-      expect(computeOverlapArea(buttonRect, coveredLabel)).toBe(0);
+      expect(LabelOverlapToggleService.computeOverlapArea(buttonRect, coveredLabel)).toBe(0);
       for (const avoid of avoidRects) {
-        expect(computeOverlapArea(buttonRect, avoid)).toBe(0);
+        expect(LabelOverlapToggleService.computeOverlapArea(buttonRect, avoid)).toBe(0);
       }
     });
   });
 
   describe("computeLabelHideOffsetPx", () => {
     it("adds the default margin past the label's right edge", () => {
-      expect(computeLabelHideOffsetPx({ left: 100, width: 200 })).toBe(100 + 200 + LABEL_HIDE_MARGIN_PX);
+      expect(LabelOverlapToggleService.computeLabelHideOffsetPx({ left: 100, width: 200 })).toBe(100 + 200 + LABEL_HIDE_MARGIN_PX);
     });
 
     it("supports a custom margin", () => {
-      expect(computeLabelHideOffsetPx({ left: 50, width: 80 }, { marginPx: 10 })).toBe(140);
+      expect(LabelOverlapToggleService.computeLabelHideOffsetPx({ left: 50, width: 80 }, { marginPx: 10 })).toBe(140);
     });
 
     it("clears the right viewport edge when dir is rtl", () => {
       expect(
-        computeLabelHideOffsetPx(
+        LabelOverlapToggleService.computeLabelHideOffsetPx(
           { left: 100, width: 200 },
           { dir: "rtl", viewportWidth: 800 },
         ),
@@ -266,7 +263,7 @@ describe("labelOverlapToggle", () => {
 
     it("uses custom margin for rtl", () => {
       expect(
-        computeLabelHideOffsetPx(
+        LabelOverlapToggleService.computeLabelHideOffsetPx(
           { left: 50, width: 80 },
           { dir: "rtl", viewportWidth: 500, marginPx: 10 },
         ),

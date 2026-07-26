@@ -1,7 +1,7 @@
 import { EventBlockers } from "./EventBlockers";
 import { SvgArrow, type SvgArrowRenderInput } from "./SvgArrow";
 import {
-  LEGACY_COLLAPSED_SPOTLIGHT_STATE,
+  collapsedSpotlightUpdate,
   LEGACY_INITIAL_SPOTLIGHT_STATE,
   LEGACY_SPOTLIGHT_ANIMATION_DURATION_MS,
   SvgMaskSpotlight,
@@ -9,14 +9,16 @@ import {
   type SpotlightGeometryState,
   type SvgMaskSpotlightUpdate,
 } from "./SvgMaskSpotlight";
-import type { BlockerRect } from "./geometry";
+import type { BlockerRect } from "./GeometryService";
 import type { ButtonConfig, TextDirection } from "../types";
 import {
   LEGACY_LABEL_ARROW_DELAY_MS,
   LEGACY_OVERSIZED_LABEL_DELAY_MS,
 } from "../stepTiming";
-import { computeLabelHideOffsetPx, LABEL_TOGGLE_BUTTON_SIZE_PX } from "./labelOverlapToggle";
-import { VIEWPORT_EDGE_MARGIN_PX } from "./viewportClamp";
+import { LabelOverlapToggleService, LABEL_TOGGLE_BUTTON_SIZE_PX } from "./LabelOverlapToggleService";
+import { SVG_NS } from "./svgNs";
+import { getViewportSize } from "../elementViewport";
+import { ButtonLayoutService, type ButtonPositionInput } from "./ButtonLayoutService";
 
 export interface LabelPresentationOptions {
   oversized?: boolean;
@@ -27,12 +29,6 @@ const LEGACY_OVERSIZED_LABEL_BACKGROUND = "#272A26";
 
 type ClickCallback = () => void;
 
-const SVG_NS = "http://www.w3.org/2000/svg";
-const MOBILE_BUTTON_BREAKPOINT_PX = 640;
-const MOBILE_NEXT_BUTTON_TEXT = "\u203A";
-const MOBILE_PREV_BUTTON_TEXT = "\u2039";
-const LEGACY_BUTTON_MIN_WIDTH_PX = 100;
-const LEGACY_BUTTON_HEIGHT_PX = 40;
 const LABEL_MAX_WIDTH_RATIO = 0.8;
 
 const EYE_OPEN_ICON_SVG =
@@ -189,7 +185,7 @@ export class OverlayRenderer {
     this.root?.classList.remove("enjoyhint_svg_transparent");
     this.labelContainer?.remove();
     this.labelContainer = undefined;
-    this.svg?.querySelectorAll("#enjoyhint_arrpw_line").forEach((arrow) => arrow.remove());
+    SvgArrow.clearFrom(this.svg);
     this.hideNext();
     this.hidePrev();
     this.hideSkip();
@@ -211,7 +207,7 @@ export class OverlayRenderer {
     measure.style.position = "absolute";
     measure.style.left = "0px";
     measure.style.top = "0px";
-    const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
+    const viewportWidth = getViewportSize().width;
     const defaultMaxWidth = Math.floor(viewportWidth * LABEL_MAX_WIDTH_RATIO);
     measure.style.maxWidth = `${maxWidthPx !== undefined ? Math.min(maxWidthPx, defaultMaxWidth) : defaultMaxWidth}px`;
     measure.innerHTML = html;
@@ -266,7 +262,7 @@ export class OverlayRenderer {
 
       if (oversized) {
         this.applyOversizedLabelStyles(detachedLabel);
-        this.svg?.querySelectorAll("#enjoyhint_arrpw_line").forEach((arrow) => arrow.remove());
+        SvgArrow.clearFrom(this.svg);
         this.root?.classList.remove("enjoyhint_svg_transparent");
       }
 
@@ -285,7 +281,7 @@ export class OverlayRenderer {
 
     this.arrowPresentationTimeoutId = window.setTimeout(() => {
       this.arrowPresentationTimeoutId = undefined;
-      this.svg?.querySelectorAll("#enjoyhint_arrpw_line").forEach((arrow) => arrow.remove());
+      SvgArrow.clearFrom(this.svg);
       this.renderArrow(input);
       this.root?.classList.remove("enjoyhint_svg_transparent");
     }, LEGACY_LABEL_ARROW_DELAY_MS);
@@ -442,175 +438,20 @@ export class OverlayRenderer {
     return this.arrow.render(input);
   }
 
-  positionButtons(input: {
-    labelX: number;
-    labelY: number;
-    labelWidth: number;
-    labelHeight: number;
-    xFrom: number;
-    yFrom: number;
-    xTo: number;
-    yTo: number;
-    viewportWidth: number;
-    viewportHeight?: number;
-    spotlightTop?: number;
-    spotlightBottom?: number;
-    arrowTop?: number;
-    arrowBottom?: number;
-  }): void {
-    const nextWidth = this.getSummaryButtonWidth(this.nextButton);
-    const prevWidth = this.getSummaryButtonWidth(this.prevButton);
-    const skipWidth = this.getSummaryButtonWidth(this.skipButton);
-    const summaryButtonWidth = nextWidth + skipWidth + prevWidth + 30;
-    let distance = input.labelX - 100;
-    let verticalPosition = input.labelY + input.labelHeight + 40;
-
-    if (summaryButtonWidth + input.labelX > input.xTo) {
-      distance = input.xTo >= input.xFrom ? input.xTo + 20 : input.labelX + input.labelWidth / 2;
-    }
-
-    if (summaryButtonWidth + distance > input.viewportWidth || distance < 0) {
-      distance = 10;
-      verticalPosition = input.yFrom < input.yTo ? input.labelY - 80 : input.labelY + input.labelHeight + 40;
-    }
-
-    const initialDistance = distance;
-    const initialVerticalPosition = verticalPosition;
-    const isMobileViewport = input.viewportWidth <= MOBILE_BUTTON_BREAKPOINT_PX;
-
-    if (isMobileViewport) {
-      distance = 10;
-      verticalPosition = 10;
-      if (this.nextButton) {
-        this.nextButton.textContent = MOBILE_NEXT_BUTTON_TEXT;
-      }
-      if (this.prevButton) {
-        this.prevButton.textContent = MOBILE_PREV_BUTTON_TEXT;
-      }
-    } else {
-      distance = initialDistance;
-      verticalPosition = initialVerticalPosition;
-      if (this.nextButton) {
-        this.nextButton.textContent = this.nextButtonConfig?.text ?? this.nextDefaultText;
-      }
-      if (this.prevButton) {
-        this.prevButton.textContent = this.prevButtonConfig?.text ?? this.prevDefaultText;
-      }
-    }
-
-    const mobilePrevWidth = this.getButtonContentWidth(this.prevButton);
-    const mobileNextWidth = this.getButtonContentWidth(this.nextButton);
-    const resolvedPrevWidth = this.getLayoutButtonWidth(
-      this.prevButton,
-      mobilePrevWidth,
-      isMobileViewport,
-    );
-    const resolvedNextWidth = this.getLayoutButtonWidth(
-      this.nextButton,
-      mobileNextWidth,
-      isMobileViewport,
-    );
-
-    let nextLeft = distance + resolvedPrevWidth + 10;
-    let skipLeft = distance + resolvedPrevWidth + resolvedNextWidth + 20;
-
-    if (!this.nextVisible) {
-      skipLeft = distance + resolvedPrevWidth + 10;
-    }
-
-    if (!this.prevVisible) {
-      nextLeft = distance;
-      skipLeft = distance + resolvedNextWidth + 10;
-    }
-
-    const viewportHeight =
-      input.viewportHeight ??
-      (window.innerHeight || document.documentElement.clientHeight);
-    const rowSkipWidth = this.getLayoutButtonWidth(this.skipButton, 0, isMobileViewport);
-    const clampedRow = this.clampButtonRowToViewport({
-      distance,
-      verticalPosition,
-      nextLeft,
-      skipLeft,
-      skipWidth: rowSkipWidth,
-      viewportWidth: input.viewportWidth,
-      viewportHeight,
-      labelY: input.labelY,
-      labelHeight: input.labelHeight,
-      spotlightTop: input.spotlightTop,
-      spotlightBottom: input.spotlightBottom,
-      arrowTop: input.arrowTop,
-      arrowBottom: input.arrowBottom,
-      isMobileViewport,
+  positionButtons(input: ButtonPositionInput): void {
+    this.buttonRowRect = ButtonLayoutService.positionButtons({
+      input,
+      nextButton: this.nextButton,
+      prevButton: this.prevButton,
+      skipButton: this.skipButton,
+      nextVisible: this.nextVisible,
+      prevVisible: this.prevVisible,
+      dir: this.dir,
+      nextButtonConfig: this.nextButtonConfig,
+      prevButtonConfig: this.prevButtonConfig,
+      nextDefaultText: this.nextDefaultText,
+      prevDefaultText: this.prevDefaultText,
     });
-    if (this.dir === "rtl") {
-      const left = clampedRow.distance;
-      const skipW = rowSkipWidth;
-      const nextW = resolvedNextWidth;
-      const prevW = resolvedPrevWidth;
-      const skipL = left;
-      let nextL: number;
-      let prevL: number;
-
-      if (!this.prevVisible) {
-        // Skip → Next (no Prev) — mirrors LTR when prev is hidden.
-        nextL = left + skipW + 10;
-        prevL = nextL;
-      } else if (!this.nextVisible) {
-        // Skip → Prev (no Next) — mirrors LTR when next is hidden.
-        prevL = left + skipW + 10;
-        nextL = prevL;
-      } else {
-        // Skip → Next → Prev
-        nextL = left + skipW + 10;
-        prevL = left + skipW + nextW + 20;
-      }
-
-      const rtlRight = this.prevVisible
-        ? prevL + prevW
-        : this.nextVisible
-          ? nextL + nextW
-          : skipL + skipW;
-      const ltrRight = clampedRow.skipLeft + skipW;
-      // Desktop: row width is order-invariant, so unclamped shift is 0; shift
-      // re-anchors to the LTR-clamped right edge when clamp moved the row.
-      // Mobile: LTR pins the cluster to the top-left (margin 10); RTL pins it
-      // to the top-right instead.
-      const shift = isMobileViewport
-        ? input.viewportWidth - 10 - rtlRight
-        : ltrRight - rtlRight;
-      const positionedSkipL = skipL + shift;
-      const positionedNextL = nextL + shift;
-      const positionedPrevL = prevL + shift;
-
-      this.setButtonPosition(this.skipButton, positionedSkipL, clampedRow.verticalPosition);
-      this.setButtonPosition(this.nextButton, positionedNextL, clampedRow.verticalPosition);
-      this.setButtonPosition(this.prevButton, positionedPrevL, clampedRow.verticalPosition);
-      this.revealPositionedButtons();
-
-      this.buttonRowRect = {
-        top: clampedRow.verticalPosition,
-        bottom: clampedRow.verticalPosition + LEGACY_BUTTON_HEIGHT_PX,
-        left: Math.min(positionedSkipL, positionedNextL, positionedPrevL),
-        right: Math.max(
-          positionedSkipL + skipW,
-          positionedNextL + nextW,
-          positionedPrevL + prevW,
-        ),
-      };
-    } else {
-      this.setButtonPosition(this.prevButton, clampedRow.distance, clampedRow.verticalPosition);
-      this.setButtonPosition(this.nextButton, clampedRow.nextLeft, clampedRow.verticalPosition);
-      this.setButtonPosition(this.skipButton, clampedRow.skipLeft, clampedRow.verticalPosition);
-      this.revealPositionedButtons();
-
-      this.buttonRowRect = {
-        top: clampedRow.verticalPosition,
-        bottom: clampedRow.verticalPosition + LEGACY_BUTTON_HEIGHT_PX,
-        left: clampedRow.distance,
-        right: clampedRow.skipLeft + rowSkipWidth,
-      };
-    }
   }
 
   /**
@@ -639,11 +480,11 @@ export class OverlayRenderer {
       this.setLabelHidden(false);
     }
 
-    this.labelHideOffsetPx = computeLabelHideOffsetPx(
+    this.labelHideOffsetPx = LabelOverlapToggleService.computeLabelHideOffsetPx(
       { left: input.labelLeft, width: input.labelWidth },
       {
         dir: this.dir,
-        viewportWidth: input.viewportWidth ?? window.innerWidth,
+        viewportWidth: input.viewportWidth ?? getViewportSize().width,
       },
     );
 
@@ -664,107 +505,6 @@ export class OverlayRenderer {
     if (this.labelHidden) {
       this.applyLabelHiddenTransform();
     }
-  }
-
-  private clampButtonRowToViewport(input: {
-    distance: number;
-    verticalPosition: number;
-    nextLeft: number;
-    skipLeft: number;
-    skipWidth: number;
-    viewportWidth: number;
-    viewportHeight: number;
-    labelY: number;
-    labelHeight: number;
-    spotlightTop?: number;
-    spotlightBottom?: number;
-    arrowTop?: number;
-    arrowBottom?: number;
-    isMobileViewport: boolean;
-  }): {
-    distance: number;
-    verticalPosition: number;
-    nextLeft: number;
-    skipLeft: number;
-  } {
-    let {
-      distance,
-      verticalPosition,
-      nextLeft,
-      skipLeft,
-      skipWidth,
-      viewportWidth,
-      viewportHeight,
-      labelY,
-      labelHeight,
-      spotlightTop,
-      spotlightBottom,
-      arrowTop,
-      arrowBottom,
-      isMobileViewport,
-    } = input;
-
-    const minTop = VIEWPORT_EDGE_MARGIN_PX;
-    const maxTop = Math.max(minTop, viewportHeight - LEGACY_BUTTON_HEIGHT_PX - VIEWPORT_EDGE_MARGIN_PX);
-    const clampTop = (top: number) => Math.min(Math.max(minTop, top), maxTop);
-    const overlapWithBand = (top: number, bandStart: number, bandEnd: number) =>
-      Math.max(0, Math.min(top + LEGACY_BUTTON_HEIGHT_PX, bandEnd) - Math.max(top, bandStart));
-    // The button row must avoid the label, the spotlight target, and the
-    // arrow connecting them: a naive "below the label" position can clear
-    // both the label and the spotlight individually while still cutting
-    // straight through the arrow curve between them.
-    const totalOverlap = (top: number) =>
-      overlapWithBand(top, labelY, labelY + labelHeight) +
-      overlapWithBand(top, spotlightTop ?? 0, spotlightBottom ?? 0) +
-      overlapWithBand(top, arrowTop ?? 0, arrowBottom ?? 0);
-
-    verticalPosition = clampTop(verticalPosition);
-
-    // Mobile buttons are pinned chevrons fixed to the top-left corner by
-    // design; they must never be pushed elsewhere to dodge the label or
-    // spotlight, regardless of what happens to occupy that corner.
-    if (!isMobileViewport && totalOverlap(verticalPosition) > 0) {
-      // Something occupies this row; try flipping the button row to
-      // whichever side of the label/spotlight has clearance instead of
-      // rescue-clamping it on top of them.
-      const candidates = [
-        clampTop(labelY - LEGACY_BUTTON_HEIGHT_PX - VIEWPORT_EDGE_MARGIN_PX),
-        clampTop(labelY + labelHeight + VIEWPORT_EDGE_MARGIN_PX),
-        verticalPosition,
-      ];
-      if (spotlightTop !== undefined && spotlightBottom !== undefined) {
-        candidates.push(
-          clampTop(spotlightTop - LEGACY_BUTTON_HEIGHT_PX - VIEWPORT_EDGE_MARGIN_PX),
-          clampTop(spotlightBottom + VIEWPORT_EDGE_MARGIN_PX),
-        );
-      }
-      if (arrowTop !== undefined && arrowBottom !== undefined) {
-        candidates.push(
-          clampTop(arrowTop - LEGACY_BUTTON_HEIGHT_PX - VIEWPORT_EDGE_MARGIN_PX),
-          clampTop(arrowBottom + VIEWPORT_EDGE_MARGIN_PX),
-        );
-      }
-      verticalPosition = candidates.reduce((best, candidate) =>
-        totalOverlap(candidate) < totalOverlap(best) ? candidate : best,
-      );
-    }
-
-    const rightOverflow =
-      skipLeft + skipWidth - (viewportWidth - VIEWPORT_EDGE_MARGIN_PX);
-    if (rightOverflow > 0) {
-      distance = Math.max(VIEWPORT_EDGE_MARGIN_PX, distance - rightOverflow);
-      nextLeft = Math.max(VIEWPORT_EDGE_MARGIN_PX, nextLeft - rightOverflow);
-      skipLeft = Math.max(VIEWPORT_EDGE_MARGIN_PX, skipLeft - rightOverflow);
-    }
-
-    if (distance < VIEWPORT_EDGE_MARGIN_PX) {
-      const shift = VIEWPORT_EDGE_MARGIN_PX - distance;
-      distance = VIEWPORT_EDGE_MARGIN_PX;
-      nextLeft += shift;
-      skipLeft += shift;
-    }
-
-    return { distance, verticalPosition, nextLeft, skipLeft };
   }
 
   setStepClass(stepNumber: number): void {
@@ -975,83 +715,8 @@ export class OverlayRenderer {
     if (button === this.prevButton) this.prevVisible = visible;
   }
 
-  private setButtonPosition(button: HTMLElement | undefined, left: number, top: number): void {
-    if (!button) {
-      return;
-    }
-
-    button.style.left = `${left}px`;
-    button.style.top = `${top}px`;
-  }
-
-  private revealPositionedButtons(): void {
-    for (const button of [this.nextButton, this.prevButton, this.skipButton]) {
-      if (button && !button.classList.contains("enjoyhint_hide")) {
-        button.style.visibility = "visible";
-      }
-    }
-  }
-
-  private getLayoutButtonWidth(
-    button: HTMLElement | undefined,
-    mobileWidth: number,
-    isMobileViewport: boolean,
-  ): number {
-    if (!button || button.classList.contains("enjoyhint_hide")) {
-      return 0;
-    }
-
-    if (isMobileViewport) {
-      return mobileWidth;
-    }
-
-    return Math.max(this.getButtonContentWidth(button), LEGACY_BUTTON_MIN_WIDTH_PX);
-  }
-
-  private getSummaryButtonWidth(button: HTMLElement | undefined): number {
-    if (!button) {
-      return 0;
-    }
-
-    return Math.max(this.getButtonContentWidth(button), LEGACY_BUTTON_MIN_WIDTH_PX);
-  }
-
-  private getButtonContentWidth(button: HTMLElement | undefined): number {
-    if (!button) {
-      return 0;
-    }
-
-    if (button.classList.contains("enjoyhint_hide")) {
-      const minWidth = Number.parseFloat(window.getComputedStyle(button).minWidth);
-      return Number.isFinite(minWidth) && minWidth > 0 ? minWidth : LEGACY_BUTTON_MIN_WIDTH_PX;
-    }
-
-    const previousVisibility = button.style.visibility;
-    if (previousVisibility === "hidden") {
-      button.style.visibility = "visible";
-    }
-
-    const style = window.getComputedStyle(button);
-    const width =
-      button.offsetWidth -
-      (Number.parseFloat(style.paddingLeft) || 0) -
-      (Number.parseFloat(style.paddingRight) || 0) -
-      (Number.parseFloat(style.borderLeftWidth) || 0) -
-      (Number.parseFloat(style.borderRightWidth) || 0);
-
-    button.style.visibility = previousVisibility;
-    return width > 0 ? width : 0;
-  }
-
   private collapseSpotlight(): void {
-    this.renderSpotlight({
-      shape: "rect",
-      x: LEGACY_COLLAPSED_SPOTLIGHT_STATE.centerX,
-      y: LEGACY_COLLAPSED_SPOTLIGHT_STATE.centerY,
-      width: LEGACY_COLLAPSED_SPOTLIGHT_STATE.width,
-      height: LEGACY_COLLAPSED_SPOTLIGHT_STATE.height,
-      radius: LEGACY_COLLAPSED_SPOTLIGHT_STATE.radius,
-    });
+    this.renderSpotlight(collapsedSpotlightUpdate());
   }
 
   private configureButton(

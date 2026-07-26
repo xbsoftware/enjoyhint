@@ -1,12 +1,8 @@
 import { normalizeSteps } from "./StepNormalizer";
 import { StepController } from "./StepController";
-import type { EnjoyHintOptions, NormalizedStep } from "./types";
+import type { EnjoyHintOptions, NormalizedStep, RequiredCallbacks } from "./types";
 
 type RawStep = Record<string, unknown>;
-
-type RequiredCallbacks = Required<
-  Pick<EnjoyHintOptions, "onStart" | "onEnd" | "onSkip" | "onNext">
->;
 
 export class EnjoyHint {
   private steps: NormalizedStep[] = [];

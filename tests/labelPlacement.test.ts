@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { computeLabelPlacement } from "../src/overlay/labelPlacement";
+import { LabelPlacementService } from "../src/overlay/LabelPlacementService";
 
 const baseShape = {
   type: "rect" as const,
@@ -7,9 +7,9 @@ const baseShape = {
   height: 80,
 };
 
-describe("computeLabelPlacement", () => {
+describe("LabelPlacementService.computeLabelPlacement", () => {
   it("selects right_center when the right side has the largest fitting area", () => {
-    const placement = computeLabelPlacement({
+    const placement = LabelPlacementService.computeLabelPlacement({
       viewport: { width: 1000, height: 800 },
       label: { width: 200, height: 80 },
       shape: { ...baseShape, centerX: 200, centerY: 400 },
@@ -27,7 +27,7 @@ describe("computeLabelPlacement", () => {
   });
 
   it("selects left_center when the left side has the largest fitting area", () => {
-    const placement = computeLabelPlacement({
+    const placement = LabelPlacementService.computeLabelPlacement({
       viewport: { width: 1000, height: 800 },
       label: { width: 200, height: 80 },
       shape: { ...baseShape, centerX: 800, centerY: 400 },
@@ -45,7 +45,7 @@ describe("computeLabelPlacement", () => {
   });
 
   it("selects center_top when the area above the shape is best", () => {
-    const placement = computeLabelPlacement({
+    const placement = LabelPlacementService.computeLabelPlacement({
       viewport: { width: 1000, height: 800 },
       label: { width: 200, height: 80 },
       shape: { ...baseShape, centerX: 500, centerY: 700 },
@@ -63,7 +63,7 @@ describe("computeLabelPlacement", () => {
   });
 
   it("selects center_bottom when the area below the shape is best", () => {
-    const placement = computeLabelPlacement({
+    const placement = LabelPlacementService.computeLabelPlacement({
       viewport: { width: 1000, height: 800 },
       label: { width: 200, height: 80 },
       shape: { ...baseShape, centerX: 500, centerY: 100 },
@@ -81,7 +81,7 @@ describe("computeLabelPlacement", () => {
   });
 
   it("falls back to centered oversized placement when no area can fit the label", () => {
-    const placement = computeLabelPlacement({
+    const placement = LabelPlacementService.computeLabelPlacement({
       viewport: { width: 500, height: 500 },
       label: { width: 600, height: 400 },
       shape: { ...baseShape, centerX: 250, centerY: 250, height: 100 },
@@ -102,7 +102,7 @@ describe("computeLabelPlacement", () => {
   });
 
   it("keeps labels inside the viewport when left placement would overflow", () => {
-    const placement = computeLabelPlacement({
+    const placement = LabelPlacementService.computeLabelPlacement({
       viewport: { width: 375, height: 649 },
       label: { width: 240, height: 20 },
       shape: { ...baseShape, centerX: 368.45, centerY: 144, width: 120, height: 48 },
@@ -115,7 +115,7 @@ describe("computeLabelPlacement", () => {
   });
 
   it("keeps the label-side arrow endpoint within the viewport margin", () => {
-    const placement = computeLabelPlacement({
+    const placement = LabelPlacementService.computeLabelPlacement({
       viewport: { width: 375, height: 649 },
       label: { width: 240, height: 20 },
       shape: { ...baseShape, centerX: 368.45, centerY: 144, width: 120, height: 48 },
@@ -133,7 +133,7 @@ describe("computeLabelPlacement", () => {
     // is wide enough that neither side has room for it (matching legacy's
     // plain width check), so center_bottom is selected and xTo lands exactly
     // on the target's center.
-    const placement = computeLabelPlacement({
+    const placement = LabelPlacementService.computeLabelPlacement({
       viewport: { width: 375, height: 649 },
       label: { width: 320, height: 20 },
       shape: { ...baseShape, centerX: 368.45, centerY: 144, width: 120, height: 48 },
@@ -151,7 +151,7 @@ describe("computeLabelPlacement", () => {
     // position formula would overflow - the existing viewport clamp (further
     // below) is what keeps it fully visible, matching legacy's area check
     // while still avoiding an off-screen label.
-    const placement = computeLabelPlacement({
+    const placement = LabelPlacementService.computeLabelPlacement({
       viewport: { width: 260, height: 800 },
       label: { width: 100, height: 40 },
       shape: { type: "rect", width: 100, height: 750, centerX: 200, centerY: 400 },
@@ -170,7 +170,7 @@ describe("computeLabelPlacement", () => {
     // back to the oversized/no-arrow placement - which the plain-width check
     // (matching legacy) avoids - would make the same step look inconsistent
     // across visits.
-    const placement = computeLabelPlacement({
+    const placement = LabelPlacementService.computeLabelPlacement({
       viewport: { width: 600, height: 470 },
       label: { width: 311.703125, height: 114.21875 },
       shape: { type: "rect", centerX: 225.953125, centerY: 219.484375, width: 94, height: 48 },
@@ -191,7 +191,7 @@ describe("computeLabelPlacement", () => {
     // The label's width should be capped to the available space instead, so
     // the label stays at its natural (unclamped) position with a real gap
     // to the arrow's target-facing endpoint.
-    const placement = computeLabelPlacement({
+    const placement = LabelPlacementService.computeLabelPlacement({
       viewport: { width: 600, height: 470 },
       label: { width: 311.703125, height: 114.21875 },
       shape: { type: "rect", centerX: 225.953125, centerY: 219.484375, width: 94, height: 48 },
@@ -206,7 +206,7 @@ describe("computeLabelPlacement", () => {
   });
 
   it("uses legacy circle half-dimensions for vertical label offsets", () => {
-    const placement = computeLabelPlacement({
+    const placement = LabelPlacementService.computeLabelPlacement({
       viewport: { width: 375, height: 649 },
       label: { width: 105, height: 18 },
       shape: { type: "circle", centerX: 220, centerY: 144, width: 120, height: 120, radius: 60 },

@@ -2,6 +2,14 @@ export function getElementWindow(element: Element): Window {
   return element.ownerDocument?.defaultView ?? window;
 }
 
+export function getViewportSize(win: Window = window): { width: number; height: number } {
+  const doc = win.document.documentElement;
+  return {
+    width: win.innerWidth || doc.clientWidth,
+    height: win.innerHeight || doc.clientHeight,
+  };
+}
+
 export function translateRectToViewport(
   rect: DOMRectReadOnly,
   element: Element,

@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { computeScrollTarget, scrollToElement } from "../src/ScrollHelper";
+import { ScrollHelperService } from "../src/ScrollHelperService";
 
 class ControlledAnimationClock {
   private frameId = 0;
@@ -27,7 +27,7 @@ class ControlledAnimationClock {
   }
 }
 
-describe("computeScrollTarget", () => {
+describe("ScrollHelperService.computeScrollTarget", () => {
   afterEach(() => {
     vi.restoreAllMocks();
   });
@@ -38,11 +38,11 @@ describe("computeScrollTarget", () => {
     } as Element;
     vi.spyOn(window, "scrollY", "get").mockReturnValue(100);
 
-    expect(computeScrollTarget(el)).toBe(400);
+    expect(ScrollHelperService.computeScrollTarget(el)).toBe(400);
   });
 });
 
-describe("scrollToElement", () => {
+describe("ScrollHelperService.scrollToElement", () => {
   afterEach(() => {
     vi.unstubAllGlobals();
     vi.restoreAllMocks();
@@ -57,7 +57,7 @@ describe("scrollToElement", () => {
     } as Element;
     vi.spyOn(window, "scrollY", "get").mockReturnValue(100);
 
-    scrollToElement(el, 250, onAfter);
+    ScrollHelperService.scrollToElement(el, 250, onAfter);
 
     clock.advance(0);
     expect(onAfter).not.toHaveBeenCalled();
@@ -79,7 +79,7 @@ describe("scrollToElement", () => {
     } as Element;
     vi.spyOn(window, "scrollY", "get").mockReturnValue(25);
 
-    scrollToElement(el, 0);
+    ScrollHelperService.scrollToElement(el, 0);
 
     expect(scrollTo).toHaveBeenCalledWith({
       top: 275,
@@ -95,7 +95,7 @@ describe("scrollToElement", () => {
     } as Element;
     vi.spyOn(window, "scrollY", "get").mockReturnValue(100);
 
-    const cancel = scrollToElement(el, 250, onAfter);
+    const cancel = ScrollHelperService.scrollToElement(el, 250, onAfter);
     cancel();
     clock.advance(250);
 

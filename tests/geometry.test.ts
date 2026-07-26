@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { computeSpotlightRect, positionBlockers } from "../src/overlay/geometry";
+import { GeometryService } from "../src/overlay/GeometryService";
 
 describe("geometry", () => {
   it("computes rect spotlight from element bounds and margin", () => {
-    const rect = computeSpotlightRect({
+    const rect = GeometryService.computeSpotlightRect({
       left: 100,
       top: 200,
       width: 80,
@@ -21,7 +21,7 @@ describe("geometry", () => {
   });
 
   it("uses legacy default margin when margin is omitted", () => {
-    const rect = computeSpotlightRect({
+    const rect = GeometryService.computeSpotlightRect({
       left: 100,
       top: 200,
       width: 80,
@@ -38,7 +38,7 @@ describe("geometry", () => {
   });
 
   it("applies normalized step offsets to rect spotlight bounds", () => {
-    const rect = computeSpotlightRect({
+    const rect = GeometryService.computeSpotlightRect({
       elementLeft: 100,
       elementTop: 200,
       width: 80,
@@ -60,7 +60,7 @@ describe("geometry", () => {
   });
 
   it("computes circle spotlight from radius and normalized step offsets", () => {
-    const rect = computeSpotlightRect({
+    const rect = GeometryService.computeSpotlightRect({
       elementLeft: 100,
       elementTop: 200,
       width: 80,
@@ -83,7 +83,7 @@ describe("geometry", () => {
   });
 
   it("positions four blockers around spotlight", () => {
-    const styles = positionBlockers({ top: 100, left: 50, right: 300, bottom: 400 });
+    const styles = GeometryService.positionBlockers({ top: 100, left: 50, right: 300, bottom: 400 });
 
     expect(styles).toEqual({
       top: {

@@ -1,6 +1,6 @@
 import { svgFragmentUrl } from "./svgFragmentUrl";
+import { SVG_NS } from "./svgNs";
 
-const SVG_NS = "http://www.w3.org/2000/svg";
 const MASK_ID_PREFIX = "enjoyhint-spotlight-mask";
 const SPOTLIGHT_HOLE_ATTR = "data-enjoyhint-spotlight-hole";
 export const LEGACY_INITIAL_SPOTLIGHT_STATE: SpotlightGeometryState = {
@@ -18,6 +18,18 @@ export const LEGACY_COLLAPSED_SPOTLIGHT_STATE: SpotlightGeometryState = {
   height: 0,
   radius: 0,
 };
+
+/** Spotlight update payload used to collapse the hole to a zero-size rect. */
+export function collapsedSpotlightUpdate(): SvgMaskSpotlightUpdate {
+  return {
+    shape: "rect",
+    x: LEGACY_COLLAPSED_SPOTLIGHT_STATE.centerX,
+    y: LEGACY_COLLAPSED_SPOTLIGHT_STATE.centerY,
+    width: LEGACY_COLLAPSED_SPOTLIGHT_STATE.width,
+    height: LEGACY_COLLAPSED_SPOTLIGHT_STATE.height,
+    radius: LEGACY_COLLAPSED_SPOTLIGHT_STATE.radius,
+  };
+}
 
 export const LEGACY_SPOTLIGHT_ANIMATION_DURATION_MS = 200;
 
@@ -73,7 +85,7 @@ export function sampleSpotlightGeometry(
   };
 }
 
-export function applyLegacyKineticEaseInOut(progress: number): number {
+function applyLegacyKineticEaseInOut(progress: number): number {
   const clamped = clampProgress(progress);
 
   if (clamped < 0.5) {

@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { StepController } from "../src/StepController";
 import { OverlayRenderer } from "../src/overlay/OverlayRenderer";
-import { LABEL_TOGGLE_BUTTON_SIZE_PX } from "../src/overlay/labelOverlapToggle";
+import { LABEL_TOGGLE_BUTTON_SIZE_PX } from "../src/overlay/LabelOverlapToggleService";
 import {
   getLegacyStepRenderDelay,
   LEGACY_LABEL_ARROW_DELAY_MS,

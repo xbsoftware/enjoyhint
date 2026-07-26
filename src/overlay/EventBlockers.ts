@@ -1,4 +1,4 @@
-import { positionBlockers, type BlockerRect, type BlockerStyles } from "./geometry";
+import { GeometryService, type BlockerRect, type BlockerStyles } from "./GeometryService";
 
 type BlockerName = keyof BlockerStyles;
 
@@ -12,7 +12,7 @@ export class EventBlockers {
   }
 
   apply(rect: BlockerRect): void {
-    const styles = positionBlockers(rect);
+    const styles = GeometryService.positionBlockers(rect);
 
     BLOCKER_ORDER.forEach((name, index) => {
       const blocker = this.blockers[index];

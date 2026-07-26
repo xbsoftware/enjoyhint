@@ -22,6 +22,10 @@ export interface EnjoyHintOptions {
   dir?: TextDirection;
 }
 
+export type RequiredCallbacks = Required<
+  Pick<EnjoyHintOptions, "onStart" | "onEnd" | "onSkip" | "onNext">
+>;
+
 export interface NormalizedStep {
   selector: string;
   event: string;

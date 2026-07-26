@@ -1,28 +1,20 @@
 import { DomAdapter } from "./DomAdapter";
 import { EventBus } from "./EventBus";
-import { getElementViewportRect, getElementWindow } from "./elementViewport";
-import { isRectOutsideViewport, scrollToElement } from "./ScrollHelper";
+import { getElementViewportRect, getElementWindow, getViewportSize } from "./elementViewport";
+import { ScrollHelperService } from "./ScrollHelperService";
 import { OverlayRenderer } from "./overlay/OverlayRenderer";
-import { computeLabelPlacement } from "./overlay/labelPlacement";
-import {
-  computeToggleButtonPosition,
-  doesLabelOverlapSpotlight,
-  LABEL_TOGGLE_BUTTON_SIZE_PX,
-} from "./overlay/labelOverlapToggle";
+import { LabelPlacementService, type LabelPlacement } from "./overlay/LabelPlacementService";
+import { LabelOverlapToggleService, LABEL_TOGGLE_BUTTON_SIZE_PX } from "./overlay/LabelOverlapToggleService";
 import {
   LEGACY_DEFAULT_SCROLL_SPEED_MS,
   getLegacyStepRenderDelay,
 } from "./stepTiming";
-import { LEGACY_COLLAPSED_SPOTLIGHT_STATE } from "./overlay/SvgMaskSpotlight";
-import type { SpotlightRect, TextDirection } from "./types";
-import type { EnjoyHintOptions, NormalizedStep } from "./types";
+import { collapsedSpotlightUpdate } from "./overlay/SvgMaskSpotlight";
+import { GeometryService } from "./overlay/GeometryService";
+import type { SpotlightRect, TextDirection, RequiredCallbacks, EnjoyHintOptions, NormalizedStep } from "./types";
 import { mergeButtonConfig } from "./mergeButtonConfig";
 
 type Disposer = () => void;
-
-type RequiredCallbacks = Required<
-  Pick<EnjoyHintOptions, "onStart" | "onEnd" | "onSkip" | "onNext">
->;
 
 export class StepController {
   private readonly callbacks: RequiredCallbacks & EnjoyHintOptions;
@@ -150,58 +142,7 @@ export class StepController {
 
     this.callbacks.onNext();
 
-    const scheduleStep = () => {
-      if (!this.isCurrentStepToken(token)) {
-        return;
-      }
-
-      if (!step.selector) {
-        this.scheduleStepTimeout(() => {
-          if (!this.isCurrentStepToken(token)) {
-            return;
-          }
-
-          this.renderTargetlessOverlay(step);
-          this.bindStepEvents(step, null);
-        }, getLegacyStepRenderDelay(LEGACY_DEFAULT_SCROLL_SPEED_MS));
-        return;
-      }
-
-      const target = this.dom.query(step.selector);
-      if (!target) {
-        this.finish();
-        return;
-      }
-
-      const elementWindow = getElementWindow(target);
-      const localRect = target.getBoundingClientRect();
-      const viewportRect =
-        elementWindow === window ? localRect : getElementViewportRect(target);
-      const needsParentScroll = isRectOutsideViewport(viewportRect, window);
-      const needsIframeScroll =
-        elementWindow !== window && isRectOutsideViewport(localRect, elementWindow);
-      const needsScroll = needsParentScroll || needsIframeScroll;
-      const scrollSpeed = needsScroll
-        ? step.scrollAnimationSpeed ?? LEGACY_DEFAULT_SCROLL_SPEED_MS
-        : LEGACY_DEFAULT_SCROLL_SPEED_MS;
-
-      if (needsScroll) {
-        this.renderer.mount();
-        this.renderer.prepareForScroll();
-        const cancelScroll = scrollToElement(target, scrollSpeed);
-        this.stepDisposers.push(cancelScroll);
-      }
-
-      this.scheduleStepTimeout(() => {
-        if (!this.isCurrentStepToken(token)) {
-          return;
-        }
-
-        this.renderOverlay(step, target, this.dom.getBoundingClientRect(target));
-        this.installDialogClosingHandler(target);
-        this.bindStepEvents(step, target);
-      }, getLegacyStepRenderDelay(scrollSpeed));
-    };
+    const scheduleStep = () => this.scheduleCurrentStep(step, token);
 
     if (step.timeout && step.timeout > 0) {
       this.scheduleStepTimeout(scheduleStep, step.timeout);
@@ -210,13 +151,72 @@ export class StepController {
     }
   }
 
+  private scheduleCurrentStep(step: NormalizedStep, token: number): void {
+    if (!this.isCurrentStepToken(token)) {
+      return;
+    }
+
+    if (!step.selector) {
+      this.scheduleStepTimeout(() => {
+        if (!this.isCurrentStepToken(token)) {
+          return;
+        }
+
+        this.renderTargetlessOverlay(step);
+        this.bindStepEvents(step, null);
+      }, getLegacyStepRenderDelay(LEGACY_DEFAULT_SCROLL_SPEED_MS));
+      return;
+    }
+
+    const target = this.dom.query(step.selector);
+    if (!target) {
+      this.finish();
+      return;
+    }
+
+    const scrollSpeed = this.maybeScrollToTarget(target, step);
+
+    this.scheduleStepTimeout(() => {
+      if (!this.isCurrentStepToken(token)) {
+        return;
+      }
+
+      this.renderOverlay(step, target, this.dom.getBoundingClientRect(target));
+      this.installDialogClosingHandler(target);
+      this.bindStepEvents(step, target);
+    }, getLegacyStepRenderDelay(scrollSpeed));
+  }
+
+  private maybeScrollToTarget(target: Element, step: NormalizedStep): number {
+    const elementWindow = getElementWindow(target);
+    const localRect = target.getBoundingClientRect();
+    const viewportRect =
+      elementWindow === window ? localRect : getElementViewportRect(target);
+    const needsParentScroll = ScrollHelperService.isRectOutsideViewport(viewportRect, window);
+    const needsIframeScroll =
+      elementWindow !== window && ScrollHelperService.isRectOutsideViewport(localRect, elementWindow);
+    const needsScroll = needsParentScroll || needsIframeScroll;
+    const scrollSpeed = needsScroll
+      ? step.scrollAnimationSpeed ?? LEGACY_DEFAULT_SCROLL_SPEED_MS
+      : LEGACY_DEFAULT_SCROLL_SPEED_MS;
+
+    if (needsScroll) {
+      this.renderer.mount();
+      this.renderer.prepareForScroll();
+      const cancelScroll = ScrollHelperService.scrollToElement(target, scrollSpeed);
+      this.stepDisposers.push(cancelScroll);
+    }
+
+    return scrollSpeed;
+  }
+
   private renderOverlay(
     step: NormalizedStep,
     target: Element,
     targetRect = this.dom.getBoundingClientRect(target),
     options: { immediate?: boolean } = {},
   ): void {
-    const spotlight = this.computeStepSpotlight(step, targetRect);
+    const spotlight = GeometryService.computeStepSpotlight(step, targetRect);
 
     this.renderer.mount();
     this.renderer.setStepClass(this.currentStep + 1);
@@ -240,26 +240,13 @@ export class StepController {
     step: NormalizedStep,
     options: { immediate?: boolean } = {},
   ): void {
-    const viewport = {
-      width: window.innerWidth || document.documentElement.clientWidth,
-      height: window.innerHeight || document.documentElement.clientHeight,
-    };
+    const viewport = getViewportSize();
 
     this.renderer.mount();
     this.renderer.setStepClass(this.currentStep + 1);
     this.renderer.show();
     this.renderer.clearStepPresentation();
-    this.renderer.renderSpotlight(
-      {
-        shape: "rect",
-        x: LEGACY_COLLAPSED_SPOTLIGHT_STATE.centerX,
-        y: LEGACY_COLLAPSED_SPOTLIGHT_STATE.centerY,
-        width: LEGACY_COLLAPSED_SPOTLIGHT_STATE.width,
-        height: LEGACY_COLLAPSED_SPOTLIGHT_STATE.height,
-        radius: LEGACY_COLLAPSED_SPOTLIGHT_STATE.radius,
-      },
-      { ...options, immediate: true },
-    );
+    this.renderer.renderSpotlight(collapsedSpotlightUpdate(), { ...options, immediate: true });
 
     this.renderButtons(step);
 
@@ -305,39 +292,13 @@ export class StepController {
     spotlight: SpotlightRect,
     options: { immediate?: boolean } = {},
   ): void {
-    const viewport = {
-      width: window.innerWidth || document.documentElement.clientWidth,
-      height: window.innerHeight || document.documentElement.clientHeight,
-    };
-    const spotlightWidth = spotlight.right - spotlight.left;
-    const spotlightHeight = spotlight.bottom - spotlight.top;
-    const shape = {
-      type: step.shape ?? "rect",
-      centerX: spotlight.centerX,
-      centerY: spotlight.centerY,
-      width: spotlightWidth,
-      height: spotlightHeight,
-      radius: step.shape === "circle" ? spotlightWidth / 2 : step.radius,
-    } as const;
+    const viewport = getViewportSize();
+    const { placement, labelWidth, labelHeight, isOversized } = this.computeLabelLayout(
+      step,
+      spotlight,
+      viewport,
+    );
 
-    let { width: labelWidth, height: labelHeight } = this.renderer.measureLabel(step.description);
-    let placement = computeLabelPlacement({ viewport, label: { width: labelWidth, height: labelHeight }, shape });
-
-    // A side placement may have capped the label narrower than it naturally
-    // measured, to keep the arrow's target-facing endpoint from being
-    // swallowed by the label once it's clamped on-screen (see
-    // labelPlacement.ts). Re-measure at that narrower width - this reflows
-    // the text taller, exactly like a real browser reflowing an
-    // absolutely-positioned label - and recompute the placement so the
-    // arrow/buttons agree with what will actually be rendered.
-    if (placement.label.width < labelWidth) {
-      const reflowed = this.renderer.measureLabel(step.description, placement.label.width);
-      labelWidth = reflowed.width;
-      labelHeight = reflowed.height;
-      placement = computeLabelPlacement({ viewport, label: { width: labelWidth, height: labelHeight }, shape });
-    }
-
-    const isOversized = placement.side === "oversized";
     this.renderer.scheduleLabelPresentation(step.description, placement.label, {
       oversized: isOversized,
       maxWidthPx: isOversized ? undefined : placement.label.width,
@@ -355,137 +316,146 @@ export class StepController {
     }
 
     this.scheduleStepTimeout(() => {
-      this.renderer.positionButtons({
-        labelX: placement.label.x,
-        labelY: placement.label.y,
+      this.positionLabelChrome({
+        step,
+        spotlight,
+        viewport,
+        placement,
         labelWidth,
         labelHeight,
-        xFrom: placement.arrow.xFrom,
-        yFrom: placement.arrow.yFrom,
-        xTo: placement.arrow.xTo,
-        yTo: placement.arrow.yTo,
-        viewportWidth: viewport.width,
-        viewportHeight: viewport.height,
-        spotlightTop: spotlight.top,
-        spotlightBottom: spotlight.bottom,
-        arrowTop: isOversized ? undefined : Math.min(placement.arrow.yFrom, placement.arrow.yTo),
-        arrowBottom: isOversized ? undefined : Math.max(placement.arrow.yFrom, placement.arrow.yTo),
-      });
-
-      // The overlap toggle only ever applies to oversized, centered,
-      // dark-background labels - a normal arrow-pointed label never covers
-      // the spotlight or the target, so it never needs to hide.
-      if (!isOversized) {
-        this.renderer.configureLabelOverlapToggle({
-          overlaps: false,
-          anchorX: 0,
-          anchorY: 0,
-          labelLeft: 0,
-          labelWidth: 0,
-          resetHidden: !options.immediate,
-        });
-        return;
-      }
-
-      const labelRect = {
-        top: placement.label.y,
-        left: placement.label.x,
-        right: placement.label.x + placement.label.width,
-        bottom: placement.label.y + labelHeight,
-      };
-      const overlapsSpotlight = doesLabelOverlapSpotlight(labelRect, spotlight);
-      const buttonRowRect = this.renderer.getButtonRowRect();
-      // Keep clear of the close button's fixed home - top-right in LTR,
-      // mirrored to top-left in RTL.
-      const closeButtonRect =
-        this.dir === "rtl"
-          ? { top: 0, right: 60, bottom: 60, left: 0 }
-          : { top: 0, right: viewport.width, bottom: 60, left: viewport.width - 60 };
-      const avoidRects = [closeButtonRect, ...(buttonRowRect ? [buttonRowRect] : [])];
-      const togglePosition = computeToggleButtonPosition({
-        labelRect,
-        spotlight,
-        avoidRects,
-        buttonSize: LABEL_TOGGLE_BUTTON_SIZE_PX,
-        viewport,
-        dir: this.dir,
-      });
-
-      this.renderer.configureLabelOverlapToggle({
-        overlaps: overlapsSpotlight,
-        anchorX: togglePosition.x,
-        anchorY: togglePosition.y,
-        labelLeft: labelRect.left,
-        labelWidth: placement.label.width,
-        viewportWidth: viewport.width,
+        isOversized,
         resetHidden: !options.immediate,
       });
     }, 0);
   }
 
-  private computeStepSpotlight(step: NormalizedStep, targetRect: DOMRect): SpotlightRect {
-    const centerX = targetRect.left + Math.round(targetRect.width / 2);
-    const centerY = targetRect.top + Math.round(targetRect.height / 2);
+  private computeLabelLayout(
+    step: NormalizedStep,
+    spotlight: SpotlightRect,
+    viewport: { width: number; height: number },
+  ) {
+    const spotlightWidth = spotlight.right - spotlight.left;
+    const spotlightHeight = spotlight.bottom - spotlight.top;
+    const shape = {
+      type: step.shape ?? "rect",
+      centerX: spotlight.centerX,
+      centerY: spotlight.centerY,
+      width: spotlightWidth,
+      height: spotlightHeight,
+      radius: step.shape === "circle" ? spotlightWidth / 2 : step.radius,
+    } as const;
 
-    if (step.shape === "circle") {
-      let centerX = targetRect.left + Math.round(targetRect.width / 2);
-      let centerY = targetRect.top + Math.round(targetRect.height / 2);
-      let radius = step.radius ?? Math.round(Math.max(targetRect.width, targetRect.height) / 2) + 5;
-      const offsets = {
-        top: step.top ?? 0,
-        bottom: step.bottom ?? 0,
-        left: step.left ?? 0,
-        right: step.right ?? 0,
-      };
-      const half = radius;
-      const sides = {
-        top: centerY - half + offsets.top,
-        bottom: centerY + half - offsets.bottom,
-        left: centerX - half + offsets.left,
-        right: centerX + half - offsets.right,
-      };
-      const width = sides.right - sides.left;
-      const height = sides.bottom - sides.top;
-      radius = Math.round(Math.min(width, height) / 2);
-      centerX = sides.left + Math.round(width / 2);
-      centerY = sides.top + Math.round(height / 2);
+    let { width: labelWidth, height: labelHeight } = this.renderer.measureLabel(step.description);
+    let placement = LabelPlacementService.computeLabelPlacement({
+      viewport,
+      label: { width: labelWidth, height: labelHeight },
+      shape,
+    });
 
-      return {
-        top: centerY - radius,
-        right: centerX + radius,
-        bottom: centerY + radius,
-        left: centerX - radius,
-        centerX,
-        centerY,
-      };
+    // A side placement may have capped the label narrower than it naturally
+    // measured, to keep the arrow's target-facing endpoint from being
+    // swallowed by the label once it's clamped on-screen (see
+    // LabelPlacementService.ts). Re-measure at that narrower width - this reflows
+    // the text taller, exactly like a real browser reflowing an
+    // absolutely-positioned label - and recompute the placement so the
+    // arrow/buttons agree with what will actually be rendered.
+    if (placement.label.width < labelWidth) {
+      const reflowed = this.renderer.measureLabel(step.description, placement.label.width);
+      labelWidth = reflowed.width;
+      labelHeight = reflowed.height;
+      placement = LabelPlacementService.computeLabelPlacement({
+        viewport,
+        label: { width: labelWidth, height: labelHeight },
+        shape,
+      });
     }
 
-    const shapeMargin = step.margin !== undefined ? step.margin : 10;
-    const width = targetRect.width + shapeMargin;
-    const height = targetRect.height + shapeMargin;
-    const halfWidth = Math.round(width / 2);
-    const halfHeight = Math.round(height / 2);
-    const sides = {
-      top: centerY - halfHeight + (step.top ?? 0),
-      right: centerX + halfWidth - (step.right ?? 0),
-      bottom: centerY + halfHeight - (step.bottom ?? 0),
-      left: centerX - halfWidth + (step.left ?? 0),
-    };
-    const nextWidth = sides.right - sides.left;
-    const nextHeight = sides.bottom - sides.top;
-    const nextCenterX = sides.left + Math.round(nextWidth / 2);
-    const nextCenterY = sides.top + Math.round(nextHeight / 2);
-    const nextHalfWidth = Math.round(nextWidth / 2);
-    const nextHalfHeight = Math.round(nextHeight / 2);
-
     return {
-      top: nextCenterY - nextHalfHeight,
-      right: nextCenterX + nextHalfWidth,
-      bottom: nextCenterY + nextHalfHeight,
-      left: nextCenterX - nextHalfWidth,
-      centerX: nextCenterX,
-      centerY: nextCenterY,
+      placement,
+      labelWidth,
+      labelHeight,
+      isOversized: placement.side === "oversized",
     };
+  }
+
+  private positionLabelChrome(input: {
+    step: NormalizedStep;
+    spotlight: SpotlightRect;
+    viewport: { width: number; height: number };
+    placement: LabelPlacement;
+    labelWidth: number;
+    labelHeight: number;
+    isOversized: boolean;
+    resetHidden: boolean;
+  }): void {
+    const { spotlight, viewport, placement, labelWidth, labelHeight, isOversized, resetHidden } =
+      input;
+
+    this.renderer.positionButtons({
+      labelX: placement.label.x,
+      labelY: placement.label.y,
+      labelWidth,
+      labelHeight,
+      xFrom: placement.arrow.xFrom,
+      yFrom: placement.arrow.yFrom,
+      xTo: placement.arrow.xTo,
+      yTo: placement.arrow.yTo,
+      viewportWidth: viewport.width,
+      viewportHeight: viewport.height,
+      spotlightTop: spotlight.top,
+      spotlightBottom: spotlight.bottom,
+      arrowTop: isOversized ? undefined : Math.min(placement.arrow.yFrom, placement.arrow.yTo),
+      arrowBottom: isOversized ? undefined : Math.max(placement.arrow.yFrom, placement.arrow.yTo),
+    });
+
+    // The overlap toggle only ever applies to oversized, centered,
+    // dark-background labels - a normal arrow-pointed label never covers
+    // the spotlight or the target, so it never needs to hide.
+    if (!isOversized) {
+      this.renderer.configureLabelOverlapToggle({
+        overlaps: false,
+        anchorX: 0,
+        anchorY: 0,
+        labelLeft: 0,
+        labelWidth: 0,
+        resetHidden,
+      });
+      return;
+    }
+
+    const labelRect = {
+      top: placement.label.y,
+      left: placement.label.x,
+      right: placement.label.x + placement.label.width,
+      bottom: placement.label.y + labelHeight,
+    };
+    const overlapsSpotlight = LabelOverlapToggleService.doesLabelOverlapSpotlight(labelRect, spotlight);
+    const buttonRowRect = this.renderer.getButtonRowRect();
+    // Keep clear of the close button's fixed home - top-right in LTR,
+    // mirrored to top-left in RTL.
+    const closeButtonRect =
+      this.dir === "rtl"
+        ? { top: 0, right: 60, bottom: 60, left: 0 }
+        : { top: 0, right: viewport.width, bottom: 60, left: viewport.width - 60 };
+    const avoidRects = [closeButtonRect, ...(buttonRowRect ? [buttonRowRect] : [])];
+    const togglePosition = LabelOverlapToggleService.computeToggleButtonPosition({
+      labelRect,
+      spotlight,
+      avoidRects,
+      buttonSize: LABEL_TOGGLE_BUTTON_SIZE_PX,
+      viewport,
+      dir: this.dir,
+    });
+
+    this.renderer.configureLabelOverlapToggle({
+      overlaps: overlapsSpotlight,
+      anchorX: togglePosition.x,
+      anchorY: togglePosition.y,
+      labelLeft: labelRect.left,
+      labelWidth: placement.label.width,
+      viewportWidth: viewport.width,
+      resetHidden,
+    });
   }
 
   private renderButtons(step: NormalizedStep): void {

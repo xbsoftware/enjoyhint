@@ -1,7 +1,7 @@
-import type { ArrowOrientation } from "./labelPlacement";
+import type { ArrowOrientation } from "./LabelPlacementService";
 import { svgFragmentUrl } from "./svgFragmentUrl";
+import { SVG_NS } from "./svgNs";
 
-const SVG_NS = "http://www.w3.org/2000/svg";
 const ARROW_PATH_ID = "enjoyhint_arrpw_line";
 const MARKER_PATH_ID = "poliline";
 const DEFAULT_ARROW_COLOR = "rgb(255, 255, 255)";
@@ -22,6 +22,10 @@ export class SvgArrow {
     this.svg = svg;
   }
 
+  static clearFrom(root: ParentNode | null | undefined): void {
+    root?.querySelectorAll(`#${ARROW_PATH_ID}`).forEach((arrow) => arrow.remove());
+  }
+
   render(input: SvgArrowRenderInput): SVGPathElement {
     const xFrom = input.xFrom ?? 0;
     const yFrom = input.yFrom ?? 0;
@@ -31,7 +35,7 @@ export class SvgArrow {
     const stroke = this.getValidStroke(input.arrowColor);
     const path = document.createElementNS(SVG_NS, "path");
 
-    this.svg.querySelectorAll(`#${ARROW_PATH_ID}`).forEach((stalePath) => stalePath.remove());
+    SvgArrow.clearFrom(this.svg);
     path.setAttribute("style", `fill: none; stroke: ${stroke}; stroke-width: 3;`);
     path.setAttribute("marker-end", svgFragmentUrl("arrowMarker"));
     path.setAttribute("d", buildArrowPath({ xFrom, yFrom, xTo, yTo, byTopSide }));
