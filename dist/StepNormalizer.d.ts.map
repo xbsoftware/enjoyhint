@@ -1,0 +1,1 @@
+{"version":3,"file":"StepNormalizer.d.ts","sourceRoot":"","sources":["../src/StepNormalizer.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,cAAc,EAAE,MAAM,SAAS,CAAC;AAE9C,KAAK,OAAO,GAAG,MAAM,CAAC,MAAM,EAAE,OAAO,CAAC,CAAC;AAkBvC,wBAAgB,aAAa,CAAC,GAAG,EAAE,OAAO,GAAG,cAAc,CAuD1D;AAED,wBAAgB,cAAc,CAAC,QAAQ,EAAE,OAAO,EAAE,GAAG,cAAc,EAAE,CAEpE"}
