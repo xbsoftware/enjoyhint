@@ -3,3 +3,6 @@ lib/*
 dist/
 .worktrees/
 .superpowers/
+.vscode/
+test-results/
+tests/parity/issues/fixtures/

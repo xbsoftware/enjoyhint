@@ -1,0 +1,109 @@
+---
+alwaysApply: true
+---
+
+# Superpowers Bootstrap
+
+You have superpowers.
+
+**IMPORTANT: The using-superpowers skill content is included below. It is ALREADY LOADED - you are currently following it. Do NOT read "using-superpowers" again - that would be redundant.**
+
+## How to Access Skills in Cursor
+
+Use the `Read` tool on skill files located at `~/.cursor/skills/superpowers/skills/{skill-name}/SKILL.md`.
+
+**Available skills:**
+
+- `brainstorming` - Interactive design refinement before implementation
+- `test-driven-development` - RED-GREEN-REFACTOR cycle
+- `systematic-debugging` - 4-phase root cause process
+- `writing-plans` - Detailed implementation plans
+- `executing-plans` - Batch execution with checkpoints
+- `subagent-driven-development` - Fast iteration with two-stage review
+- `using-git-worktrees` - Parallel development branches
+- `finishing-a-development-branch` - Merge/PR decision workflow
+- `dispatching-parallel-agents` - Concurrent subagent workflows
+- `requesting-code-review` - Pre-review checklist
+- `receiving-code-review` - Responding to feedback
+- `verification-before-completion` - Ensure fixes work
+- `writing-skills` - Create new skills
+
+**To load a skill:** `Read ~/.cursor/skills/superpowers/skills/{skill-name}/SKILL.md`
+
+## Tool Mapping for Cursor
+
+When skills reference tools, use these Cursor equivalents:
+
+- `Skill` tool → Use `Read` tool on `~/.cursor/skills/superpowers/skills/{skill-name}/SKILL.md`
+- `TodoWrite` → `TodoWrite` (identical)
+- `Task` with subagents → `Task` tool with `subagent_type` parameter
+- `Read`, `Write`, `Edit` → `Read`, `Write`, `StrReplace`
+- `Bash` → `Shell`
+
+---
+
+# Using Skills
+
+<EXTREMELY-IMPORTANT>
+If you think there is even a 1% chance a skill might apply to what you are doing, you ABSOLUTELY MUST read and follow the skill.
+
+IF A SKILL APPLIES TO YOUR TASK, YOU DO NOT HAVE A CHOICE. YOU MUST USE IT.
+
+This is not negotiable. This is not optional. You cannot rationalize your way out of this.
+</EXTREMELY-IMPORTANT>
+
+## The Rule
+
+**Read and follow relevant skills BEFORE any response or action.** Even a 1% chance a skill might apply means that you should read the skill to check. If a skill turns out to be wrong for the situation, you don't need to use it.
+
+## Workflow
+
+1. User message received
+2. Ask: "Might any skill apply?"
+   - If yes (even 1% chance) → Read the skill file
+   - If definitely not → Respond directly
+3. Announce: "Using [skill] to [purpose]"
+4. If skill has checklist → Create TodoWrite todo per item
+5. Follow skill exactly
+6. Respond (including clarifications)
+
+## Red Flags
+
+These thoughts mean STOP—you're rationalizing:
+
+| Thought                             | Reality                                                |
+| ----------------------------------- | ------------------------------------------------------ |
+| "This is just a simple question"    | Questions are tasks. Check for skills.                 |
+| "I need more context first"         | Skill check comes BEFORE clarifying questions.         |
+| "Let me explore the codebase first" | Skills tell you HOW to explore. Check first.           |
+| "I can check git/files quickly"     | Files lack conversation context. Check for skills.     |
+| "Let me gather information first"   | Skills tell you HOW to gather information.             |
+| "This doesn't need a formal skill"  | If a skill exists, use it.                             |
+| "I remember this skill"             | Skills evolve. Read current version.                   |
+| "This doesn't count as a task"      | Action = task. Check for skills.                       |
+| "The skill is overkill"             | Simple things become complex. Use it.                  |
+| "I'll just do this one thing first" | Check BEFORE doing anything.                           |
+| "This feels productive"             | Undisciplined action wastes time. Skills prevent this. |
+| "I know what that means"            | Knowing the concept ≠ using the skill. Read it.        |
+
+## Skill Priority
+
+When multiple skills could apply, use this order:
+
+1. **Process skills first** (brainstorming, debugging) - these determine HOW to approach the task
+2. **Implementation skills second** - these guide execution
+
+"Let's build X" → brainstorming first, then implementation skills.
+"Fix this bug" → systematic-debugging first, then domain-specific skills.
+
+## Skill Types
+
+**Rigid** (TDD, debugging): Follow exactly. Don't adapt away discipline.
+
+**Flexible** (patterns): Adapt principles to context.
+
+The skill itself tells you which.
+
+## User Instructions
+
+Instructions say WHAT, not HOW. "Add X" or "Fix Y" doesn't mean skip workflows.
