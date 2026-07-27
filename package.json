@@ -1,6 +1,6 @@
 {
   "name": "enjoyhint",
-  "version": "5.0.0",
+  "version": "5.0.0-rc.0",
   "description": "Web-tool that provides the simplest way to create interactive tutorials and hints.",
   "type": "module",
   "main": "dist/enjoyhint.cjs",
