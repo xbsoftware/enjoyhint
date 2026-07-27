@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>EnjoyHint Placement Fixture</title>
+    <link rel="stylesheet" href="../../dist/enjoyhint.css" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        min-height: 1200px;
+      }
+
+      .fixture {
+        margin: 120px 0 0 160px;
+        width: 520px;
+      }
+
+      .fixture.low-target {
+        margin-top: 520px;
+      }
+
+      .fixture.right-edge {
+        margin-left: calc(100vw - 220px);
+        width: 180px;
+      }
+
+      .target,
+      .target-secondary {
+        display: inline-block;
+        width: 120px;
+        height: 48px;
+        border: 0;
+        border-radius: 4px;
+        background: #2c7be5;
+        color: #fff;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="fixture" id="fixture-root">
+      <button class="target">Target</button>
+      <button class="target-secondary" style="margin-left: 24px">More</button>
+    </main>
+
+    <script src="../../dist/enjoyhint.min.js"></script>
+    <script>
+      const scenario = new URLSearchParams(window.location.search).get("scenario") || "default";
+      const fixtureRoot = document.getElementById("fixture-root");
+
+      if (scenario === "low-target") {
+        fixtureRoot.classList.add("low-target");
+      }
+      if (scenario === "right-edge") {
+        fixtureRoot.classList.add("right-edge");
+      }
+
+      const stepsByScenario = {
+        default: [
+          {
+            "next .target": "Inspect the target",
+            nextButton: { text: "Forward", className: "fixture-next" },
+            skipButton: { text: "Leave", className: "fixture-skip" },
+            arrowColor: "tomato",
+            margin: 10,
+          },
+        ],
+        "with-prev": [
+          {
+            "next .target": "First step",
+            margin: 10,
+          },
+          {
+            "next .target-secondary": "Second step with previous button",
+            margin: 10,
+          },
+        ],
+        circle: [
+          {
+            "next .target": "Circle spotlight",
+            shape: "circle",
+            radius: 60,
+            margin: 10,
+          },
+        ],
+        "low-target": [
+          {
+            "next .target": "Low target placement",
+            margin: 10,
+          },
+        ],
+        "right-edge": [
+          {
+            "next .target": "Right edge placement",
+            margin: 10,
+          },
+        ],
+      };
+
+      window.__callbacks = [];
+      window.__createEnjoyHint = function () {
+        var Ctor = window.EnjoyHint && (window.EnjoyHint.default || window.EnjoyHint);
+        window.__hint = new Ctor({
+          onStart: function () {
+            window.__callbacks.push("start");
+          },
+          onNext: function () {
+            window.__callbacks.push("next");
+          },
+          onEnd: function () {
+            window.__callbacks.push("end");
+          },
+          onSkip: function () {
+            window.__callbacks.push("skip");
+          },
+          btnNextText: "Forward",
+          btnSkipText: "Leave",
+          backgroundColor: "rgba(0,0,0,0.6)",
+        });
+        window.__hint.set(stepsByScenario[scenario] || stepsByScenario.default);
+      };
+      window.__startTour = function (step) {
+        if (!window.__hint) {
+          window.__createEnjoyHint();
+        }
+        if (typeof step === "number" && step > 0) {
+          window.__hint.reRunScript(step);
+          return;
+        }
+        window.__hint.run();
+      };
+      window.__parityReady = true;
+    </script>
+  </body>
+</html>

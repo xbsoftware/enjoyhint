@@ -1,11 +1,11 @@
 @font-face {
   font-family: "casino_handregular";
-  src: url("src/Casino_Hand/casino_hand-webfont.eot");
-  src: url("src/Casino_Hand/casino_hand-webfont.eot?#iefix")
+  src: url("./Casino_Hand/casino_hand-webfont.eot");
+  src: url("./Casino_Hand/casino_hand-webfont.eot?#iefix")
       format("embedded-opentype"),
-    url("src/Casino_Hand/casino_hand-webfont.woff") format("woff"),
-    url("src/Casino_Hand/casino_hand-webfont.ttf") format("truetype"),
-    url("src/Casino_Hand/casino_hand-webfont.svg#casino_handregular") format("svg");
+    url("./Casino_Hand/casino_hand-webfont.woff") format("woff"),
+    url("./Casino_Hand/casino_hand-webfont.ttf") format("truetype"),
+    url("./Casino_Hand/casino_hand-webfont.svg#casino_handregular") format("svg");
   font-weight: normal;
   font-style: normal;
 }
@@ -19,6 +19,11 @@
   z-index: 1010;
   pointer-events: none;
   overflow: hidden;
+  direction: ltr;
+}
+
+.enjoyhint[dir="rtl"] {
+  direction: rtl;
 }
 
 .enjoyhint_hide {
@@ -277,6 +282,41 @@
   transition: none;
 }
 
+.enjoyhint_label_toggle_btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  z-index: 1012;
+  pointer-events: all;
+  box-sizing: content-box;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid rgb(30, 205, 151);
+  background: rgba(0, 0, 0, 0);
+  color: rgb(30, 205, 151);
+  cursor: pointer;
+  transition: background-color 0.3s cubic-bezier(0, 0, 0, 0), color 0.3s cubic-bezier(0, 0, 0, 0);
+}
+
+/* Must beat `.enjoyhint_label_toggle_btn { display: inline-flex }` — equal
+   specificity alone lets the later flex rule override `.enjoyhint_hide`,
+   which left the eye painted on arrow / transparent-label steps. */
+.enjoyhint_label_toggle_btn.enjoyhint_hide {
+  display: none;
+}
+
+.enjoyhint_label_toggle_btn svg {
+  display: block;
+  pointer-events: none;
+}
+
+.enjoyhint_label_toggle_btn:hover {
+  background: rgb(30, 205, 151);
+  color: rgba(255, 255, 255, 1);
+}
+
 .enjoyhint_btn {
   -webkit-box-sizing: content-box;
   -moz-box-sizing: content-box;
@@ -348,6 +388,24 @@
   left: 0;
 }
 
+#kinetic_container svg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+#kinetic_container svg * {
+  pointer-events: none;
+}
+
+.enjoyhint_svg_wrapper,
+.enjoyhint_svg_wrapper * {
+  pointer-events: none !important;
+}
+
 .enjoyhint_svg_wrapper {
   position: absolute;
   width: 100%;
@@ -355,6 +413,7 @@
   top: 0;
   left: 0;
   z-index: 100;
+  pointer-events: none;
   -webkit-transition: opacity 400ms cubic-bezier(0.42, 0, 0.58, 1);
   -moz-transition: opacity 400ms cubic-bezier(0.42, 0, 0.58, 1);
   transition: opacity 400ms cubic-bezier(0.42, 0, 0.58, 1);
@@ -365,11 +424,13 @@
   height: 100%;
   top: 0;
   left: 0;
+  pointer-events: none;
 }
 
 .enjoyhint_svg_transparent .enjoyhint_svg_wrapper,
 .enjoyhint_svg_transparent .enjoy_hint_label {
   opacity: 0;
+  pointer-events: none;
 }
 
 .enjoy_hint_label {
@@ -379,12 +440,23 @@
   overflow: hidden;
   text-align: center;
   color: white;
-  z-index: 107;
+  /* Above .enjoyhint_disable_events (1011) so label links can receive clicks;
+     non-link pixels stay click-through via pointer-events: none. */
+  z-index: 1012;
   font-size: 22px;
   font-family: "casino_handregular", "Arial";
-  -webkit-transition: opacity 400ms cubic-bezier(0.42, 0, 0.58, 1);
-  -moz-transition: opacity 400ms cubic-bezier(0.42, 0, 0.58, 1);
-  transition: opacity 400ms cubic-bezier(0.42, 0, 0.58, 1);
+  pointer-events: none;
+  -webkit-transition: opacity 400ms cubic-bezier(0.42, 0, 0.58, 1),
+    -webkit-transform 400ms cubic-bezier(0.42, 0, 0.58, 1);
+  -moz-transition: opacity 400ms cubic-bezier(0.42, 0, 0.58, 1),
+    -moz-transform 400ms cubic-bezier(0.42, 0, 0.58, 1);
+  transition: opacity 400ms cubic-bezier(0.42, 0, 0.58, 1),
+    transform 400ms cubic-bezier(0.42, 0, 0.58, 1);
+}
+
+.enjoy_hint_label a {
+  pointer-events: all;
+  cursor: pointer;
 }
 
 @media (max-width : 640px){

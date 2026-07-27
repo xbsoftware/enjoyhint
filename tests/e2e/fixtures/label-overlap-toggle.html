@@ -1,0 +1,49 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Label overlap toggle fixture</title>
+    <link href="../../../dist/enjoyhint.css" rel="stylesheet" />
+    <script src="../../../dist/enjoyhint.min.js"></script>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      #target {
+        position: absolute;
+        top: 40%;
+        left: 40%;
+        width: 120px;
+        height: 200px;
+        background: #4a8f4a;
+        color: #eaffea;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: sans-serif;
+      }
+    </style>
+  </head>
+  <body>
+    <button id="target">Click me</button>
+    <script>
+      window.__fixtureTest = {
+        run: function () {
+          var hint = new EnjoyHint({});
+          hint.setScript([
+            {
+              selector: "#target",
+              event: "click",
+              description:
+                "This is a long hint description written specifically to force the oversized centered label path so it visually overlaps the spotlight hole and the button underneath it.",
+            },
+          ]);
+          hint.run();
+          window.__fixtureHint = hint;
+        },
+      };
+    </script>
+  </body>
+</html>
