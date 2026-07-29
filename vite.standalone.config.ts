@@ -1,28 +1,18 @@
-import { copyFileSync, cpSync, mkdirSync } from "fs";
-import { dirname, resolve } from "path";
-import { defineConfig, type Plugin } from "vite";
-
-function copyCss(): Plugin {
-  const source = resolve(__dirname, "src/jquery.enjoyhint.css");
-  const target = resolve(__dirname, "dist/enjoyhint.css");
-  const sourceFonts = resolve(__dirname, "src/Casino_Hand");
-  const targetFonts = resolve(__dirname, "dist/Casino_Hand");
-
-  return {
-    name: "copy-enjoyhint-css",
-    closeBundle() {
-      mkdirSync(dirname(target), { recursive: true });
-      copyFileSync(source, target);
-      cpSync(sourceFonts, targetFonts, { recursive: true });
-    },
-  };
-}
+import { resolve } from "path";
+import { defineConfig } from "vite";
+import {
+  copyEnjoyHintAssets,
+  preserveEnjoyHintCssSideEffect,
+} from "./vite.plugins";
 
 export default defineConfig({
   resolve: {
     extensions: [".ts", ".tsx", ".mjs", ".js", ".mts", ".jsx", ".json"],
   },
-  plugins: [copyCss()],
+  // preserveEnjoyHintCssSideEffect injects CSS only for es/cjs; UMD stays clean.
+  // standalone entry has no CSS import, so CJS still needs the inject path —
+  // keep the plugin so CJS gets require("./enjoyhint.css").
+  plugins: [preserveEnjoyHintCssSideEffect(), copyEnjoyHintAssets()],
   build: {
     emptyOutDir: false,
     lib: {

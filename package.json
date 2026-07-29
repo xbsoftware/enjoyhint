@@ -12,8 +12,15 @@
       "import": "./dist/enjoyhint.js",
       "require": "./dist/enjoyhint.cjs",
       "default": "./dist/enjoyhint.js"
-    }
+    },
+    "./dist/enjoyhint.css": "./dist/enjoyhint.css",
+    "./enjoyhint.css": "./dist/enjoyhint.css",
+    "./package.json": "./package.json"
   },
+  "sideEffects": [
+    "./dist/enjoyhint.js",
+    "./dist/enjoyhint.cjs"
+  ],
   "files": [
     "dist"
   ],

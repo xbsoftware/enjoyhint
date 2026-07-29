@@ -35,7 +35,9 @@ v5 is a dependency-free ESM/CJS build, so Angular can import EnjoyHint like any 
 ```typescript
 import { AfterViewInit, OnDestroy, Component } from '@angular/core';
 import EnjoyHint from 'xbs-enjoyhint';
-import 'xbs-enjoyhint/dist/enjoyhint.css';
+// Styles load via the package side-effect CSS import.
+// Optional explicit import if your bundler does not follow JS CSS imports:
+// import 'xbs-enjoyhint/dist/enjoyhint.css';
 
 @Component({ /* ... */ })
 export class TourHostComponent implements AfterViewInit, OnDestroy {
@@ -54,6 +56,8 @@ export class TourHostComponent implements AfterViewInit, OnDestroy {
   }
 }
 ```
+
+`import EnjoyHint from 'xbs-enjoyhint'` auto-injects styles at runtime for ESM/CJS (including Angular CLI, which cannot process CSS side-effect imports from `node_modules`). The CSS path is also exported as `xbs-enjoyhint/dist/enjoyhint.css` and `xbs-enjoyhint/enjoyhint.css` for optional `<link>` / global styles. UMD (`enjoyhint.min.js`) still expects a separate `<link>` to `dist/enjoyhint.css`.
 
 Highlighting targets inside Angular Material dialogs (`MD-DIALOG` / `dialogClosing`) is supported. The pre-v5 bundler errors (`Can't resolve './jquery.enjoyhint.js'`, `global is not defined`) do not apply to v5.
 

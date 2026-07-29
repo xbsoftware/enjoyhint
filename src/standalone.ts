@@ -1,3 +1,3 @@
-import EnjoyHint from "./index";
+import { EnjoyHint } from "./EnjoyHint";
 
 export default EnjoyHint;
