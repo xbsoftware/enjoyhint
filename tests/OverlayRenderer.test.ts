@@ -1083,8 +1083,10 @@ describe("OverlayRenderer", () => {
   it("allows pointer events on label anchors while the label stays non-interactive", () => {
     const css = readFileSync(resolve(__dirname, "../src/jquery.enjoyhint.css"), "utf8");
 
+    expect(css).toMatch(/\.enjoyhint\s*\{[^}]*z-index:\s*99999/s);
+    expect(css).toMatch(/\.enjoyhint_disable_events\s*\{[^}]*z-index:\s*100000/s);
     expect(css).toMatch(/\.enjoy_hint_label\s*\{[^}]*pointer-events:\s*none/s);
-    expect(css).toMatch(/\.enjoy_hint_label\s*\{[^}]*z-index:\s*1012/s);
+    expect(css).toMatch(/\.enjoy_hint_label\s*\{[^}]*z-index:\s*100001/s);
     expect(css).toMatch(/\.enjoy_hint_label\s+a\s*\{[^}]*pointer-events:\s*all/s);
     expect(css).toMatch(/\.enjoy_hint_label\s+a\s*\{[^}]*cursor:\s*pointer/s);
   });

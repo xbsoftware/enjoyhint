@@ -16,7 +16,7 @@
   height: 100%;
   top: 0;
   left: 0;
-  z-index: 1010;
+  z-index: 99999;
   pointer-events: none;
   overflow: hidden;
   direction: ltr;
@@ -34,7 +34,7 @@
   position: absolute;
   width: 2000px;
   height: 1500px;
-  z-index: 1011;
+  z-index: 100000;
   /*display: none;*/
   pointer-events: all;
 }
@@ -42,7 +42,7 @@
 .enjoyhint_next_btn {
   min-width: 100px;
   position: absolute;
-  z-index: 1012;
+  z-index: 100001;
   /*display: none;*/
   pointer-events: all;
   -webkit-box-sizing: content-box;
@@ -82,7 +82,7 @@
 .enjoyhint_prev_btn {
   min-width: 100px;
   position: absolute;
-  z-index: 1012;
+  z-index: 100001;
   /*display: none;*/
   pointer-events: all;
   -webkit-box-sizing: content-box;
@@ -150,7 +150,7 @@
 .enjoyhint_skip_btn {
   position: absolute;
   position: absolute;
-  z-index: 1012;
+  z-index: 100001;
   /*display: none;*/
   pointer-events: all;
   min-width: 100px;
@@ -205,7 +205,7 @@
 .enjoyhint_close_btn {
   display: inline-block;
   position: absolute;
-  z-index: 1012;
+  z-index: 100001;
   pointer-events: all;
   -webkit-box-sizing: content-box;
   -moz-box-sizing: content-box;
@@ -287,7 +287,7 @@
   align-items: center;
   justify-content: center;
   position: absolute;
-  z-index: 1012;
+  z-index: 100001;
   pointer-events: all;
   box-sizing: content-box;
   width: 32px;
@@ -440,9 +440,9 @@
   overflow: hidden;
   text-align: center;
   color: white;
-  /* Above .enjoyhint_disable_events (1011) so label links can receive clicks;
+  /* Above .enjoyhint_disable_events (100000) so label links can receive clicks;
      non-link pixels stay click-through via pointer-events: none. */
-  z-index: 1012;
+  z-index: 100001;
   font-size: 22px;
   font-family: "casino_handregular", "Arial";
   pointer-events: none;
