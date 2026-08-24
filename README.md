@@ -17,6 +17,13 @@ You can install it through the `node` package manager:
 ```
 npm install xbs-enjoyhint
 ```
+
+v5 is built with Vite and TypeScript and ships ESM (`dist/enjoyhint.js`), CommonJS (`dist/enjoyhint.cjs`), and UMD (`dist/enjoyhint.min.js`):
+
+```javascript
+import EnjoyHint from 'xbs-enjoyhint';
+```
+
 Alternative way:
 - Download the latest version of EnjoyHint from GitHub.
 - Extract the archive with EnjoyHint.
@@ -175,6 +182,12 @@ With `dir: "rtl"`, EnjoyHint mirrors:
 
 Spotlight shape/position, event blockers, arrow endpoints, and step shape offsets (`left` / `right` / `top` / `bottom` / `margin`) stay tied to physical element coordinates in both modes. `dir` is tour-wide and set only at construction; EnjoyHint does not auto-detect the page’s `dir` or `lang`.
 
+#### Label overlap hide toggle
+When an oversized caption (centered, dark background, no arrow) covers the spotlight, EnjoyHint shows a small toggle so the user can temporarily hide the caption, see and interact with the target, then show the caption again. Arrow labels never get this control. No extra step configuration is required.
+
+#### Same-origin iframe targets
+Selectors can match elements inside same-origin iframes (including nested ones). EnjoyHint translates those elements into parent-viewport coordinates so the spotlight lines up with the embedded target. Cross-origin iframes cannot be queried.
+
 #### Non-standard events:
 * `auto` - for example, you need to click on the same button on the second step imediatelly after the first step and go to the next step after it. Then you can use "auto" in the "event_type" property and "click" in "event" property.
 * `custom` - this value is very usefull if you need to go to the next step by event in your app code. For example, you want to go to the next step only after some data have been loaded in your application. Then you should use the "custom" event_type and the "trigger" method of the EnjoyHint instance.  
@@ -201,6 +214,7 @@ $.get('/load/some_data', function(data){
 * `onStart` - fires on the first step.
 * `onEnd` - fires after the last step in script.
 * `onSkip` - fires after user has clicked skip.
+* `onNext` - fires when the tour advances to the next step. Does not fire for steps skipped by `onBeforeStart` returning `false`.
 ```javascript
 var enjoyhint_instance = new EnjoyHint({
   onStart:function(){
@@ -228,10 +242,19 @@ var enjoyhint_script_steps = [
 
 ##### v.5
 
-* Rewritten in TypeScript with native DOM and SVG rendering.
+* Rewritten in TypeScript with native DOM and SVG rendering (Vite build; ESM, CJS, and UMD).
 * Removed runtime dependencies on jQuery, jQuery.scrollTo, and KineticJS.
+* Importing `xbs-enjoyhint` injects required CSS at runtime. UMD / script-tag usage still needs a separate `<link>` to `dist/enjoyhint.css`.
 * Existing `EnjoyHint` initialization, methods, callbacks, and step configuration remain compatible.
 * For script-tag usage, remove the old external dependency scripts and load `dist/enjoyhint.min.js`.
+* Highlights work inside modal dialogs (for example Angular Material) and same-origin iframes.
+* Targetless steps, `dir: "rtl"`, HTML links in descriptions, `onBeforeStart` skip, and global `nextButton` / `prevButton` / `skipButton` defaults (see above).
+* Label overlap hide toggle when an oversized caption covers the spotlight.
+* SVG mask and arrow URLs resolve correctly under path/hash routers (for example Ember-style `#/…` routes).
+* Label, arrow, and button placement improvements on resize and smaller viewports.
+* Higher overlay z-index so tours appear above dense application UI.
+
+Official React hooks support is planned and is not part of the 5.0.0 core release.
 
 ##### v.4
 
