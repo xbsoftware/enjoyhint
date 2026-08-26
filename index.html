@@ -50,8 +50,6 @@
 			<% } %>
     </script>
     <script src="example2/bower_components/jquery/jquery.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/kineticjs/5.2.0/kinetic.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-scrollTo/2.1.2/jquery.scrollTo.min.js"></script>
 		<script src="example2/bower_components/todomvc-common/base.js"></script>
 		<script src="example2/bower_components/underscore/underscore.js"></script>
 		<script src="example2/bower_components/backbone/backbone.js"></script>
@@ -62,7 +60,7 @@
 		<script src="example2/js/views/app-view.js"></script>
 		<script src="example2/js/routers/router.js"></script>
 		<script src="example2/js/app.js"></script>
-		<script src="enjoyhint/enjoyhint.js"></script>
+		<script src="enjoyhint/enjoyhint.min.js"></script>
     <script>
       localStorage.clear();
       var enjoyhint_script_data = [
@@ -93,7 +91,7 @@
           description:'Enter the second task description and press Enter.',
         },
         {
-          selector:'#todo-list .toggle:first',
+          selector:'#todo-list li:first-child .toggle',
           event:'click',
           description:'Set first task as completed',
           shape:'circle',
@@ -105,8 +103,8 @@
           description:'Select all completed tasks',
         },
         {
-          selector:'#todo-list .view:first',
-          event_selector:'#todo-list .destroy:first',
+          selector:'#todo-list li:first-child .view',
+          event_selector:'#todo-list li:first-child .destroy',
           event:'click',
           shape:'circle',
           description:'Remove this task',

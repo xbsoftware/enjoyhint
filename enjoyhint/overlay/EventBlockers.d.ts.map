@@ -1,0 +1,1 @@
+{"version":3,"file":"EventBlockers.d.ts","sourceRoot":"","sources":["../../src/overlay/EventBlockers.ts"],"names":[],"mappings":"AAAA,OAAO,EAAmB,KAAK,WAAW,EAAsB,MAAM,mBAAmB,CAAC;AAM1F,qBAAa,aAAa;IACxB,OAAO,CAAC,QAAQ,CAAC,QAAQ,CAAgB;gBAE7B,QAAQ,EAAE,QAAQ,CAAC,WAAW,CAAC;IAI3C,KAAK,CAAC,IAAI,EAAE,WAAW,GAAG,IAAI;CAU/B"}

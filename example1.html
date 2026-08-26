@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>EnjoyHint</title>
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/kineticjs/5.2.0/kinetic.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-scrollTo/2.1.2/jquery.scrollTo.min.js"></script>
     <script src="enjoyhint/enjoyhint.min.js"></script>
     <script src="example1/bootstrap/bootstrap.min.js"></script>
     <link href="example1/bootstrap/bootstrap.min.css" rel="stylesheet">
@@ -21,6 +19,11 @@
             <h1>EnjoyHint</h1>
             <p class="lead">EnjoyHint is a web-tool that provides the simplest way to create interactive tutorials and hints for your site or web-application. It can also be used to highlight and sign application elements.</p>
             <p class="lead"><a href="https://github.com/xbsoftware/enjoyhint">View in Github</a></p>
+            <p class="lead">
+                <button type="button" class="btn btn-primary" id="tour-resume-btn" disabled>Resume tour</button>
+                <button type="button" class="btn btn-default" id="tour-restart-btn">Restart tour</button>
+            </p>
+            <p class="text-muted">Skip the tour, then use <strong>Resume tour</strong> to continue from the same step. Use <strong>Restart tour</strong> after completion or anytime to start from the beginning.</p>
         </div>
 
     </div>
@@ -1154,6 +1157,28 @@
         </div>
     </div>
 </div>
+
+<div class="bs-docs-section clearfix">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="page-header">
+                <h1 id="iframe-demo-section">Iframe targets</h1>
+            </div>
+            <p class="lead">EnjoyHint can highlight elements inside embedded iframes from the parent page.</p>
+            <div id="iframe-demo-host" style="margin-top: 80px; padding: 24px; background: #f7f7f7; border: 1px solid #ddd;">
+                <iframe
+                    id="iframe-demo"
+                    title="EnjoyHint iframe demo"
+                    style="width: 100%; height: 220px; border: 0; background: #fff;"
+                    srcdoc="<!DOCTYPE html><html><head><meta charset='utf-8'></head><body style='margin:0;padding:32px;font-family:sans-serif'><h3 style='margin-top:0'>Embedded page</h3><button id='iframe-demo-button' type='button' style='background:#f0ad4e;border:2px solid #333;padding:10px 18px;font-size:16px;cursor:pointer'>Start demonstration</button></body></html>"
+                ></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden target used by the onBeforeStart return-false skip demo in example1/script.js -->
+<div id="skip-demo-hidden" hidden aria-hidden="true"></div>
 
 <div id="source-modal" class="modal fade">
     <div class="modal-dialog modal-lg">
