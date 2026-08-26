@@ -168,16 +168,22 @@ export class StepController {
       return;
     }
 
-    const target = this.dom.query(step.selector);
-    if (!target) {
+    const initialTarget = this.dom.query(step.selector);
+    if (!initialTarget) {
       this.finish();
       return;
     }
 
-    const scrollSpeed = this.maybeScrollToTarget(target, step);
+    const scrollSpeed = this.maybeScrollToTarget(initialTarget, step);
 
     this.scheduleStepTimeout(() => {
       if (!this.isCurrentStepToken(token)) {
+        return;
+      }
+
+      const target = this.dom.query(step.selector);
+      if (!target) {
+        this.finish();
         return;
       }
 

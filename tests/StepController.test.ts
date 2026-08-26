@@ -360,6 +360,47 @@ describe("StepController", () => {
     expect(blockers[0]?.style.height).toBe("120px");
   });
 
+  it("re-queries the selector after the render delay when the original target is replaced", () => {
+    const original = addTarget();
+    const controller = new StepController([makeStep({ margin: 0 })]);
+
+    controller.run();
+
+    original.remove();
+    const replacement = addTarget();
+    vi.mocked(replacement.getBoundingClientRect).mockReturnValue({
+      x: 400,
+      y: 500,
+      top: 500,
+      right: 460,
+      bottom: 520,
+      left: 400,
+      width: 60,
+      height: 20,
+      toJSON: () => ({}),
+    });
+
+    advanceStepRender();
+
+    const blockers = document.querySelectorAll<HTMLElement>(".enjoyhint_disable_events");
+    expect(blockers[0]?.style.height).toBe("500px");
+
+    replacement.dispatchEvent(new Event("click"));
+    expect(controller.getCurrentStep()).toBe(1);
+  });
+
+  it("ends the tour when the selector no longer matches after the render delay", () => {
+    const onEnd = vi.fn();
+    const original = addTarget();
+    const controller = new StepController([makeStep()], { onEnd });
+
+    controller.run();
+    original.remove();
+    advanceStepRender();
+
+    expect(onEnd).toHaveBeenCalledTimes(1);
+  });
+
   it("does not render after destroy during a pending scroll", () => {
     const target = addTarget();
     vi.mocked(target.getBoundingClientRect).mockReturnValue({

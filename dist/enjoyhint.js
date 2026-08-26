@@ -1317,7 +1317,13 @@ var q = class {
 		}
 		let r = this.maybeScrollToTarget(n, e);
 		this.scheduleStepTimeout(() => {
-			this.isCurrentStepToken(t) && (this.renderOverlay(e, n, this.dom.getBoundingClientRect(n)), this.installDialogClosingHandler(n), this.bindStepEvents(e, n));
+			if (!this.isCurrentStepToken(t)) return;
+			let n = this.dom.query(e.selector);
+			if (!n) {
+				this.finish();
+				return;
+			}
+			this.renderOverlay(e, n, this.dom.getBoundingClientRect(n)), this.installDialogClosingHandler(n), this.bindStepEvents(e, n);
 		}, I(r));
 	}
 	maybeScrollToTarget(e, t) {
